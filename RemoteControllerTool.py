@@ -34,7 +34,10 @@ log_key = 'RemoteControllerTool'
 
 
 class RemoteControllerTool(UniqueObject, Folder):
-    """
+    """A tool providing an high-level API for manipulating documents.
+
+    This tool is particularly useful for application which may use XML-RPC to
+    communicate with CPS.
     """
 
     id = 'portal_remote_controller'
