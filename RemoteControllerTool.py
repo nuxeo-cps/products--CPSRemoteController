@@ -26,7 +26,9 @@ from Products.CMFCore.permissions import ManagePortal, ChangePermissions, \
      AddPortalContent, ModifyPortalContent, View
 from Products.CMFCore.utils import UniqueObject
 from OFS.Folder import Folder
-
+from OFS.Image import File
+from xmlrpclib import Binary
+from Products.CPSUtil.id import generateId
 from zLOG import LOG, DEBUG
 
 
@@ -254,6 +256,21 @@ class RemoteControllerTool(UniqueObject, Folder):
         {'Title': "The company hires", 'Description': "The company goes well and
         hires"},
         'workspaces', 0)
+
+        from xmlrpclib import ServerProxy, Binary
+        f = open('MyImage.png', 'r')
+        binary = Binary(f.read())
+        p.createDocument('File',
+        {'Title': "The report from Monday meeting",
+         'Description': "Another boring report"},
+         'file_name': "MyImage.png",
+         'file': binary,
+         },
+        'workspaces')
+        p.createDocument('News Item',
+        {'Title': "The company hires", 'Description': "The company goes well and
+        hires"},
+        'workspaces', 2)
         """
         # If no Title is given, the portal_type is used as a fallback title
         document_title = data_dict.get('Title', portal_type)
@@ -262,19 +279,29 @@ class RemoteControllerTool(UniqueObject, Folder):
         folder_proxy.invokeFactory(portal_type, id)
         doc_proxy = getattr(folder_proxy, id)
         doc = doc_proxy.getEditableContent()
+
+        # Getting and processing a potential file
         file = data_dict.get('file', None)
+        DEFAULT_FILE_NAME = "Uploaded file"
+        file_name = data_dict.get('file_name', DEFAULT_FILE_NAME)
         if file is not None:
-            LOG(log_key, DEBUG, "file = %s" % file)
-            LOG(log_key, DEBUG, "file = %s" % str(file))
-            LOG(log_key, DEBUG, "file.data = %s" % file.data)
-            LOG(log_key, DEBUG, "file.data = %s" % str(file.data))
-            #arg = xmlrpclib.Binary()
-            #arg.decode(content)
+            file = data_dict.get('file', None)
+            binary = data_dict['file']
+            if isinstance(binary, Binary):
+                file_id = generateId(file_name, lower=True)
+                data_dict['file'] = File(file_id, file_name, binary.data)
+            else:
+                # We don't know how to handle this case so we discard this item
+                del data_dict['file']
+        if file_name != DEFAULT_FILE_NAME:
+            # We don't need this key anymore and we don't want the document to
+            # be modified by it.
+            del data_dict['file_name']
+
         doc.edit(data_dict)
         if position >= 0:
             context = doc_proxy.aq_parent
             context.move_object_to_position(id, position)
-
 
 
     security.declareProtected(ModifyPortalContent, 'editDocument')
