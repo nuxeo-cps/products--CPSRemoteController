@@ -54,7 +54,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
     security.declareProtected(ChangePermissions, 'getLocalRoles')
     def getLocalRoles(self, username, rpath, REQUEST=None, **kw):
-        """Return XXX.
+        """Return the roles of the given user local to the specified context.
         """
         proxy = self.restrictedTraverse(rpath)
         local_roles_struct = proxy.getCPSLocalRoles()
@@ -69,7 +69,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
     security.declareProtected(ChangePermissions, 'checkPermission')
     def checkPermission(self, rpath, permission, REQUEST=None, **kw):
-        """Return XXX.
+        """Check the given permission for the current user on the given context.
         """
         proxy = self.restrictedTraverse(rpath)
         # checkPermission returns True if allowed and None otherwise, which is
@@ -108,7 +108,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
     security.declareProtected(View, 'getDocumentHistory')
     def getDocumentHistory(self, rpath, REQUEST=None, **kw):
-        """Return XXX.
+        """Return the document history.
         """
         proxy = self.restrictedTraverse(rpath)
         history = proxy.getContentInfo(proxy=proxy, level=3)['history']
@@ -136,7 +136,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
     security.declareProtected(View, 'isDocumentLocked')
     def isDocumentLocked(self, rpath, REQUEST=None, **kw):
-        """Return XXX.
+        """Return whether the document is locked (in the WebDAV sense) or not.
         """
         proxy = self.restrictedTraverse(rpath)
         return proxy.wl_isLocked()
@@ -180,10 +180,8 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
     security.declareProtected(ModifyPortalContent, 'changeDocumentOrder')
-    def changeDocumentOrder(self, rpath, step, REQUEST=None, **kw):
-        """Return XXX.
-
-        step must be a non-zero integer.
+    def changeDocumentPosition(self, rpath, step, REQUEST=None, **kw):
+        """Change the document position in its current folder.
         """
         proxy = self.restrictedTraverse(rpath)
         id = proxy.getId()
@@ -195,7 +193,7 @@ class RemoteControllerTool(UniqueObject, Folder):
     security.declareProtected(ModifyPortalContent, 'get')
     def createDocument(self, document_title, type_name, folder_rpath,
                        data_dict={}, REQUEST=None, **kw):
-        """Return XXX.
+        """Create document according to the given data.
         """
         folder_proxy = self.restrictedTraverse(folder_rpath)
         id = folder_proxy.computeId(compute_from=document_title)
@@ -207,7 +205,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
     security.declareProtected(ModifyPortalContent, 'get')
     def editDocument(self, rpath, data_dict={}, REQUEST=None, **kw):
-        """Return XXX.
+        """Modify the specified document.
         """
         proxy = self.restrictedTraverse(rpath)
         doc = proxy.getEditableContent()
