@@ -7,6 +7,7 @@ New features:
 Bug fixes:
 ~~~~~~~~~~
 - Fixed in many places finding of the parent container.
+- Removed duplicate getDocumentState method.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -
