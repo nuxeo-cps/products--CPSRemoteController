@@ -23,7 +23,7 @@
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
 from Products.CMFCore.permissions import ManagePortal, ChangePermissions, \
-     ModifyPortalContent, View
+     AddPortalContent, ModifyPortalContent, View
 from Products.CMFCore.utils import UniqueObject
 from OFS.Folder import Folder
 
@@ -38,6 +38,14 @@ class RemoteControllerTool(UniqueObject, Folder):
 
     This tool is particularly useful for application which may use XML-RPC to
     communicate with CPS.
+
+    To use those methods trough XML-RPC:
+    $ python
+    >>> from xmlrpclib import ServerProxy
+    >>> p = ServerProxy('http://manager:xxxxx@myserver.net:8080/cps/portal_remote_controller')
+    >>> p.listContent('workspaces/folder1')
+    ['cps/workspaces/folder1', 'cps/workspaces/folder1/folder11', 'cps/workspaces/folder1/other_file']
+    >>>
     """
 
     id = 'portal_remote_controller'
@@ -46,7 +54,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
     security.declareProtected(ChangePermissions, 'checkRoles')
-    def getRoles(self, username, REQUEST=None, **kw):
+    def getRoles(self, username):
         """Return the roles of the given user.
         """
         membersDirectory = self.portal_directories.members
@@ -56,7 +64,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
     security.declareProtected(ChangePermissions, 'getLocalRoles')
-    def getLocalRoles(self, username, rpath, REQUEST=None, **kw):
+    def getLocalRoles(self, username, rpath):
         """Return the roles of the given user local to the specified context.
         """
         proxy = self.restrictedTraverse(rpath)
@@ -71,7 +79,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
     security.declareProtected(ChangePermissions, 'checkPermission')
-    def checkPermission(self, rpath, permission, REQUEST=None, **kw):
+    def checkPermission(self, rpath, permission):
         """Check the given permission for the current user on the given context.
         """
         proxy = self.restrictedTraverse(rpath)
@@ -82,11 +90,16 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
     security.declareProtected(View, 'listContent')
-    def listContent(self, rpath, REQUEST=None, **kw):
+    def listContent(self, rpath):
         """Return the list of document contained in the document specified by
         the given relative path.
 
         rpath is of the form "workspaces" or "workspaces/folder1".
+
+        Examples:
+        p = ServerProxy('http://manager:xxxxx@myserver.net:8080/cps/portal_remote_controller')
+        p.listContent('workspaces')
+        p.listContent('workspaces/folder1')
         """
         proxy = self.restrictedTraverse(rpath)
         portal = self.portal_url.getPortalObject()
@@ -98,7 +111,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
     security.declareProtected(View, 'getDocumentState')
-    def getDocumentState(self, rpath, REQUEST=None, **kw):
+    def getDocumentState(self, rpath):
         """Return the workflow state of the document specified by the given
         relative path.
 
@@ -110,7 +123,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
     security.declareProtected(View, 'getDocumentHistory')
-    def getDocumentHistory(self, rpath, REQUEST=None, **kw):
+    def getDocumentHistory(self, rpath):
         """Return the document history.
         """
         proxy = self.restrictedTraverse(rpath)
@@ -126,7 +139,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
     security.declareProtected(View, 'getDocumentState')
-    def getDocumentState(self, rpath, REQUEST=None, **kw):
+    def getDocumentState(self, rpath):
         """Return the workflow state of the document specified by the given
         relative path.
 
@@ -138,7 +151,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
     security.declareProtected(View, 'isDocumentLocked')
-    def isDocumentLocked(self, rpath, REQUEST=None, **kw):
+    def isDocumentLocked(self, rpath):
         """Return whether the document is locked (in the WebDAV sense) or not.
         """
         proxy = self.restrictedTraverse(rpath)
@@ -146,7 +159,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
 ##     security.declareProtected(ModifyPortalContent, 'lockDocument')
-##     def lockDocument(self, rpath, REQUEST=None, **kw):
+##     def lockDocument(self, rpath):
 ##         """Lock the document and return the associated lock token or False if
 ##         some problem arose.
 ##         """
@@ -157,7 +170,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
 ##     security.declareProtected(ModifyPortalContent, 'unLockDocument')
-##     def unLockDocument(self, rpath, lock, REQUEST=None, **kw):
+##     def unLockDocument(self, rpath, lock):
 ##         """Un-lock the document.
 ##         """
 ##         proxy = self.restrictedTraverse(rpath)
@@ -167,7 +180,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
     security.declareProtected(ModifyPortalContent, 'publishDocument')
-    def publishDocument(self, document_rpath, section_rpath, REQUEST=None, **kw):
+    def publishDocument(self, document_rpath, section_rpath):
         """Publish the document specified by the given relative path.
 
         document_rpath is of the form "workspaces/doc1" or "workspaces/folder/doc2".
@@ -188,7 +201,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
     security.declareProtected(ModifyPortalContent, 'unpublishDocument')
-    def unpublishDocument(self, rpath, REQUEST=None, **kw):
+    def unpublishDocument(self, rpath):
         """Unpublish the document specified by the given relative path.
 
         rpath is of the form "sections/doc1" or "sections/folder/doc2".
@@ -204,7 +217,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
     security.declareProtected(ModifyPortalContent, 'changeDocumentOrder')
-    def changeDocumentPosition(self, rpath, step, REQUEST=None, **kw):
+    def changeDocumentPosition(self, rpath, step):
         """Change the document position in its current folder.
         """
         proxy = self.restrictedTraverse(rpath)
@@ -214,22 +227,42 @@ class RemoteControllerTool(UniqueObject, Folder):
         context.move_object_to_position(id, newpos)
 
 
-    security.declareProtected(ModifyPortalContent, 'get')
-    def createDocument(self, document_title, type_name, folder_rpath,
-                       data_dict={}, REQUEST=None, **kw):
-        """Create document according to the given data.
+    security.declareProtected(AddPortalContent, 'createDocument')
+    def createDocument(self, portal_type, data_dict, folder_rpath, order=-1):
+        """Create document with the given portal_type with data from the given
+        data dictionary.
+
+        Examples:
+        p = ServerProxy('http://manager:xxxxx@myserver.net:8080/cps/portal_remote_controller')
+        p.createDocument('File',
+        {'Title': "The report from Monday meeting", 'Description': "Another boring report"},
+        'workspaces')
+        p.createDocument('News Item',
+        {'Title': "The company hires", 'Description': "The company goes well and
+        hires"},
+        'workspaces')
         """
+        # If no Title is given, the portal_type is used as a fallback title
+        document_title = data_dict.get('Title', portal_type)
         folder_proxy = self.restrictedTraverse(folder_rpath)
         id = folder_proxy.computeId(compute_from=document_title)
-        folder_proxy.invokeFactory(type_name, id)
+        folder_proxy.invokeFactory(portal_type, id)
         doc_proxy = getattr(folder_proxy, id)
         doc = doc_proxy.getEditableContent()
-        doc.edit(Title=document_title)
+        file = data_dict['file']
+        LOG(log_key, DEBUG, "file = %s" % file)
+        LOG(log_key, DEBUG, "file = %s" % str(file))
+        LOG(log_key, DEBUG, "file.data = %s" % file.data)
+        LOG(log_key, DEBUG, "file.data = %s" % str(file.data))
+        #arg = xmlrpclib.Binary()
+        #arg.decode(content)
+        doc.edit(data_dict)
 
 
-    security.declareProtected(ModifyPortalContent, 'get')
-    def editDocument(self, rpath, data_dict={}, REQUEST=None, **kw):
-        """Modify the specified document.
+    security.declareProtected(ModifyPortalContent, 'editDocument')
+    def editDocument(self, rpath, data_dict={}):
+        """Modify the specified document with data from the given
+        data dictionary.
         """
         proxy = self.restrictedTraverse(rpath)
         doc = proxy.getEditableContent()
