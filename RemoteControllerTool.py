@@ -142,18 +142,6 @@ class RemoteControllerTool(UniqueObject, Folder):
         return history_simplified
 
 
-    security.declareProtected(View, 'getDocumentState')
-    def getDocumentState(self, rpath):
-        """Return the workflow state of the document specified by the given
-        relative path.
-
-        rpath is of the form "workspaces/doc1" or "sections/doc2".
-        """
-        proxy = self.restrictedTraverse(rpath)
-        state = proxy.getContentInfo(proxy=proxy, level=0)['review_state']
-        return state
-
-
     security.declareProtected(View, 'isDocumentLocked')
     def isDocumentLocked(self, rpath):
         """Return whether the document is locked (in the WebDAV sense) or not.
