@@ -163,9 +163,30 @@ class RemoteControllerTool(UniqueObject, Folder):
 ##         lock = self.wl_getLock(token)
 
 
+    security.declareProtected(ModifyPortalContent, 'publishDocument')
+    def publishDocument(self, document_rpath, section_rpath, REQUEST=None, **kw):
+        """Publish the document specified by the given relative path.
+
+        document_rpath is of the form "workspaces/doc1" or "workspaces/folder/doc2".
+        section_rpath is of the form "sections/doc1" or "sections/folder/doc2".
+        """
+        wftool = self.portal_workflow
+        proxy = self.restrictedTraverse(document_rpath)
+        context = proxy
+        workflow_action = 'copy_submit'
+        transition = 'publish'
+        comments = "Publishing done through the Remote Controller"
+        allowed_transitions = wftool.getAllowedPublishingTransitions(context)
+        LOG(log_key, DEBUG, "allowed_transitions = %s" % str(allowed_transitions))
+        wftool.doActionFor(context, workflow_action,
+                           dest_container=section_rpath,
+                           initial_transition=transition,
+                           comment=comments)
+
+
     security.declareProtected(ModifyPortalContent, 'unpublishDocument')
     def unpublishDocument(self, rpath, REQUEST=None, **kw):
-        """Unpublish the document specify by the given relative path.
+        """Unpublish the document specified by the given relative path.
 
         rpath is of the form "sections/doc1" or "sections/folder/doc2".
         """
