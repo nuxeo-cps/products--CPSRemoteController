@@ -233,9 +233,12 @@ class RemoteControllerTool(UniqueObject, Folder):
         """Create document with the given portal_type with data from the given
         data dictionary.
 
+        Optional parameter position can be any value >= 0.
+
         Examples:
         from xmlrpclib import ServerProxy
         p = ServerProxy('http://manager:xxxxx@myserver.net:8080/cps/portal_remote_controller')
+
         p.createDocument('File',
         {'Title': "The report from Monday meeting", 'Description': "Another boring report"},
         'workspaces')
@@ -243,6 +246,14 @@ class RemoteControllerTool(UniqueObject, Folder):
         {'Title': "The company hires", 'Description': "The company goes well and
         hires"},
         'workspaces')
+
+        p.createDocument('File',
+        {'Title': "The report from Monday meeting", 'Description': "Another boring report"},
+        'workspaces')
+        p.createDocument('News Item',
+        {'Title': "The company hires", 'Description': "The company goes well and
+        hires"},
+        'workspaces', 0)
         """
         # If no Title is given, the portal_type is used as a fallback title
         document_title = data_dict.get('Title', portal_type)
