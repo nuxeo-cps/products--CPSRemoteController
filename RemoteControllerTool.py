@@ -97,6 +97,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         rpath is of the form "workspaces" or "workspaces/folder1".
 
         Examples:
+        from xmlrpclib import ServerProxy
         p = ServerProxy('http://manager:xxxxx@myserver.net:8080/cps/portal_remote_controller')
         p.listContent('workspaces')
         p.listContent('workspaces/folder1')
@@ -233,6 +234,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         data dictionary.
 
         Examples:
+        from xmlrpclib import ServerProxy
         p = ServerProxy('http://manager:xxxxx@myserver.net:8080/cps/portal_remote_controller')
         p.createDocument('File',
         {'Title': "The report from Monday meeting", 'Description': "Another boring report"},
@@ -249,17 +251,18 @@ class RemoteControllerTool(UniqueObject, Folder):
         folder_proxy.invokeFactory(portal_type, id)
         doc_proxy = getattr(folder_proxy, id)
         doc = doc_proxy.getEditableContent()
-        file = data_dict['file']
-        LOG(log_key, DEBUG, "file = %s" % file)
-        LOG(log_key, DEBUG, "file = %s" % str(file))
-        LOG(log_key, DEBUG, "file.data = %s" % file.data)
-        LOG(log_key, DEBUG, "file.data = %s" % str(file.data))
-        #arg = xmlrpclib.Binary()
-        #arg.decode(content)
+        file = data_dict.get('file', None)
+        if file is not None:
+            LOG(log_key, DEBUG, "file = %s" % file)
+            LOG(log_key, DEBUG, "file = %s" % str(file))
+            LOG(log_key, DEBUG, "file.data = %s" % file.data)
+            LOG(log_key, DEBUG, "file.data = %s" % str(file.data))
+            #arg = xmlrpclib.Binary()
+            #arg.decode(content)
         doc.edit(data_dict)
         if position >= 0:
-            context = proxy.aq_parent
-            proxy.move_object_to_position(id, position)
+            context = doc_proxy.aq_parent
+            context.move_object_to_position(id, position)
 
 
 
