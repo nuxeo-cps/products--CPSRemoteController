@@ -26,6 +26,7 @@ from Products.CMFCore.permissions import ManagePortal, ChangePermissions, \
      AddPortalContent, ModifyPortalContent, View
 from Products.CMFCore.utils import UniqueObject
 from OFS.Folder import Folder
+from Acquisition import aq_parent, aq_inner
 from OFS.Image import File
 from xmlrpclib import Binary
 from Products.CPSUtil.id import generateId
@@ -225,7 +226,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         """
         proxy = self.restrictedTraverse(rpath)
         id = proxy.getId()
-        context = proxy.aq_parent
+        context = aq_parent(aq_inner(proxy))
         newpos = context.get_object_position(id) + step
         context.move_object_to_position(id, newpos)
 
@@ -300,7 +301,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
         doc.edit(data_dict)
         if position >= 0:
-            context = doc_proxy.aq_parent
+            context = aq_parent(aq_inner(doc_proxy))
             context.move_object_to_position(id, position)
 
 
