@@ -228,7 +228,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
     security.declareProtected(AddPortalContent, 'createDocument')
-    def createDocument(self, portal_type, data_dict, folder_rpath, order=-1):
+    def createDocument(self, portal_type, data_dict, folder_rpath, position=-1):
         """Create document with the given portal_type with data from the given
         data dictionary.
 
@@ -257,6 +257,10 @@ class RemoteControllerTool(UniqueObject, Folder):
         #arg = xmlrpclib.Binary()
         #arg.decode(content)
         doc.edit(data_dict)
+        if position >= 0:
+            context = proxy.aq_parent
+            proxy.move_object_to_position(id, position)
+
 
 
     security.declareProtected(ModifyPortalContent, 'editDocument')
