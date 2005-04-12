@@ -172,24 +172,77 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
     security.declareProtected(ModifyPortalContent, 'publishDocument')
-    def publishDocument(self, document_rpath, section_rpath):
+    def publishDocument(self, document_rpath, rpath_to_publish_dict):
         """Publish the document specified by the given relative path.
 
         document_rpath is of the form "workspaces/doc1" or "workspaces/folder/doc2".
-        section_rpath is of the form "sections/doc1" or "sections/folder/doc2".
+
+        rpath_to_publish_dict is a dictionary. The dictionary keys are the rpath
+        of where to publish the document. The rpath can be the rpath of a
+        section or the rpath of a document. The dictionary values are either the
+        empty string, "before", "after" or "replace".
         """
+        portal = self.portal_url.getPortalObject()
+        portal_ppath = portal.getPhysicalPath()
         wftool = self.portal_workflow
         proxy = self.restrictedTraverse(document_rpath)
+        document_id = proxy.getId()
         context = proxy
         workflow_action = 'copy_submit'
         transition = 'publish'
         comments = "Publishing done through the Remote Controller"
         allowed_transitions = wftool.getAllowedPublishingTransitions(context)
         LOG(log_key, DEBUG, "allowed_transitions = %s" % str(allowed_transitions))
-        wftool.doActionFor(context, workflow_action,
-                           dest_container=section_rpath,
-                           initial_transition=transition,
-                           comment=comments)
+
+        for target_rpath, placement in rpath_to_publish_dict.items():
+            LOG(log_key, DEBUG, "target_rpath / placement = %s / %s"
+                % (target_rpath, placement))
+            target_document = None
+            try:
+                object = portal.restrictedTraverse(target_rpath)
+            except KeyError:
+                LOG(log_key, DEBUG, 'publishDocument no object with rpath = %s'
+                    % target_rpath)
+                continue
+            if object.portal_type == 'Section':
+                section_rpath = target_rpath
+                section = object
+            else:
+                try:
+                    target_document = portal.restrictedTraverse(target_rpath)
+                    target_document_ppath = target_document.getPhysicalPath()
+                    rppath = target_document_ppath[len(portal_ppath):]
+                    object = portal.restrictedTraverse(rppath[:-1])
+                except KeyError:
+                    LOG(log_key, DEBUG, 'publishDocument no object with rpath = %s'
+                        % target_rpath)
+                    continue
+                if object.portal_type == 'Section':
+                    section_rpath = target_rpath
+                    section = object
+                else:
+                    LOG(log_key, DEBUG, 'publishDocument no section with rpath = %s'
+                        % target_rpath)
+                    continue
+            wftool.doActionFor(context, workflow_action,
+                               dest_container=section_rpath,
+                               initial_transition=transition,
+                               comment=comments)
+            # If the rpath provided was the one of a document then we will
+            # consider the placement value to optionally move the document.
+            if target_document is not None:
+                target_id = target_document.getId()
+                target_pos = section.get_object_position(target_id)
+                newpos = None
+                if placement == 'before':
+                    newpos = target_pos
+                elif placement == 'after':
+                    newpos = target_pos + 1
+                elif placement == 'replace':
+                    LOG(log_key, DEBUG, "Not implemented yet.")
+                LOG(log_key, DEBUG, "publishDocument newpos = %s" % newpos)
+                if newpos is not None:
+                    section.move_object_to_position(document_id, newpos)
 
 
     security.declareProtected(ModifyPortalContent, 'unpublishDocument')
@@ -301,6 +354,11 @@ class RemoteControllerTool(UniqueObject, Folder):
         proxy = self.restrictedTraverse(rpath)
         doc = proxy.getEditableContent()
         doc.edit(data_dict)
+
+
+    security.declareProtected(AddPortalContent, 'editOrCreateDocument')
+    def editOrCreateDocument(self, portal_type, data_dict, folder_rpath, position=-1):
+        pass
 
 
 InitializeClass(RemoteControllerTool)
