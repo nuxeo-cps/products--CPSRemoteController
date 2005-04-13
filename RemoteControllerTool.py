@@ -205,9 +205,11 @@ class RemoteControllerTool(UniqueObject, Folder):
                     % target_rpath)
                 continue
             if object.portal_type == 'Section':
+                LOG(log_key, DEBUG, "1.")
                 section_rpath = target_rpath
                 section = object
             else:
+                LOG(log_key, DEBUG, "2.")
                 try:
                     target_document = portal.restrictedTraverse(target_rpath)
                     target_document_ppath = target_document.getPhysicalPath()
@@ -218,12 +220,15 @@ class RemoteControllerTool(UniqueObject, Folder):
                         % target_rpath)
                     continue
                 if object.portal_type == 'Section':
-                    section_rpath = target_rpath
+                    LOG(log_key, DEBUG, "3.")
+                    section_rpath = '/'.join(object.getPhysicalPath()[len(portal_ppath):])
                     section = object
                 else:
+                    LOG(log_key, DEBUG, "4.")
                     LOG(log_key, DEBUG, 'publishDocument no section with rpath = %s'
                         % target_rpath)
                     continue
+            LOG(log_key, DEBUG, "section_rpath = %s" % section_rpath)
             wftool.doActionFor(context, workflow_action,
                                dest_container=section_rpath,
                                initial_transition=transition,
@@ -239,7 +244,7 @@ class RemoteControllerTool(UniqueObject, Folder):
                 elif placement == 'after':
                     newpos = target_pos + 1
                 elif placement == 'replace':
-                    LOG(log_key, DEBUG, "Not implemented yet.")
+                    LOG(log_key, DEBUG, "In fact this option is useless.")
                 LOG(log_key, DEBUG, "publishDocument newpos = %s" % newpos)
                 if newpos is not None:
                     section.move_object_to_position(document_id, newpos)
