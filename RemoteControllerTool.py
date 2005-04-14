@@ -154,6 +154,17 @@ class RemoteControllerTool(UniqueObject, Folder):
     def lockDocument(self, rpath):
         """Lock the document and return the associated lock token or False if
         some problem arose.
+
+        Example:
+        >>> p.isDocumentLocked('workspaces/pr1')
+        0
+        >>> lock = p.lockDocument('workspaces/pr1')
+        >>> p.isDocumentLocked('workspaces/pr1')
+        1
+        >>> p.unlockDocument('workspaces/pr1', lock)
+        True
+        >>> p.isDocumentLocked('workspaces/pr1')
+        0
         """
         log_key = glog_key + ' lockDocument()'
         proxy = self.restrictedTraverse(rpath)
