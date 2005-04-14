@@ -9,4 +9,4 @@ Bug fixes:
 - Added missing log ERROR import.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
--
+- Added unit tests.
