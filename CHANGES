@@ -11,6 +11,7 @@ Bug fixes:
 - Fixed in many places finding of the parent container.
 - Removed duplicate getDocumentState method.
 - Fixed the case when the target rpath was the one of a document.
+- Added an optional "comments" param to the publishDocument method.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -

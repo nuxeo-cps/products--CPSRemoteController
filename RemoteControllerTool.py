@@ -172,7 +172,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
     security.declareProtected(ModifyPortalContent, 'publishDocument')
-    def publishDocument(self, document_rpath, rpath_to_publish_dict):
+    def publishDocument(self, document_rpath, rpath_to_publish_dict, comments=""):
         """Publish the document specified by the given relative path.
 
         document_rpath is of the form "workspaces/doc1" or "workspaces/folder/doc2".
@@ -190,7 +190,6 @@ class RemoteControllerTool(UniqueObject, Folder):
         context = proxy
         workflow_action = 'copy_submit'
         transition = 'publish'
-        comments = "Publishing done through the Remote Controller"
         allowed_transitions = wftool.getAllowedPublishingTransitions(context)
         LOG(log_key, DEBUG, "allowed_transitions = %s" % str(allowed_transitions))
 
