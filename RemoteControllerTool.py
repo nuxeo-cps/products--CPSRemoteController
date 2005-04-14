@@ -150,25 +150,26 @@ class RemoteControllerTool(UniqueObject, Folder):
         return proxy.wl_isLocked()
 
 
-##     security.declareProtected(ModifyPortalContent, 'lockDocument')
-##     def lockDocument(self, rpath):
-##         """Lock the document and return the associated lock token or False if
-##         some problem arose.
-##         """
-##         proxy = self.restrictedTraverse(rpath)
-##         if proxy.wl_isLocked():
-##             return False
-##         lock = proxy.wl_getLock(token)
+    security.declareProtected(ModifyPortalContent, 'lockDocument')
+    def lockDocument(self, rpath):
+        """Lock the document and return the associated lock token or False if
+        some problem arose.
+        """
+        proxy = self.restrictedTraverse(rpath)
+        if proxy.wl_isLocked():
+            return False
+        lock = proxy.wl_getLock(token)
 
 
-##     security.declareProtected(ModifyPortalContent, 'unLockDocument')
-##     def unLockDocument(self, rpath, lock):
-##         """Un-lock the document.
-##         """
-##         proxy = self.restrictedTraverse(rpath)
-##         if proxy.wl_isLocked():
-##             return False
-##         lock = self.wl_getLock(token)
+    security.declareProtected(ModifyPortalContent, 'unLockDocument')
+    def unLockDocument(self, rpath, lock):
+        """Un-lock the document and return True or False depending of the
+        success of the operation.
+        """
+        proxy = self.restrictedTraverse(rpath)
+        if proxy.wl_isLocked():
+            return False
+        return True
 
 
     security.declareProtected(ModifyPortalContent, 'publishDocument')
@@ -250,7 +251,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
     security.declareProtected(ModifyPortalContent, 'unpublishDocument')
-    def unpublishDocument(self, rpath):
+    def unpublishDocument(self, rpath, comments=""):
         """Unpublish the document specified by the given relative path.
 
         rpath is of the form "sections/doc1" or "sections/folder/doc2".
@@ -259,7 +260,6 @@ class RemoteControllerTool(UniqueObject, Folder):
         proxy = self.restrictedTraverse(rpath)
         context = proxy
         workflow_action = 'unpublish'
-        comments = "Un-publishing done through the Remote Controller"
         allowed_transitions = wftool.getAllowedPublishingTransitions(context)
         LOG(log_key, DEBUG, "allowed_transitions = %s" % str(allowed_transitions))
         wftool.doActionFor(context, workflow_action, comment=comments)
@@ -280,6 +280,8 @@ class RemoteControllerTool(UniqueObject, Folder):
     def createDocument(self, portal_type, data_dict, folder_rpath, position=-1):
         """Create document with the given portal_type with data from the given
         data dictionary.
+
+        The method returns the id of the created document.
 
         Optional parameter position can be any value >= 0.
 
@@ -324,6 +326,58 @@ class RemoteControllerTool(UniqueObject, Folder):
         id = folder_proxy.computeId(compute_from=document_title)
         folder_proxy.invokeFactory(portal_type, id)
         doc_proxy = getattr(folder_proxy, id)
+
+        self._editDocument(doc_proxy, data_dict)
+
+        if position >= 0:
+            context = aq_parent(aq_inner(doc_proxy))
+            context.move_object_to_position(id, position)
+
+        return id
+
+
+    security.declareProtected(ModifyPortalContent, 'editDocument')
+    def editDocument(self, rpath, data_dict={}):
+        """Modify the specified document with data from the given
+        data dictionary.
+        """
+        doc_proxy = self.restrictedTraverse(rpath)
+        self._editDocument(doc_proxy, data_dict)
+
+
+    security.declareProtected(AddPortalContent, 'editOrCreateDocument')
+    def editOrCreateDocument(self, rpath, portal_type, data_dict, position=-1):
+        """Create or edit a document with the given portal_type with data from
+        the given data dictionary.
+
+        The method returns the id of the created or edited document.
+
+        Optional parameter position can be any value >= 0.
+        """
+        try:
+            proxy = self.restrictedTraverse(rpath)
+            LOG(log_key, DEBUG, "editOrCreateDocument document DOES exist")
+        except KeyError:
+            proxy = None
+            LOG(log_key, DEBUG, "editOrCreateDocument document does NOT exist")
+        if proxy is not None and proxy.portal_type == portal_type:
+            self._editDocument(proxy, data_dict)
+            id = proxy.getId()
+        else:
+            folder_rpath = rpath.split('/')[:-1]
+            LOG(log_key, DEBUG,
+                "editOrCreateDocument folder_rpath = %s"% folder_rpath)
+            id = self.createDocument(portal_type, data_dict, folder_rpath,
+                                     position)
+        return id
+
+
+    def _editDocument(self, doc_proxy, data_dict):
+        """Modify the document given its proxy.
+
+        This method holds the special logic used to retrieve a potential file
+        upload.
+        """
         doc = doc_proxy.getEditableContent()
 
         # Getting and processing a potential file
@@ -345,24 +399,6 @@ class RemoteControllerTool(UniqueObject, Folder):
             del data_dict['file_name']
 
         doc.edit(data_dict)
-        if position >= 0:
-            context = aq_parent(aq_inner(doc_proxy))
-            context.move_object_to_position(id, position)
-
-
-    security.declareProtected(ModifyPortalContent, 'editDocument')
-    def editDocument(self, rpath, data_dict={}):
-        """Modify the specified document with data from the given
-        data dictionary.
-        """
-        proxy = self.restrictedTraverse(rpath)
-        doc = proxy.getEditableContent()
-        doc.edit(data_dict)
-
-
-    security.declareProtected(AddPortalContent, 'editOrCreateDocument')
-    def editOrCreateDocument(self, portal_type, data_dict, folder_rpath, position=-1):
-        pass
 
 
 InitializeClass(RemoteControllerTool)
