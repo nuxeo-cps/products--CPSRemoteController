@@ -31,7 +31,7 @@ from OFS.Image import File
 from xmlrpclib import Binary
 from webdav.LockItem import LockItem
 from Products.CPSUtil.id import generateId
-from zLOG import LOG, DEBUG
+from zLOG import LOG, DEBUG, ERROR
 
 
 glog_key = 'RemoteControllerTool'
@@ -106,7 +106,6 @@ class RemoteControllerTool(UniqueObject, Folder):
         p.listContent('workspaces')
         p.listContent('workspaces/folder1')
         """
-        proxy = self.restrictedTraverse(rpath)
         portal = self.portal_url.getPortalObject()
         brains = portal.search(query={'cps_filter_sets': 'searchable'},
                                folder_prefix=rpath)
