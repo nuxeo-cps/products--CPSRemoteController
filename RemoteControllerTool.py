@@ -29,11 +29,12 @@ from OFS.Folder import Folder
 from Acquisition import aq_parent, aq_inner
 from OFS.Image import File
 from xmlrpclib import Binary
+from webdav.LockItem import LockItem
 from Products.CPSUtil.id import generateId
 from zLOG import LOG, DEBUG
 
 
-log_key = 'RemoteControllerTool'
+glog_key = 'RemoteControllerTool'
 
 
 class RemoteControllerTool(UniqueObject, Folder):
@@ -60,8 +61,8 @@ class RemoteControllerTool(UniqueObject, Folder):
     def getRoles(self, username):
         """Return the roles of the given user.
         """
-        membersDirectory = self.portal_directories.members
-        entry = membersDirectory.getEntry(username)
+        members_directory = self.portal_directories.members
+        entry = members_directory.getEntry(username)
         roles = entry['roles']
         return roles
 
@@ -72,7 +73,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         """
         proxy = self.restrictedTraverse(rpath)
         local_roles_struct = proxy.getCPSLocalRoles()
-        LOG(log_key, DEBUG, "local_roles = %s" % str(local_roles_struct[0]))
+        LOG(glog_key, DEBUG, "local_roles = %s" % str(local_roles_struct[0]))
         user_local_roles = local_roles_struct[0]
         user_key = 'user:%s' % username
         if user_local_roles.get(user_key):
@@ -132,13 +133,13 @@ class RemoteControllerTool(UniqueObject, Folder):
         """
         proxy = self.restrictedTraverse(rpath)
         history = proxy.getContentInfo(proxy=proxy, level=3)['history']
-        LOG(log_key, DEBUG, "history = %s" % history)
+        LOG(glog_key, DEBUG, "history = %s" % history)
         # A simplified value of the history so that it can be transported over
         # XML-RPC.
         history_simplified = {}
         for event in history:
             history_simplified[event['action']] = event['time_str']
-        LOG(log_key, DEBUG, "history_simplified = %s" % history_simplified)
+        LOG(glog_key, DEBUG, "history_simplified = %s" % history_simplified)
         return history_simplified
 
 
@@ -155,20 +156,32 @@ class RemoteControllerTool(UniqueObject, Folder):
         """Lock the document and return the associated lock token or False if
         some problem arose.
         """
+        log_key = glog_key + ' lockDocument()'
         proxy = self.restrictedTraverse(rpath)
         if proxy.wl_isLocked():
+            LOG(log_key, DEBUG, "document is already locked")
             return False
-        lock = proxy.wl_getLock(token)
+        member = self.portal_membership.getAuthenticatedMember()
+        creator = member.getUser()
+        lock = LockItem(creator)
+        lock_token = lock.getLockToken()
+        proxy.wl_setLock(lock_token, lock)
+        if not proxy.wl_isLocked():
+            LOG(log_key, ERROR,
+                "setLock failed because document is currently not locked.")
+            return False
+        return lock_token
 
 
-    security.declareProtected(ModifyPortalContent, 'unLockDocument')
-    def unLockDocument(self, rpath, lock):
+    security.declareProtected(ModifyPortalContent, 'unlockDocument')
+    def unlockDocument(self, rpath, lock_token):
         """Un-lock the document and return True or False depending of the
         success of the operation.
         """
         proxy = self.restrictedTraverse(rpath)
-        if proxy.wl_isLocked():
+        if not proxy.wl_isLocked():
             return False
+        proxy.wl_delLock(lock_token)
         return True
 
 
@@ -192,43 +205,43 @@ class RemoteControllerTool(UniqueObject, Folder):
         workflow_action = 'copy_submit'
         transition = 'publish'
         allowed_transitions = wftool.getAllowedPublishingTransitions(context)
-        LOG(log_key, DEBUG, "allowed_transitions = %s" % str(allowed_transitions))
+        LOG(glog_key, DEBUG, "allowed_transitions = %s" % str(allowed_transitions))
 
         for target_rpath, placement in rpath_to_publish_dict.items():
-            LOG(log_key, DEBUG, "target_rpath / placement = %s / %s"
+            LOG(glog_key, DEBUG, "target_rpath / placement = %s / %s"
                 % (target_rpath, placement))
             target_document = None
             try:
                 object = portal.restrictedTraverse(target_rpath)
             except KeyError:
-                LOG(log_key, DEBUG, 'publishDocument no object with rpath = %s'
+                LOG(glog_key, DEBUG, 'publishDocument no object with rpath = %s'
                     % target_rpath)
                 continue
             if object.portal_type == 'Section':
-                LOG(log_key, DEBUG, "1.")
+                LOG(glog_key, DEBUG, "1.")
                 section_rpath = target_rpath
                 section = object
             else:
-                LOG(log_key, DEBUG, "2.")
+                LOG(glog_key, DEBUG, "2.")
                 try:
                     target_document = portal.restrictedTraverse(target_rpath)
                     target_document_ppath = target_document.getPhysicalPath()
                     rppath = target_document_ppath[len(portal_ppath):]
                     object = portal.restrictedTraverse(rppath[:-1])
                 except KeyError:
-                    LOG(log_key, DEBUG, 'publishDocument no object with rpath = %s'
+                    LOG(glog_key, DEBUG, 'publishDocument no object with rpath = %s'
                         % target_rpath)
                     continue
                 if object.portal_type == 'Section':
-                    LOG(log_key, DEBUG, "3.")
+                    LOG(glog_key, DEBUG, "3.")
                     section_rpath = '/'.join(object.getPhysicalPath()[len(portal_ppath):])
                     section = object
                 else:
-                    LOG(log_key, DEBUG, "4.")
-                    LOG(log_key, DEBUG, 'publishDocument no section with rpath = %s'
+                    LOG(glog_key, DEBUG, "4.")
+                    LOG(glog_key, DEBUG, 'publishDocument no section with rpath = %s'
                         % target_rpath)
                     continue
-            LOG(log_key, DEBUG, "section_rpath = %s" % section_rpath)
+            LOG(glog_key, DEBUG, "section_rpath = %s" % section_rpath)
             wftool.doActionFor(context, workflow_action,
                                dest_container=section_rpath,
                                initial_transition=transition,
@@ -244,8 +257,8 @@ class RemoteControllerTool(UniqueObject, Folder):
                 elif placement == 'after':
                     newpos = target_pos + 1
                 elif placement == 'replace':
-                    LOG(log_key, DEBUG, "In fact this option is useless.")
-                LOG(log_key, DEBUG, "publishDocument newpos = %s" % newpos)
+                    LOG(glog_key, DEBUG, "In fact this option is useless.")
+                LOG(glog_key, DEBUG, "publishDocument newpos = %s" % newpos)
                 if newpos is not None:
                     section.move_object_to_position(document_id, newpos)
 
@@ -261,7 +274,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         context = proxy
         workflow_action = 'unpublish'
         allowed_transitions = wftool.getAllowedPublishingTransitions(context)
-        LOG(log_key, DEBUG, "allowed_transitions = %s" % str(allowed_transitions))
+        LOG(glog_key, DEBUG, "allowed_transitions = %s" % str(allowed_transitions))
         wftool.doActionFor(context, workflow_action, comment=comments)
 
 
@@ -356,16 +369,16 @@ class RemoteControllerTool(UniqueObject, Folder):
         """
         try:
             proxy = self.restrictedTraverse(rpath)
-            LOG(log_key, DEBUG, "editOrCreateDocument document DOES exist")
+            LOG(glog_key, DEBUG, "editOrCreateDocument document DOES exist")
         except KeyError:
             proxy = None
-            LOG(log_key, DEBUG, "editOrCreateDocument document does NOT exist")
+            LOG(glog_key, DEBUG, "editOrCreateDocument document does NOT exist")
         if proxy is not None and proxy.portal_type == portal_type:
             self._editDocument(proxy, data_dict)
             id = proxy.getId()
         else:
             folder_rpath = rpath.split('/')[:-1]
-            LOG(log_key, DEBUG,
+            LOG(glog_key, DEBUG,
                 "editOrCreateDocument folder_rpath = %s"% folder_rpath)
             id = self.createDocument(portal_type, data_dict, folder_rpath,
                                      position)
