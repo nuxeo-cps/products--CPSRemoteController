@@ -1,0 +1,23 @@
+*******************************************
+** CPSRemoteController V0.1.0 [R1 build 2005/04/14-16:43 by madarche]
+
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+- Initial code.
+- Made the publishDocument method more powerful and able to publish in multiple
+  places in one call.
+- Implemented the editOrCreateDocument method.
+- Implemented the isDocumentLocked, lockDocument and unlockDocument methods.
+Bug fixes:
+~~~~~~~~~~
+- Fixed in many places finding of the parent container.
+- Removed duplicate getDocumentState method.
+- Fixed the case when the target rpath was the one of a document.
+- Added an optional "comments" param to the publishDocument method.
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+
