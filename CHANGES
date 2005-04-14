@@ -6,6 +6,7 @@ New features:
 - Initial code.
 - Made the publishDocument method more powerful and able to publish in multiple
   places in one call.
+- Implemented the editOrCreateDocument method.
 Bug fixes:
 ~~~~~~~~~~
 - Fixed in many places finding of the parent container.
