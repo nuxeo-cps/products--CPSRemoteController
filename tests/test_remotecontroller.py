@@ -24,14 +24,14 @@ if __name__ == '__main__':
 
 import unittest
 from Testing import ZopeTestCase
-from Products.CPSDefault.tests import CPSDefaultTestCase
 import CPSRemoteControllerTestCase
+from Products.CPSDefault.tests.CPSTestCase import MANAGER_ID
+from xmlrpclib import Binary
 
-class ProductTestCase(CPSRemoteControllerTestCate.CPSRemoteControllerTestCase,
-                      CPSDefaultTestCase.CPSDefaultTestCase):
+class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
 
     def afterSetUp(self):
-        self.login_id = 'manager'
+        self.login_id = MANAGER_ID
         self.login(self.login_id)
         self.portal.REQUEST.SESSION = {}
         self.portal.REQUEST['AUTHENTICATED_USER'] = self.login_id
@@ -42,7 +42,7 @@ class ProductTestCase(CPSRemoteControllerTestCate.CPSRemoteControllerTestCase,
         self.portal._setObject('installRemoteController', installer)
         self.assert_('installRemoteController' in self.portal.objectIds())
         self.portal.installRemoteController()
-        self.remote_controller_tool = self.portal.portal_remote_controller
+        self.tool = self.portal.portal_remote_controller
 
 
     def beforeTearDown(self):
@@ -50,7 +50,57 @@ class ProductTestCase(CPSRemoteControllerTestCate.CPSRemoteControllerTestCase,
 
 
     def test_listContent(self):
-        pass
+        folder_rpath = 'workspaces'
+        self.assert_(self.tool.listContent(folder_rpath))
+
+
+    def test_createDocument(self):
+        folder_rpath = 'workspaces'
+        proxy_list1 = self.tool.listContent(folder_rpath)
+        data_dict = {'Title': "The report from Monday meeting",
+                     'Description': "Another boring report",
+                     }
+        doc_id = self.tool.createDocument('File', data_dict, folder_rpath, 0)
+        proxy_list2 = self.tool.listContent(folder_rpath)
+        self.assertEquals(len(proxy_list1) + 1, len(proxy_list2))
+        self.assertEquals(folder_rpath + '/' + doc_id in proxy_list2, True)
+
+
+    def test_editOrcreateDocument(self):
+        folder_rpath = 'workspaces'
+        proxy_list1 = self.tool.listContent(folder_rpath)
+        data_dict = {'Title': "The report from Monday meeting",
+                     'Description': "Another boring report",
+                     }
+        doc1_id = self.tool.createDocument('File', data_dict, folder_rpath, 0)
+        doc1_rpath = folder_rpath + '/' + doc1_id
+        proxy_list2 = self.tool.listContent(folder_rpath)
+        self.assertEquals(len(proxy_list1) + 1, len(proxy_list2))
+
+        doc2_id = self.tool.editOrCreateDocument(doc1_rpath, 'File', data_dict, 0)
+        proxy_list3 = self.tool.listContent(folder_rpath)
+        self.assertEquals(len(proxy_list2), len(proxy_list3))
+
+        doc3_rpath = (folder_rpath + '/'
+                      + 'dummy-id-that-we-cannot-guess-before-doc-is-created')
+        doc3_id = self.tool.editOrCreateDocument(doc3_rpath, 'File', data_dict, 0)
+        proxy_list4 = self.tool.listContent(folder_rpath)
+        self.assertEquals(len(proxy_list3) + 1, len(proxy_list4))
+
+
+    def test_lockDocument(self):
+        folder_rpath = 'workspaces'
+        proxy_list1 = self.tool.listContent(folder_rpath)
+        data_dict = {'Title': "The report from Monday meeting",
+                     'Description': "Another boring report",
+                     }
+        doc_id = self.tool.createDocument('File', data_dict, folder_rpath, 0)
+        doc_rpath = folder_rpath + '/' + doc_id
+        self.assertEquals(self.tool.isDocumentLocked(doc_rpath), False)
+        lock_tocken = self.tool.lockDocument(doc_rpath)
+        self.assertEquals(self.tool.isDocumentLocked(doc_rpath), True)
+        self.tool.unlockDocument(doc_rpath, lock_tocken)
+        self.assertEquals(self.tool.isDocumentLocked(doc_rpath), False)
 
 
 def test_suite():
