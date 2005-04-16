@@ -349,6 +349,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         id = folder_proxy.computeId(compute_from=document_title)
         folder_proxy.invokeFactory(portal_type, id)
         doc_proxy = getattr(folder_proxy, id)
+	doc_rpath = folder_proxy.getContentInfo(doc_proxy, level=0)['rpath']
 
         self._editDocument(doc_proxy, data_dict)
 
@@ -356,7 +357,7 @@ class RemoteControllerTool(UniqueObject, Folder):
             context = aq_parent(aq_inner(doc_proxy))
             context.move_object_to_position(id, position)
 
-        return id
+        return doc_rpath
 
 
     security.declareProtected(ModifyPortalContent, 'editDocument')
