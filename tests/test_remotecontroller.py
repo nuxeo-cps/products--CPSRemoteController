@@ -63,7 +63,7 @@ class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
         doc_id = self.tool.createDocument('File', data_dict, folder_rpath, 0)
         proxy_list2 = self.tool.listContent(folder_rpath)
         self.assertEquals(len(proxy_list1) + 1, len(proxy_list2))
-        self.assertEquals(folder_rpath + '/' + doc_id in proxy_list2, True)
+        self.assertEquals(doc_id in proxy_list2, True)
 
 
     def test_editOrcreateDocument(self):
