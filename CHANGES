@@ -3,7 +3,8 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
--
+- Modified createDocument and editOrCreateDocument so that they return the rpath
+  of the document instead of its id.
 Bug fixes:
 ~~~~~~~~~~
 - Added missing log ERROR import.

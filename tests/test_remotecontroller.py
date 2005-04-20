@@ -19,6 +19,7 @@
 # $Id$
 
 import os, sys
+import os.path
 if __name__ == '__main__':
     execfile(os.path.join(sys.path[0], 'framework.py'))
 
@@ -81,9 +82,9 @@ class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
         proxy_list3 = self.tool.listContent(folder_rpath)
         self.assertEquals(len(proxy_list2), len(proxy_list3))
 
-        doc3_rpath = (folder_rpath + '/'
-                      + 'dummy-id-that-we-cannot-guess-before-doc-is-created')
-        doc3_id = self.tool.editOrCreateDocument(doc3_rpath, 'File', data_dict, 0)
+        doc3_rpath = os.path.join(folder_rpath,
+                                  'dummy-id-that-we-cannot-guess-before-doc-is-created')
+        doc3_returned_rpath = self.tool.editOrCreateDocument(doc3_rpath, 'File', data_dict, 0)
         proxy_list4 = self.tool.listContent(folder_rpath)
         self.assertEquals(len(proxy_list3) + 1, len(proxy_list4))
 

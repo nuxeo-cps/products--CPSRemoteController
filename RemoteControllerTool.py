@@ -20,11 +20,12 @@
 """
 """
 
+import os.path
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
 from Products.CMFCore.permissions import ManagePortal, ChangePermissions, \
      AddPortalContent, ModifyPortalContent, View
-from Products.CMFCore.utils import UniqueObject
+from Products.CMFCore.utils import UniqueObject, getToolByName
 from OFS.Folder import Folder
 from Acquisition import aq_parent, aq_inner
 from OFS.Image import File
@@ -122,7 +123,8 @@ class RemoteControllerTool(UniqueObject, Folder):
         rpath is of the form "workspaces/doc1" or "sections/doc2".
         """
         proxy = self.restrictedTraverse(rpath)
-        state = proxy.getContentInfo(proxy=proxy, level=0)['review_state']
+        wtool = getToolByName(self, 'portal_workflow')
+        state = wtool.getInfoFor(proxy, 'review_state', None)
         return state
 
 
@@ -304,7 +306,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         """Create document with the given portal_type with data from the given
         data dictionary.
 
-        The method returns the id of the created document.
+        The method returns the rpath of the created document.
 
         Optional parameter position can be any value >= 0.
 
@@ -349,7 +351,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         id = folder_proxy.computeId(compute_from=document_title)
         folder_proxy.invokeFactory(portal_type, id)
         doc_proxy = getattr(folder_proxy, id)
-	doc_rpath = folder_proxy.getContentInfo(doc_proxy, level=0)['rpath']
+	doc_rpath = os.path.join(folder_rpath, id)
 
         self._editDocument(doc_proxy, doc_def)
 
@@ -374,7 +376,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         """Create or edit a document with the given portal_type with data from
         the given data dictionary.
 
-        The method returns the id of the created or edited document.
+        The method returns the rpath of the created or edited document.
 
         Optional parameter position can be any value >= 0.
         """
@@ -387,13 +389,16 @@ class RemoteControllerTool(UniqueObject, Folder):
         if proxy is not None and proxy.portal_type == portal_type:
             self._editDocument(proxy, doc_def)
             id = proxy.getId()
+            utool = getToolByName(self, 'portal_url')
+            doc_rpath = utool.getRelativeUrl(proxy)
         else:
-            folder_rpath = rpath.split('/')[:-1]
+            folder_rpath = '/'.join(rpath.split('/')[:-1])
             LOG(glog_key, DEBUG,
                 "editOrCreateDocument folder_rpath = %s"% folder_rpath)
             id = self.createDocument(portal_type, doc_def, folder_rpath,
                                      position)
-        return id
+            doc_rpath = os.path.join(folder_rpath, id)
+        return doc_rpath
 
 
     def _editDocument(self, doc_proxy, doc_def):
