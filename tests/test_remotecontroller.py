@@ -64,7 +64,7 @@ class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
         doc_id = self.tool.createDocument('File', data_dict, folder_rpath, 0)
         proxy_list2 = self.tool.listContent(folder_rpath)
         self.assertEquals(len(proxy_list1) + 1, len(proxy_list2))
-        self.assertEquals(doc_id in proxy_list2, True)
+        self.assert_(doc_id in proxy_list2)
 
 
     def test_editOrcreateDocument(self):
@@ -97,11 +97,11 @@ class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
                      }
         doc_id = self.tool.createDocument('File', data_dict, folder_rpath, 0)
         doc_rpath = folder_rpath + '/' + doc_id
-        self.assertEquals(self.tool.isDocumentLocked(doc_rpath), False)
+        self.failIf(self.tool.isDocumentLocked(doc_rpath))
         lock_tocken = self.tool.lockDocument(doc_rpath)
-        self.assertEquals(self.tool.isDocumentLocked(doc_rpath), True)
+        self.assert_(self.tool.isDocumentLocked(doc_rpath))
         self.tool.unlockDocument(doc_rpath, lock_tocken)
-        self.assertEquals(self.tool.isDocumentLocked(doc_rpath), False)
+        self.failIf(self.tool.isDocumentLocked(doc_rpath))
 
 
 def test_suite():
