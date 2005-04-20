@@ -10,3 +10,4 @@ Bug fixes:
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 - Added unit tests.
+- Renamed variables so that their names don't include the used data type.

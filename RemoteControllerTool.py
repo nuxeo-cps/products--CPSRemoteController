@@ -196,12 +196,12 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
     security.declareProtected(ModifyPortalContent, 'publishDocument')
-    def publishDocument(self, document_rpath, rpath_to_publish_dict, comments=""):
+    def publishDocument(self, document_rpath, rpaths_to_publish, comments=""):
         """Publish the document specified by the given relative path.
 
         document_rpath is of the form "workspaces/doc1" or "workspaces/folder/doc2".
 
-        rpath_to_publish_dict is a dictionary. The dictionary keys are the rpath
+        rpaths_to_publish is a dictionary. The dictionary keys are the rpath
         of where to publish the document. The rpath can be the rpath of a
         section or the rpath of a document. The dictionary values are either the
         empty string, "before", "after" or "replace".
@@ -217,7 +217,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         allowed_transitions = wftool.getAllowedPublishingTransitions(context)
         LOG(glog_key, DEBUG, "allowed_transitions = %s" % str(allowed_transitions))
 
-        for target_rpath, placement in rpath_to_publish_dict.items():
+        for target_rpath, placement in rpaths_to_publish.items():
             LOG(glog_key, DEBUG, "target_rpath / placement = %s / %s"
                 % (target_rpath, placement))
             target_document = None
@@ -300,7 +300,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
     security.declareProtected(AddPortalContent, 'createDocument')
-    def createDocument(self, portal_type, data_dict, folder_rpath, position=-1):
+    def createDocument(self, portal_type, doc_def, folder_rpath, position=-1):
         """Create document with the given portal_type with data from the given
         data dictionary.
 
@@ -344,14 +344,14 @@ class RemoteControllerTool(UniqueObject, Folder):
         'workspaces', 2)
         """
         # If no Title is given, the portal_type is used as a fallback title
-        document_title = data_dict.get('Title', portal_type)
+        document_title = doc_def.get('Title', portal_type)
         folder_proxy = self.restrictedTraverse(folder_rpath)
         id = folder_proxy.computeId(compute_from=document_title)
         folder_proxy.invokeFactory(portal_type, id)
         doc_proxy = getattr(folder_proxy, id)
 	doc_rpath = folder_proxy.getContentInfo(doc_proxy, level=0)['rpath']
 
-        self._editDocument(doc_proxy, data_dict)
+        self._editDocument(doc_proxy, doc_def)
 
         if position >= 0:
             context = aq_parent(aq_inner(doc_proxy))
@@ -361,16 +361,16 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
     security.declareProtected(ModifyPortalContent, 'editDocument')
-    def editDocument(self, rpath, data_dict={}):
+    def editDocument(self, rpath, doc_def={}):
         """Modify the specified document with data from the given
         data dictionary.
         """
         doc_proxy = self.restrictedTraverse(rpath)
-        self._editDocument(doc_proxy, data_dict)
+        self._editDocument(doc_proxy, doc_def)
 
 
     security.declareProtected(AddPortalContent, 'editOrCreateDocument')
-    def editOrCreateDocument(self, rpath, portal_type, data_dict, position=-1):
+    def editOrCreateDocument(self, rpath, portal_type, doc_def, position=-1):
         """Create or edit a document with the given portal_type with data from
         the given data dictionary.
 
@@ -385,18 +385,18 @@ class RemoteControllerTool(UniqueObject, Folder):
             proxy = None
             LOG(glog_key, DEBUG, "editOrCreateDocument document does NOT exist")
         if proxy is not None and proxy.portal_type == portal_type:
-            self._editDocument(proxy, data_dict)
+            self._editDocument(proxy, doc_def)
             id = proxy.getId()
         else:
             folder_rpath = rpath.split('/')[:-1]
             LOG(glog_key, DEBUG,
                 "editOrCreateDocument folder_rpath = %s"% folder_rpath)
-            id = self.createDocument(portal_type, data_dict, folder_rpath,
+            id = self.createDocument(portal_type, doc_def, folder_rpath,
                                      position)
         return id
 
 
-    def _editDocument(self, doc_proxy, data_dict):
+    def _editDocument(self, doc_proxy, doc_def):
         """Modify the document given its proxy.
 
         This method holds the special logic used to retrieve a potential file
@@ -405,24 +405,24 @@ class RemoteControllerTool(UniqueObject, Folder):
         doc = doc_proxy.getEditableContent()
 
         # Getting and processing a potential file
-        file = data_dict.get('file', None)
+        file = doc_def.get('file', None)
         DEFAULT_FILE_NAME = "Uploaded file"
-        file_name = data_dict.get('file_name', DEFAULT_FILE_NAME)
+        file_name = doc_def.get('file_name', DEFAULT_FILE_NAME)
         if file is not None:
-            file = data_dict.get('file', None)
-            binary = data_dict['file']
+            file = doc_def.get('file', None)
+            binary = doc_def['file']
             if isinstance(binary, Binary):
                 file_id = generateId(file_name, lower=True)
-                data_dict['file'] = File(file_id, file_name, binary.data)
+                doc_def['file'] = File(file_id, file_name, binary.data)
             else:
                 # We don't know how to handle this case so we discard this item
-                del data_dict['file']
+                del doc_def['file']
         if file_name != DEFAULT_FILE_NAME:
             # We don't need this key anymore and we don't want the document to
             # be modified by it.
-            del data_dict['file_name']
+            del doc_def['file_name']
 
-        doc.edit(data_dict)
+        doc.edit(doc_def)
 
 
 InitializeClass(RemoteControllerTool)
