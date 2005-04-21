@@ -272,7 +272,7 @@ class RemoteControllerTool(UniqueObject, Folder):
                     LOG(glog_key, DEBUG, "In fact this option is useless.")
                 LOG(glog_key, DEBUG, "publishDocument newpos = %s" % newpos)
                 if newpos is not None:
-                    section.move_object_to_position(document_id, newpos)
+                    section.moveObjectToPosition(document_id, newpos)
 
 
     security.declareProtected(ModifyPortalContent, 'unpublishDocument')
@@ -298,7 +298,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         id = proxy.getId()
         context = aq_parent(aq_inner(proxy))
         newpos = context.get_object_position(id) + step
-        context.move_object_to_position(id, newpos)
+        context.moveObjectToPosition(id, newpos)
 
 
     security.declareProtected(AddPortalContent, 'createDocument')
@@ -357,7 +357,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
         if position >= 0:
             context = aq_parent(aq_inner(doc_proxy))
-            context.move_object_to_position(id, position)
+            context.moveObjectToPosition(id, position)
 
         return doc_rpath
 
