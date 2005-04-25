@@ -55,16 +55,36 @@ class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
         self.assert_(self.tool.listContent(folder_rpath))
 
 
-    def test_createDocument(self):
+    def test_createAndDeleteDocument(self):
+        folder_rpath = 'workspaces'
+        proxy_list1 = self.tool.listContent(folder_rpath)
+        data_dict = {'Title': "The report from Monday meeting",
+                     'Description': "Another boring report",
+                     }
+        doc_rpath = self.tool.createDocument('File', data_dict, folder_rpath, 0)
+        proxy_list2 = self.tool.listContent(folder_rpath)
+        self.assertEquals(len(proxy_list1) + 1, len(proxy_list2))
+        self.assert_(doc_rpath in proxy_list2)
+
+        self.tool.deleteDocument(doc_rpath)
+        proxy_list3 = self.tool.listContent(folder_rpath)
+        self.assertEquals(len(proxy_list1), len(proxy_list3))
+        self.failIf(doc_rpath in proxy_list3)
+
+
+    def test_lockDocument(self):
         folder_rpath = 'workspaces'
         proxy_list1 = self.tool.listContent(folder_rpath)
         data_dict = {'Title': "The report from Monday meeting",
                      'Description': "Another boring report",
                      }
         doc_id = self.tool.createDocument('File', data_dict, folder_rpath, 0)
-        proxy_list2 = self.tool.listContent(folder_rpath)
-        self.assertEquals(len(proxy_list1) + 1, len(proxy_list2))
-        self.assert_(doc_id in proxy_list2)
+        doc_rpath = folder_rpath + '/' + doc_id
+        self.failIf(self.tool.isDocumentLocked(doc_rpath))
+        lock_tocken = self.tool.lockDocument(doc_rpath)
+        self.assert_(self.tool.isDocumentLocked(doc_rpath))
+        self.tool.unlockDocument(doc_rpath, lock_tocken)
+        self.failIf(self.tool.isDocumentLocked(doc_rpath))
 
 
     def test_editOrcreateDocument(self):
@@ -87,21 +107,6 @@ class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
         doc3_returned_rpath = self.tool.editOrCreateDocument(doc3_rpath, 'File', data_dict, 0)
         proxy_list4 = self.tool.listContent(folder_rpath)
         self.assertEquals(len(proxy_list3) + 1, len(proxy_list4))
-
-
-    def test_lockDocument(self):
-        folder_rpath = 'workspaces'
-        proxy_list1 = self.tool.listContent(folder_rpath)
-        data_dict = {'Title': "The report from Monday meeting",
-                     'Description': "Another boring report",
-                     }
-        doc_id = self.tool.createDocument('File', data_dict, folder_rpath, 0)
-        doc_rpath = folder_rpath + '/' + doc_id
-        self.failIf(self.tool.isDocumentLocked(doc_rpath))
-        lock_tocken = self.tool.lockDocument(doc_rpath)
-        self.assert_(self.tool.isDocumentLocked(doc_rpath))
-        self.tool.unlockDocument(doc_rpath, lock_tocken)
-        self.failIf(self.tool.isDocumentLocked(doc_rpath))
 
 
 def test_suite():

@@ -24,7 +24,7 @@ import os.path
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
 from Products.CMFCore.permissions import ManagePortal, ChangePermissions, \
-     AddPortalContent, ModifyPortalContent, View
+     AddPortalContent, ModifyPortalContent, DeleteObjects, View
 from Products.CMFCore.utils import UniqueObject, getToolByName
 from OFS.Folder import Folder
 from Acquisition import aq_parent, aq_inner
@@ -32,7 +32,7 @@ from OFS.Image import File
 from xmlrpclib import Binary
 from webdav.LockItem import LockItem
 from Products.CPSUtil.id import generateId
-from zLOG import LOG, DEBUG, ERROR
+from zLOG import LOG, DEBUG, ERROR, PROBLEM
 
 
 glog_key = 'RemoteControllerTool'
@@ -428,6 +428,15 @@ class RemoteControllerTool(UniqueObject, Folder):
             del doc_def['file_name']
 
         doc.edit(doc_def)
+
+
+    security.declareProtected(DeleteObjects, 'deleteDocument')
+    def deleteDocument(self, rpath):
+        """Delete the document with the given rpath.
+        """
+        proxy = self.restrictedTraverse(rpath)
+        context = aq_parent(aq_inner(proxy))
+        context.manage_delObjects([proxy.getId()])
 
 
 InitializeClass(RemoteControllerTool)
