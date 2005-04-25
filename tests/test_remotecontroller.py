@@ -78,8 +78,7 @@ class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
         data_dict = {'Title': "The report from Monday meeting",
                      'Description': "Another boring report",
                      }
-        doc_id = self.tool.createDocument('File', data_dict, folder_rpath, 0)
-        doc_rpath = folder_rpath + '/' + doc_id
+        doc_rpath = self.tool.createDocument('File', data_dict, folder_rpath, 0)
         self.failIf(self.tool.isDocumentLocked(doc_rpath))
         lock_tocken = self.tool.lockDocument(doc_rpath)
         self.assert_(self.tool.isDocumentLocked(doc_rpath))
@@ -93,12 +92,11 @@ class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
         data_dict = {'Title': "The report from Monday meeting",
                      'Description': "Another boring report",
                      }
-        doc1_id = self.tool.createDocument('File', data_dict, folder_rpath, 0)
-        doc1_rpath = folder_rpath + '/' + doc1_id
+        doc1_rpath = self.tool.createDocument('File', data_dict, folder_rpath, 0)
         proxy_list2 = self.tool.listContent(folder_rpath)
         self.assertEquals(len(proxy_list1) + 1, len(proxy_list2))
 
-        doc2_id = self.tool.editOrCreateDocument(doc1_rpath, 'File', data_dict, 0)
+        doc2_rpath = self.tool.editOrCreateDocument(doc1_rpath, 'File', data_dict, 0)
         proxy_list3 = self.tool.listContent(folder_rpath)
         self.assertEquals(len(proxy_list2), len(proxy_list3))
 
@@ -107,6 +105,50 @@ class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
         doc3_returned_rpath = self.tool.editOrCreateDocument(doc3_rpath, 'File', data_dict, 0)
         proxy_list4 = self.tool.listContent(folder_rpath)
         self.assertEquals(len(proxy_list3) + 1, len(proxy_list4))
+
+
+    def test_publishApproveUnpublishDocument(self):
+        folder_rpath = 'workspaces'
+        sections_rpath = 'sections'
+        data_dict = {'Title': "The report from Monday meeting",
+                     'Description': "Another boring report",
+                     }
+        doc1_rpath = self.tool.createDocument('File', data_dict, folder_rpath, 0)
+        doc1_id = self.portal.restrictedTraverse(doc1_rpath).getId()
+        data_dict = {'Title': "Climate warning!",
+                     'Description': "Consumers should make the difference",
+                     }
+        doc2_rpath = self.tool.createDocument('File', data_dict, folder_rpath, 0)
+        doc2_id = self.portal.restrictedTraverse(doc2_rpath).getId()
+
+        proxy_list1 = self.tool.listContent(sections_rpath)
+        #print "proxy_list1 = %s" % proxy_list1
+        self.tool.publishDocument(doc1_rpath,
+                                  {'sections': ''})
+        proxy_list2 = self.tool.listContent(sections_rpath)
+        #print "proxy_list2 = %s" % proxy_list2
+        doc1_state = self.tool.getDocumentState(os.path.join(sections_rpath,
+                                                             doc1_id))
+        self.assertEquals(doc1_state, 'published')
+
+        self.tool.publishDocument(doc2_rpath,
+                                  {'sections': ''},
+                                  wait_for_approval=True)
+        proxy_list3 = self.tool.listContent(sections_rpath)
+        #print "proxy_list3 = %s" % proxy_list3
+        doc2_state = self.tool.getDocumentState(os.path.join(sections_rpath,
+                                                             doc2_id))
+        self.assertEquals(doc2_state, 'pending')
+        self.tool.acceptDocument(os.path.join(sections_rpath,
+                                              doc2_id))
+        doc2_state = self.tool.getDocumentState(os.path.join(sections_rpath,
+                                                             doc2_id))
+        self.assertEquals(doc2_state, 'published')
+        proxy_list4 = self.tool.listContent(sections_rpath)
+        self.tool.unpublishDocument(os.path.join(sections_rpath,
+                                                 doc2_id))
+        proxy_list5 = self.tool.listContent(sections_rpath)
+        self.assertEquals(len(proxy_list4) - 1, len(proxy_list5))
 
 
 def test_suite():

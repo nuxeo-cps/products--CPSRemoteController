@@ -197,8 +197,24 @@ class RemoteControllerTool(UniqueObject, Folder):
         return True
 
 
+    security.declareProtected(ModifyPortalContent, 'approveDocument')
+    def acceptDocument(self, rpath, comments=""):
+        """Approve the document specified by the given relative path.
+
+        rpath is of the form "sections/doc1" or "sections/folder/doc2".
+        """
+        wftool = self.portal_workflow
+        proxy = self.restrictedTraverse(rpath)
+        context = proxy
+        workflow_action = 'accept'
+        allowed_transitions = wftool.getAllowedPublishingTransitions(context)
+        LOG(glog_key, DEBUG, "allowed_transitions = %s" % str(allowed_transitions))
+        wftool.doActionFor(context, workflow_action, comment=comments)
+
+
     security.declareProtected(ModifyPortalContent, 'publishDocument')
-    def publishDocument(self, document_rpath, rpaths_to_publish, comments=""):
+    def publishDocument(self, document_rpath, rpaths_to_publish,
+                        wait_for_approval=False, comments=""):
         """Publish the document specified by the given relative path.
 
         document_rpath is of the form "workspaces/doc1" or "workspaces/folder/doc2".
@@ -215,7 +231,10 @@ class RemoteControllerTool(UniqueObject, Folder):
         document_id = proxy.getId()
         context = proxy
         workflow_action = 'copy_submit'
-        transition = 'publish'
+        if wait_for_approval:
+            transition = 'submit'
+        else:
+            transition = 'publish'
         allowed_transitions = wftool.getAllowedPublishingTransitions(context)
         LOG(glog_key, DEBUG, "allowed_transitions = %s" % str(allowed_transitions))
 
@@ -262,7 +281,7 @@ class RemoteControllerTool(UniqueObject, Folder):
             # consider the placement value to optionally move the document.
             if target_document is not None:
                 target_id = target_document.getId()
-                target_pos = section.get_object_position(target_id)
+                target_pos = section.getObjectPosition(target_id)
                 newpos = None
                 if placement == 'before':
                     newpos = target_pos
@@ -297,7 +316,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         proxy = self.restrictedTraverse(rpath)
         id = proxy.getId()
         context = aq_parent(aq_inner(proxy))
-        newpos = context.get_object_position(id) + step
+        newpos = context.getObjectPosition(id) + step
         context.moveObjectToPosition(id, newpos)
 
 

@@ -6,6 +6,8 @@ New features:
 - Modified createDocument and editOrCreateDocument so that they return the rpath
   of the document instead of its id.
 - Added the deleteDocument method.
+- Added the acceptDocument method.
+- Made it possible to not publish directly documents but to submit them.
 Bug fixes:
 ~~~~~~~~~~
 - Added missing log ERROR import.
