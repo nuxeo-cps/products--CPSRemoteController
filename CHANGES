@@ -8,6 +8,9 @@ New features:
 - Added the deleteDocument method.
 - Added the acceptDocument method.
 - Made it possible to not publish directly documents but to submit them.
+- Added a deleteDocumentLocks methods to delete all the locks owned by a user on
+  the specified document.  Calling this method should be avoided but might be
+  useful when a client application crashes and loses all the user locks.
 Bug fixes:
 ~~~~~~~~~~
 - Added missing log ERROR import.

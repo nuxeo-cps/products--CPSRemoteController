@@ -174,8 +174,8 @@ class RemoteControllerTool(UniqueObject, Folder):
             LOG(log_key, DEBUG, "document is already locked")
             return False
         member = self.portal_membership.getAuthenticatedMember()
-        creator = member.getUser()
-        lock = LockItem(creator)
+        user = member.getUser()
+        lock = LockItem(user, user)
         lock_token = lock.getLockToken()
         proxy.wl_setLock(lock_token, lock)
         if not proxy.wl_isLocked():
@@ -195,6 +195,24 @@ class RemoteControllerTool(UniqueObject, Folder):
             return False
         proxy.wl_delLock(lock_token)
         return True
+
+
+    security.declareProtected(ModifyPortalContent, 'deleteDocumentLocks')
+    def deleteDocumentLocks(self, rpath):
+        """Delete all the locks owned by a user on the specified document.
+
+        Calling this method should be avoided but might be useful when a client
+        application crashes and loses all the user locks.
+        """
+        proxy = self.restrictedTraverse(rpath)
+        if not proxy.wl_isLocked():
+            return False
+        member = self.portal_membership.getAuthenticatedMember()
+        user = member.getUser()
+        lock_mapping = proxy.wl_lockmapping(killinvalids=1)
+        for lock_token, lock in proxy.wl_lockItems():
+            if lock.getOwner() == user:
+                del lock_mapping[lock_token]
 
 
     security.declareProtected(ModifyPortalContent, 'approveDocument')

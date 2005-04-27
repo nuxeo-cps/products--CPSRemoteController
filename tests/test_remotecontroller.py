@@ -85,6 +85,12 @@ class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
         self.tool.unlockDocument(doc_rpath, lock_tocken)
         self.failIf(self.tool.isDocumentLocked(doc_rpath))
 
+        # Simulating that we have lost the lock_tokens for a document, for
+        # example because the application crashed.
+        lost_lock_tocken = self.tool.lockDocument(doc_rpath)
+        self.tool.deleteDocumentLocks(doc_rpath)
+        self.failIf(self.tool.isDocumentLocked(doc_rpath))
+
 
     def test_editOrcreateDocument(self):
         folder_rpath = 'workspaces'
