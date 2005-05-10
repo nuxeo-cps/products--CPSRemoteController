@@ -20,6 +20,7 @@
 """
 """
 
+import types
 import os.path
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
@@ -382,13 +383,14 @@ class RemoteControllerTool(UniqueObject, Folder):
         hires"},
         'workspaces', 2)
         """
+        doc_def = toLatin9(doc_def)
         # If no Title is given, the portal_type is used as a fallback title
         document_title = doc_def.get('Title', portal_type)
         folder_proxy = self.restrictedTraverse(folder_rpath)
         id = folder_proxy.computeId(compute_from=document_title)
         folder_proxy.invokeFactory(portal_type, id)
         doc_proxy = getattr(folder_proxy, id)
-	doc_rpath = os.path.join(folder_rpath, id)
+        doc_rpath = os.path.join(folder_rpath, id)
 
         self._editDocument(doc_proxy, doc_def)
 
@@ -404,6 +406,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         """Modify the specified document with data from the given
         data dictionary.
         """
+        doc_def = toLatin9(doc_def)
         doc_proxy = self.restrictedTraverse(rpath)
         self._editDocument(doc_proxy, doc_def)
 
@@ -417,6 +420,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
         Optional parameter position can be any value >= 0.
         """
+        doc_def = toLatin9(doc_def)
         try:
             proxy = self.restrictedTraverse(rpath)
             LOG(glog_key, DEBUG, "editOrCreateDocument document DOES exist")
@@ -445,6 +449,8 @@ class RemoteControllerTool(UniqueObject, Folder):
         upload.
         """
         doc = doc_proxy.getEditableContent()
+
+        doc_def = toLatin9(doc_def)
 
         # Getting and processing a potential file
         file = doc_def.get('file', None)
@@ -477,3 +483,27 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
 InitializeClass(RemoteControllerTool)
+
+
+def toLatin9(obj):
+    if type(obj) == types.DictType:
+        for k, v in obj.items():
+            if type(v) == types.UnicodeType:
+                v = _stringToLatin9(v)
+                obj[k] = v
+    elif type(obj) == types.UnicodeType:
+        obj = _stringToLatin9(obj)
+    return obj
+
+
+def _stringToLatin9(s):
+    if s is None:
+        return None
+    else:
+        # Replace RIGHT SINGLE QUOTATION MARK (unicode only)
+        # by the APOSTROPHE (ascii and latin1).
+        # cf. http://www.cl.cam.ac.uk/~mgk25/ucs/quotes.html
+        s = s.replace(u'\u2019', u'\u0027')
+        #&#8217;
+        return s.encode('iso-8859-15', 'ignore')
+
