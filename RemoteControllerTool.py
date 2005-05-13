@@ -383,6 +383,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         hires"},
         'workspaces', 2)
         """
+        LOG(glog_key, DEBUG, "editOrCreateDocument doc_def = %s" % str(doc_def))
         doc_def = toLatin9(doc_def)
         # If no Title is given, the portal_type is used as a fallback title
         document_title = doc_def.get('Title', portal_type)
@@ -406,6 +407,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         """Modify the specified document with data from the given
         data dictionary.
         """
+        LOG(glog_key, DEBUG, "editDocument doc_def = %s" % str(doc_def))
         doc_def = toLatin9(doc_def)
         doc_proxy = self.restrictedTraverse(rpath)
         self._editDocument(doc_proxy, doc_def)
@@ -420,6 +422,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
         Optional parameter position can be any value >= 0.
         """
+        LOG(glog_key, DEBUG, "editOrCreateDocument doc_def = %s" % str(doc_def))
         doc_def = toLatin9(doc_def)
         try:
             proxy = self.restrictedTraverse(rpath)
