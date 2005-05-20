@@ -1,4 +1,31 @@
 *******************************************
+** CPSRemoteController V0.2.0 [R1 build 2005/05/20-14:32 by madarche]
+** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 21687
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+- Modified createDocument and editOrCreateDocument so that they return the rpath
+  of the document instead of its id.
+- Added the deleteDocument method.
+- Added the acceptDocument method.
+- Made it possible to not publish directly documents but to submit them.
+- Added a deleteDocumentLocks methods to delete all the locks owned by a user on
+  the specified document.  Calling this method should be avoided but might be
+  useful when a client application crashes and loses all the user locks.
+Bug fixes:
+~~~~~~~~~~
+- Added missing log ERROR import.
+- Added encoding to latin9 of all possible UTF-8 strings, since CPS does not
+  handle Unicode.
+- Made the "replace" option of the publishDocument method work.
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+- Added unit tests.
+- Renamed variables so that their names don't include the used data type.
+
+*******************************************
 ** CPSRemoteController V0.1.0 [R1 build 2005/04/14-16:43 by madarche]
 
 Requires:
