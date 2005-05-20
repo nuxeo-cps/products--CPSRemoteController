@@ -16,6 +16,7 @@ Bug fixes:
 - Added missing log ERROR import.
 - Added encoding to latin9 of all possible UTF-8 strings, since CPS does not
   handle Unicode.
+- Made the "replace" option of the publishDocument method work.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 - Added unit tests.

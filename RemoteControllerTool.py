@@ -242,6 +242,11 @@ class RemoteControllerTool(UniqueObject, Folder):
         of where to publish the document. The rpath can be the rpath of a
         section or the rpath of a document. The dictionary values are either the
         empty string, "before", "after" or "replace".
+
+        "replace" is to be used so that the published document really replaces
+        another document, be it folder or document. The targeted document is
+        deleted and the document to published is inserted at the position of the
+        now deleted targeted document.
         """
         portal = self.portal_url.getPortalObject()
         portal_ppath = portal.getPhysicalPath()
@@ -268,11 +273,12 @@ class RemoteControllerTool(UniqueObject, Folder):
                     % target_rpath)
                 continue
             if object.portal_type == 'Section':
-                LOG(glog_key, DEBUG, "1.")
+                LOG(glog_key, DEBUG, "Target document is a section")
                 section_rpath = target_rpath
                 section = object
             else:
-                LOG(glog_key, DEBUG, "2.")
+                LOG(glog_key, DEBUG,
+                    "Target document is a document (not section)")
                 try:
                     target_document = portal.restrictedTraverse(target_rpath)
                     target_document_ppath = target_document.getPhysicalPath()
@@ -283,11 +289,9 @@ class RemoteControllerTool(UniqueObject, Folder):
                         % target_rpath)
                     continue
                 if object.portal_type == 'Section':
-                    LOG(glog_key, DEBUG, "3.")
                     section_rpath = '/'.join(object.getPhysicalPath()[len(portal_ppath):])
                     section = object
                 else:
-                    LOG(glog_key, DEBUG, "4.")
                     LOG(glog_key, DEBUG, 'publishDocument no section with rpath = %s'
                         % target_rpath)
                     continue
@@ -297,7 +301,8 @@ class RemoteControllerTool(UniqueObject, Folder):
                                initial_transition=transition,
                                comment=comments)
             # If the rpath provided was the one of a document then we will
-            # consider the placement value to optionally move the document.
+            # consider the placement value to optionally move the document or
+            # make it replace another one.
             if target_document is not None:
                 target_id = target_document.getId()
                 target_pos = section.getObjectPosition(target_id)
@@ -307,7 +312,9 @@ class RemoteControllerTool(UniqueObject, Folder):
                 elif placement == 'after':
                     newpos = target_pos + 1
                 elif placement == 'replace':
-                    LOG(glog_key, DEBUG, "In fact this option is useless.")
+                    newpos = target_pos
+                    context = target_document
+                    wftool.doActionFor(context, 'unpublish', comment=comments)
                 LOG(glog_key, DEBUG, "publishDocument newpos = %s" % newpos)
                 if newpos is not None:
                     section.moveObjectToPosition(document_id, newpos)
