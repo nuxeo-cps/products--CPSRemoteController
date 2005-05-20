@@ -3,7 +3,7 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
--
+- Added the getOriginalDocument and getPublishedDocuments methods.
 Bug fixes:
 ~~~~~~~~~~
 -

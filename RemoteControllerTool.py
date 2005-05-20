@@ -452,6 +452,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         return doc_rpath
 
 
+    security.declarePrivate('_editDocument')
     def _editDocument(self, doc_proxy, doc_def):
         """Modify the document given its proxy.
 
@@ -490,6 +491,48 @@ class RemoteControllerTool(UniqueObject, Folder):
         proxy = self.restrictedTraverse(rpath)
         context = aq_parent(aq_inner(proxy))
         context.manage_delObjects([proxy.getId()])
+
+
+    security.declareProtected(View, 'getOriginalDocument')
+    def getOriginalDocument(self, rpath):
+        """Return the rpath original document that has been used to publish the
+        document specified by the given path.
+
+        rpath is of the form "sections/doc1".
+        """
+        return self._getOriginalOrPublishedDocuments(rpath, False)
+
+
+    security.declareProtected(View, 'getOriginalDocument')
+    def getPublishedDocuments(self, rpath):
+        """Return a list of rpaths of documents which are publications of the
+        document specified by the given path.
+
+        rpath is of the form "workspaces/doc1".
+        """
+        return self._getOriginalOrPublishedDocuments(rpath)
+
+
+    security.declarePrivate('_editDocument')
+    def _getOriginalOrPublishedDocuments(self, rpath, published_documents=True):
+        """Return rpaths of the documents, published or not, through the history
+        of the document specified by the given path.
+        """
+        portal = self.portal_url.getPortalObject()
+        portal_ppath = portal.getPhysicalPath()
+        proxy = self.restrictedTraverse(rpath)
+        states_info = proxy.getContentInfo(proxy=proxy, level=2)['states']
+        LOG(glog_key, DEBUG, "states info = %s" % states_info)
+        published_documents_rpaths = []
+        for state_info in states_info:
+            state = state_info['review_state']
+            if (published_documents and state == 'published'
+                or not published_documents and state != 'published'):
+                published_proxy = state_info['proxy']
+                published_proxy_path = '/'.join(
+                    published_proxy.getPhysicalPath()[len(portal_ppath):])
+                published_documents_rpaths.append(published_proxy_path)
+        return published_documents_rpaths
 
 
 InitializeClass(RemoteControllerTool)
