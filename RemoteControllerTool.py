@@ -501,6 +501,15 @@ class RemoteControllerTool(UniqueObject, Folder):
             self.deleteDocument(rpath)
 
 
+    security.declareProtected(DeleteObjects, 'deleteDocumentsInDirectory')
+    def deleteDocumentsInDirectory(self, rpath):
+        """Delete the documents located in directory corresponding to the given
+        rpath.
+        """
+        proxy = self.restrictedTraverse(rpath)
+        proxy.manage_delObjects(proxy.objectIds())
+
+
     security.declareProtected(View, 'getOriginalDocument')
     def getOriginalDocument(self, rpath):
         """Return the rpath original document that has been used to publish the
