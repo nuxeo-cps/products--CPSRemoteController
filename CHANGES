@@ -4,6 +4,7 @@ Requires:
 New features:
 ~~~~~~~~~~~~~
 - Added the getOriginalDocument and getPublishedDocuments methods.
+- Added the deleteDocuments method.
 Bug fixes:
 ~~~~~~~~~~
 -

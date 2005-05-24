@@ -493,6 +493,14 @@ class RemoteControllerTool(UniqueObject, Folder):
         context.manage_delObjects([proxy.getId()])
 
 
+    security.declareProtected(DeleteObjects, 'deleteDocuments')
+    def deleteDocuments(self, rpaths):
+        """Delete the documents corresponding to the given rpaths.
+        """
+        for rpath in rpaths:
+            self.deleteDocument(rpath)
+
+
     security.declareProtected(View, 'getOriginalDocument')
     def getOriginalDocument(self, rpath):
         """Return the rpath original document that has been used to publish the
