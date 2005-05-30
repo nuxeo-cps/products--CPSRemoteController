@@ -5,6 +5,8 @@ New features:
 ~~~~~~~~~~~~~
 - Added the getOriginalDocument and getPublishedDocuments methods.
 - Added the deleteDocuments and deleteDocumentsInDirectory methods.
+- Made the methods createDocument, editDocument and editOrCreateDocument more
+  flexible in their choice of the file attribute to modify in the document.
 Bug fixes:
 ~~~~~~~~~~
 -

@@ -38,6 +38,12 @@ from zLOG import LOG, DEBUG, ERROR, PROBLEM
 
 glog_key = 'RemoteControllerTool'
 
+BINARY_FILE_KEY = 'file'
+BINARY_FILENAME_KEY = 'file_name'
+BINARY_DEFAULT_FILE_NAME = "Uploaded file"
+DOCUMENT_FILE_KEY = 'file_key'
+DOCUMENT_DEFAULT_FILE_KEY = 'file'
+
 
 class RemoteControllerTool(UniqueObject, Folder):
     """A tool providing an high-level API for manipulating documents.
@@ -389,6 +395,22 @@ class RemoteControllerTool(UniqueObject, Folder):
         {'Title': "The company hires", 'Description': "The company goes well and
         hires"},
         'workspaces', 2)
+
+        from xmlrpclib import ServerProxy, Binary
+        f = open('MyImage.png', 'r')
+        binary = Binary(f.read())
+        p.createDocument('File',
+        {'Title': "The report from Monday meeting",
+         'Description': "Another boring report"},
+         'file_name': "MyImage.png",
+         'file_key': 'file_zip',
+         'file': binary,
+         },
+        'workspaces')
+        p.createDocument('News Item',
+        {'Title': "The company hires", 'Description': "The company goes well and
+        hires"},
+        'workspaces', 2)
         """
         LOG(glog_key, DEBUG, "editOrCreateDocument doc_def = %s" % str(doc_def))
         doc_def = toLatin9(doc_def)
@@ -464,22 +486,23 @@ class RemoteControllerTool(UniqueObject, Folder):
         doc_def = toLatin9(doc_def)
 
         # Getting and processing a potential file
-        file = doc_def.get('file', None)
-        DEFAULT_FILE_NAME = "Uploaded file"
-        file_name = doc_def.get('file_name', DEFAULT_FILE_NAME)
+        file = doc_def.get(BINARY_FILE_KEY, None)
+        file_name = doc_def.get(BINARY_FILENAME_KEY, BINARY_DEFAULT_FILE_NAME)
+        file_key = doc_def.get(DOCUMENT_FILE_KEY, DOCUMENT_DEFAULT_FILE_KEY)
+
+        # We don't need those keys anymore and we don't want the document to be
+        # modified by them.
+        if doc_def.has_key(BINARY_FILE_KEY):
+            del doc_def[BINARY_FILE_KEY]
+        if doc_def.has_key(BINARY_FILENAME_KEY):
+            del doc_def[BINARY_FILENAME_KEY]
+        if doc_def.has_key(DOCUMENT_FILE_KEY):
+            del doc_def[DOCUMENT_FILE_KEY]
+
         if file is not None:
-            file = doc_def.get('file', None)
-            binary = doc_def['file']
-            if isinstance(binary, Binary):
+            if isinstance(file, Binary):
                 file_id = generateId(file_name, lower=True)
-                doc_def['file'] = File(file_id, file_name, binary.data)
-            else:
-                # We don't know how to handle this case so we discard this item
-                del doc_def['file']
-        if file_name != DEFAULT_FILE_NAME:
-            # We don't need this key anymore and we don't want the document to
-            # be modified by it.
-            del doc_def['file_name']
+                doc_def[file_key] = File(file_id, file_name, file.data)
 
         doc.edit(doc_def)
 
