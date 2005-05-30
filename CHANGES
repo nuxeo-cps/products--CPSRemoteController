@@ -9,7 +9,8 @@ New features:
   flexible in their choice of the file attribute to modify in the document.
 Bug fixes:
 ~~~~~~~~~~
--
+- Added the needed code (hack) to have document modifications appear in the
+  status history.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -

@@ -353,7 +353,8 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
     security.declareProtected(AddPortalContent, 'createDocument')
-    def createDocument(self, portal_type, doc_def, folder_rpath, position=-1):
+    def createDocument(self, portal_type, doc_def, folder_rpath, position=-1,
+                       comments=""):
         """Create document with the given portal_type with data from the given
         data dictionary.
 
@@ -422,7 +423,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         doc_proxy = getattr(folder_proxy, id)
         doc_rpath = os.path.join(folder_rpath, id)
 
-        self._editDocument(doc_proxy, doc_def)
+        self._editDocument(doc_proxy, doc_def, comments)
 
         if position >= 0:
             context = aq_parent(aq_inner(doc_proxy))
@@ -432,18 +433,19 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
     security.declareProtected(ModifyPortalContent, 'editDocument')
-    def editDocument(self, rpath, doc_def={}):
+    def editDocument(self, rpath, doc_def={}, comments=""):
         """Modify the specified document with data from the given
         data dictionary.
         """
         LOG(glog_key, DEBUG, "editDocument doc_def = %s" % str(doc_def))
         doc_def = toLatin9(doc_def)
         doc_proxy = self.restrictedTraverse(rpath)
-        self._editDocument(doc_proxy, doc_def)
+        self._editDocument(doc_proxy, doc_def, comments)
 
 
     security.declareProtected(AddPortalContent, 'editOrCreateDocument')
-    def editOrCreateDocument(self, rpath, portal_type, doc_def, position=-1):
+    def editOrCreateDocument(self, rpath, portal_type, doc_def, position=-1,
+                             comments=""):
         """Create or edit a document with the given portal_type with data from
         the given data dictionary.
 
@@ -475,7 +477,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
     security.declarePrivate('_editDocument')
-    def _editDocument(self, doc_proxy, doc_def):
+    def _editDocument(self, doc_proxy, doc_def, comments=""):
         """Modify the document given its proxy.
 
         This method holds the special logic used to retrieve a potential file
@@ -505,6 +507,11 @@ class RemoteControllerTool(UniqueObject, Folder):
                 doc_def[file_key] = File(file_id, file_name, file.data)
 
         doc.edit(doc_def)
+
+        # XXX: This hack has to be used until the CPS document modification
+        # really takes advantage of the "modify" workflow transition.
+        workflow_tool = getToolByName(self, 'portal_workflow')
+        workflow_tool.doActionFor(doc_proxy, 'modify', comment=comments)
 
 
     security.declareProtected(DeleteObjects, 'deleteDocument')
