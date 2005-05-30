@@ -558,6 +558,8 @@ class RemoteControllerTool(UniqueObject, Folder):
         """Return rpaths of the documents, published or not, through the history
         of the document specified by the given path.
         """
+        # XXX: Instead of the history, use the proxy tool to get proxies from
+        # document and document from a proxy.
         portal = self.portal_url.getPortalObject()
         portal_ppath = portal.getPhysicalPath()
         proxy = self.restrictedTraverse(rpath)
