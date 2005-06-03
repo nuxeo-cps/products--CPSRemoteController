@@ -1,3 +1,4 @@
+# -*- coding: ISO-8859-15 -*-
 # (C) Copyright 2005 Nuxeo SARL <http://nuxeo.com>
 # Authors:
 # M.-A. Darche <madarche@nuxeo.com>
