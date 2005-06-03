@@ -11,6 +11,7 @@ Bug fixes:
 ~~~~~~~~~~
 - Added the needed code (hack) to have document modifications appear in the
   status history.
+- Dealt with special case meta attribute Language.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -

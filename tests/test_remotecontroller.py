@@ -50,12 +50,12 @@ class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
         self.logout()
 
 
-    def test_listContent(self):
+    def testListContent(self):
         folder_rpath = 'workspaces'
         self.assert_(self.tool.listContent(folder_rpath))
 
 
-    def test_createAndDeleteDocument(self):
+    def testCreateAndDeleteDocument(self):
         folder_rpath = 'workspaces'
         proxy_list1 = self.tool.listContent(folder_rpath)
         data_dict = {'Title': "The report from Monday meeting",
@@ -72,7 +72,38 @@ class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
         self.failIf(doc_rpath in proxy_list3)
 
 
-    def test_lockDocument(self):
+    def testDocumentFields(self):
+        folder_rpath = 'workspaces'
+        proxy_list1 = self.tool.listContent(folder_rpath)
+
+        data_dict = {'Title': "The report from Monday meeting",
+                     'Description': "Another boring report",
+                     'Language': 'en',
+                     }
+        doc_rpath = self.tool.createDocument('File', data_dict, folder_rpath, 0)
+        doc_proxy = self.portal.restrictedTraverse(doc_rpath)
+        doc = doc_proxy.getContent()
+        self.assertEquals(doc.Language(), 'en')
+
+        proxy_list2 = self.tool.listContent(folder_rpath)
+        self.assertEquals(len(proxy_list1) + 1, len(proxy_list2))
+        self.assert_(doc_rpath in proxy_list2)
+
+        data_dict = {'Title': "Le rapport de la réunion de lundi matin",
+                     'Description': "Encore un rapport ennuyeux",
+                     'Language': 'fr',
+                     }
+        doc_rpath = self.tool.createDocument('File', data_dict, folder_rpath, 0)
+        doc_proxy = self.portal.restrictedTraverse(doc_rpath)
+        doc = doc_proxy.getContent()
+        self.assertEquals(doc.Language(), 'fr')
+
+        proxy_list3 = self.tool.listContent(folder_rpath)
+        self.assertEquals(len(proxy_list2) + 1, len(proxy_list3))
+        self.assert_(doc_rpath in proxy_list3)
+
+
+    def testLockDocument(self):
         folder_rpath = 'workspaces'
         proxy_list1 = self.tool.listContent(folder_rpath)
         data_dict = {'Title': "The report from Monday meeting",
@@ -92,7 +123,7 @@ class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
         self.failIf(self.tool.isDocumentLocked(doc_rpath))
 
 
-    def test_editOrcreateDocument(self):
+    def testEditOrcreateDocument(self):
         folder_rpath = 'workspaces'
         proxy_list1 = self.tool.listContent(folder_rpath)
         data_dict = {'Title': "The report from Monday meeting",
@@ -113,7 +144,7 @@ class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
         self.assertEquals(len(proxy_list3) + 1, len(proxy_list4))
 
 
-    def test_publishApproveUnpublishDocument(self):
+    def testPublishApproveUnpublishDocument(self):
         folder_rpath = 'workspaces'
         sections_rpath = 'sections'
         data_dict = {'Title': "The report from Monday meeting",

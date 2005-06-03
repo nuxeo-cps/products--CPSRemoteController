@@ -415,11 +415,18 @@ class RemoteControllerTool(UniqueObject, Folder):
         """
         LOG(glog_key, DEBUG, "editOrCreateDocument doc_def = %s" % str(doc_def))
         doc_def = toLatin9(doc_def)
+
         # If no Title is given, the portal_type is used as a fallback title
         document_title = doc_def.get('Title', portal_type)
+
+        # The Language attribute is a special case because Language has the
+        # 'write_ignore_storage' option set it the metadata_schema. This is to
+        # avoid unwanted effects. So the language has to be set at creation
+        # time.
+        document_language = doc_def.get('Language', 'en')
         folder_proxy = self.restrictedTraverse(folder_rpath)
         id = folder_proxy.computeId(compute_from=document_title)
-        folder_proxy.invokeFactory(portal_type, id)
+        folder_proxy.invokeFactory(portal_type, id, language=document_language)
         doc_proxy = getattr(folder_proxy, id)
         doc_rpath = os.path.join(folder_rpath, id)
 
