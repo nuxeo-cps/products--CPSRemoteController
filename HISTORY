@@ -1,4 +1,25 @@
 *******************************************
+** CPSRemoteController V0.3.0 [R1 build 2005/06/03-17:10 by madarche]
+** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 22218
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+- Added the getOriginalDocument and getPublishedDocuments methods.
+- Added the deleteDocuments and deleteDocumentsInDirectory methods.
+- Made the methods createDocument, editDocument and editOrCreateDocument more
+  flexible in their choice of the file attribute to modify in the document.
+Bug fixes:
+~~~~~~~~~~
+- Added the needed code (hack) to have document modifications appear in the
+  status history.
+- Dealt with special case meta attribute Language.
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+
+*******************************************
 ** CPSRemoteController V0.2.0 [R1 build 2005/05/20-14:32 by madarche]
 ** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 21687
 Requires:

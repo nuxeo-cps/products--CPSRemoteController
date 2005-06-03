@@ -3,15 +3,10 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
-- Added the getOriginalDocument and getPublishedDocuments methods.
-- Added the deleteDocuments and deleteDocumentsInDirectory methods.
-- Made the methods createDocument, editDocument and editOrCreateDocument more
-  flexible in their choice of the file attribute to modify in the document.
+-
 Bug fixes:
 ~~~~~~~~~~
-- Added the needed code (hack) to have document modifications appear in the
-  status history.
-- Dealt with special case meta attribute Language.
+-
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -
