@@ -77,27 +77,37 @@ class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
         folder_rpath = 'workspaces'
         proxy_list1 = self.tool.listContent(folder_rpath)
 
-        data_dict = {'Title': "The report from Monday meeting",
-                     'Description': "Another boring report",
-                     'Language': 'en',
+        title = "The report from Monday meeting"
+        description = "Another boring report"
+        language = 'en'
+        data_dict = {'Title': title,
+                     'Description': description,
+                     'Language': language,
                      }
         doc_rpath = self.tool.createDocument('File', data_dict, folder_rpath, 0)
         doc_proxy = self.portal.restrictedTraverse(doc_rpath)
         doc = doc_proxy.getContent()
-        self.assertEquals(doc.Language(), 'en')
+        self.assertEquals(doc.Title(), title)
+        self.assertEquals(doc.Description(), description)
+        self.assertEquals(doc.Language(), language)
 
         proxy_list2 = self.tool.listContent(folder_rpath)
         self.assertEquals(len(proxy_list1) + 1, len(proxy_list2))
         self.assert_(doc_rpath in proxy_list2)
 
-        data_dict = {'Title': "Le rapport de la réunion de lundi matin",
-                     'Description': "Encore un rapport ennuyeux",
-                     'Language': 'fr',
+        title = "Le rapport de la réunion de lundi matin"
+        description = "Encore un rapport ennuyeux"
+        language = 'fr'
+        data_dict = {'Title': title,
+                     'Description': description,
+                     'Language': language,
                      }
         doc_rpath = self.tool.createDocument('File', data_dict, folder_rpath, 0)
         doc_proxy = self.portal.restrictedTraverse(doc_rpath)
         doc = doc_proxy.getContent()
-        self.assertEquals(doc.Language(), 'fr')
+        self.assertEquals(doc.Title(), title)
+        self.assertEquals(doc.Description(), description)
+        self.assertEquals(doc.Language(), language)
 
         proxy_list3 = self.tool.listContent(folder_rpath)
         self.assertEquals(len(proxy_list2) + 1, len(proxy_list3))
