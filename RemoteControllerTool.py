@@ -23,7 +23,8 @@
 import types
 import os.path
 from Globals import InitializeClass
-from AccessControl import ClassSecurityInfo
+from AccessControl import ClassSecurityInfo, Unauthorized
+from Products.CMFCore.WorkflowCore import WorkflowException
 from Products.CMFCore.permissions import ManagePortal, ChangePermissions, \
      AddPortalContent, ModifyPortalContent, DeleteObjects, View
 from Products.CMFCore.utils import UniqueObject, getToolByName
@@ -185,10 +186,6 @@ class RemoteControllerTool(UniqueObject, Folder):
         lock = LockItem(user, user)
         lock_token = lock.getLockToken()
         proxy.wl_setLock(lock_token, lock)
-        if not proxy.wl_isLocked():
-            LOG(log_key, ERROR,
-                "setLock failed because document is currently not locked.")
-            return False
         return lock_token
 
 
@@ -526,13 +523,17 @@ class RemoteControllerTool(UniqueObject, Folder):
                 file_id = generateId(file_name, lower=True)
                 doc_def[file_key] = File(file_id, file_name, file.data)
 
-        doc.edit(doc_def)
+        doc.edit(doc_def, doc_proxy)
 
-        # XXX: This hack has to be used until the CPS document modification
-        # really takes advantage of the "modify" workflow transition.
         workflow_tool = getToolByName(self, 'portal_workflow')
-        workflow_tool.doActionFor(doc_proxy, 'modify', comment=comments)
-
+        # XXX: This hack has to be used until the CPS document modification
+        # really takes advantage of the "modify" workflow transition. So an hack
+        # for an hack, it is no big deal to use a try/except control like this
+        # here.
+        try:
+            workflow_tool.doActionFor(doc_proxy, 'modify', comment=comments)
+        except (WorkflowException, Unauthorized):
+            pass
 
     security.declareProtected(DeleteObjects, 'deleteDocument')
     def deleteDocument(self, rpath):

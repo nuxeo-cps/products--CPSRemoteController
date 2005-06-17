@@ -8,6 +8,9 @@ Bug fixes:
 ~~~~~~~~~~
 - Made the unit tests checks more complete.
 - Made sure a document cannot be locked when it is published.
+- Made the edition of a document more robust (passing the proxy when doing an
+  edition).
+- Made the call to the "modify" action more robust.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -
