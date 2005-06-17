@@ -1,4 +1,24 @@
 *******************************************
+** CPSRemoteController V0.3.1 [R1 build 2005/06/17-17:24 by madarche]
+** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 24201
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+-
+Bug fixes:
+~~~~~~~~~~
+- Made the unit tests checks more complete.
+- Made sure a document cannot be locked when it is published.
+- Made the edition of a document more robust (passing the proxy when doing an
+  edition).
+- Made the call to the "modify" action more robust.
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+
+*******************************************
 ** CPSRemoteController V0.3.0 [R1 build 2005/06/03-17:10 by madarche]
 ** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 22218
 Requires:
