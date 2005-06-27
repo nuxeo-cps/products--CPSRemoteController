@@ -323,18 +323,6 @@ class RemoteControllerTool(UniqueObject, Folder):
                 if newpos is not None:
                     section.moveObjectToPosition(document_id, newpos)
 
-            # Delete any lock that might be present on the published document.
-            # XXX: This is a workaround on Zope/CPS object cloning behavior.
-            # The problem comes from Zope and/or CPS which copy locks on the
-            # object while cloning it, when they should obviously not.
-            published_document = portal.restrictedTraverse(
-                os.path.join(section_rpath,
-                             published_document_id))
-            if published_document.wl_isLocked():
-                lock_mapping = published_document.wl_lockmapping(killinvalids=1)
-                for lock_token, lock in published_document.wl_lockItems():
-                    del lock_mapping[lock_token]
-
 
     security.declareProtected(ModifyPortalContent, 'unpublishDocument')
     def unpublishDocument(self, rpath, comments=""):

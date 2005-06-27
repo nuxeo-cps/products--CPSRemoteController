@@ -6,7 +6,8 @@ New features:
 -
 Bug fixes:
 ~~~~~~~~~~
--
+- Removed the lock removal mechanism on published documents since it has been
+  added in CPSWorkflow in changeset [24378].
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -
