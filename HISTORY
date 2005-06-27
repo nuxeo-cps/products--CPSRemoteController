@@ -1,4 +1,21 @@
 *******************************************
+** CPSRemoteController V0.3.2 [R1 build 2005/06/27-16:50 by madarche]
+** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 24480
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+-
+Bug fixes:
+~~~~~~~~~~
+- Removed the lock removal mechanism on published documents since it has been
+  added in CPSWorkflow in changeset [24378].
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+
+*******************************************
 ** CPSRemoteController V0.3.1 [R1 build 2005/06/17-17:24 by madarche]
 ** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 24201
 Requires:
