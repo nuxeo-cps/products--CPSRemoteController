@@ -559,7 +559,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         return self._getOriginalOrPublishedDocuments(rpath, False)
 
 
-    security.declareProtected(View, 'getOriginalDocument')
+    security.declareProtected(View, 'getPublishedDocuments')
     def getPublishedDocuments(self, rpath):
         """Return a list of rpaths of documents which are publications of the
         document specified by the given path.

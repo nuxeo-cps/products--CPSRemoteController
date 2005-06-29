@@ -6,7 +6,7 @@ New features:
 -
 Bug fixes:
 ~~~~~~~~~~
--
+- Fixed the getPublishedDocuments() availability statement.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -
