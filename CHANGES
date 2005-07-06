@@ -3,7 +3,8 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
--
+- Added event notification for document moving and multiple documents
+  publishing.
 Bug fixes:
 ~~~~~~~~~~
 - Fixed the getPublishedDocuments() availability statement.

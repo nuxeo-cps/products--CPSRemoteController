@@ -20,8 +20,10 @@
 """
 """
 
-import types
-import os.path
+from xmlrpclib import Binary
+from webdav.LockItem import LockItem
+from Products.CPSCore.EventServiceTool import getEventService
+from Products.CPSUtil.id import generateId
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo, Unauthorized
 from Products.CMFCore.WorkflowCore import WorkflowException
@@ -31,9 +33,8 @@ from Products.CMFCore.utils import UniqueObject, getToolByName
 from OFS.Folder import Folder
 from Acquisition import aq_parent, aq_inner
 from OFS.Image import File
-from xmlrpclib import Binary
-from webdav.LockItem import LockItem
-from Products.CPSUtil.id import generateId
+import types
+import os.path
 from zLOG import LOG, DEBUG, ERROR, PROBLEM
 
 
@@ -44,6 +45,9 @@ BINARY_FILENAME_KEY = 'file_name'
 BINARY_DEFAULT_FILE_NAME = "Uploaded file"
 DOCUMENT_FILE_KEY = 'file_key'
 DOCUMENT_DEFAULT_FILE_KEY = 'file'
+
+EVENT_PUBLISH_DOCUMENT = 'remote_controller_publish_documents'
+EVENT_CHANGE_DOCUMENT_POSITION = 'remote_controller_change_document_position'
 
 
 class RemoteControllerTool(UniqueObject, Folder):
@@ -307,21 +311,34 @@ class RemoteControllerTool(UniqueObject, Folder):
             # If the rpath provided was the one of a document then we will
             # consider the placement value to optionally move the document or
             # make it replace another one.
+            position = None
+            replace = False
             if target_document is not None:
                 target_id = target_document.getId()
                 target_pos = section.getObjectPosition(target_id)
-                newpos = None
                 if placement == 'before':
-                    newpos = target_pos
+                    position = target_pos
                 elif placement == 'after':
-                    newpos = target_pos + 1
+                    position = target_pos + 1
                 elif placement == 'replace':
-                    newpos = target_pos
+                    position = target_pos
+                    replace = True
                     context = target_document
                     wftool.doActionFor(context, 'unpublish', comment=comments)
-                LOG(glog_key, DEBUG, "publishDocument newpos = %s" % newpos)
-                if newpos is not None:
-                    section.moveObjectToPosition(document_id, newpos)
+                LOG(glog_key, DEBUG, "publishDocument position = %s" % position)
+                if position is not None:
+                    section.moveObjectToPosition(document_id, position)
+
+            # Sending events so that subscribers can react on commands sent to the
+            # remote controller tool.
+            info = {'rpath': document_rpath,
+                    'dest_container': section_rpath,
+                    'wait_for_approval': wait_for_approval,
+                    'position': position,
+                    'replace': replace,
+                   }
+            event_tool = getEventService(self)
+            event_tool.notify(EVENT_PUBLISH_DOCUMENT, proxy, {})
 
 
     security.declareProtected(ModifyPortalContent, 'unpublishDocument')
@@ -346,8 +363,18 @@ class RemoteControllerTool(UniqueObject, Folder):
         proxy = self.restrictedTraverse(rpath)
         id = proxy.getId()
         context = aq_parent(aq_inner(proxy))
-        newpos = context.getObjectPosition(id) + step
-        context.moveObjectToPosition(id, newpos)
+        position = context.getObjectPosition(id)
+        new_position = position + step
+        context.moveObjectToPosition(id, new_position)
+
+        # Sending events so that subscribers can react on commands sent to the
+        # remote controller tool.
+        info = {'rpath': rpath,
+                'position_from': position,
+                'position_to': new_position,
+                }
+        event_tool = getEventService(self)
+        event_tool.notify(EVENT_CHANGE_DOCUMENT_POSITION, proxy, info)
 
 
     security.declareProtected(AddPortalContent, 'createDocument')
