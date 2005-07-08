@@ -28,7 +28,6 @@ import unittest
 from Testing import ZopeTestCase
 import CPSRemoteControllerTestCase
 from Products.CPSDefault.tests.CPSTestCase import MANAGER_ID
-from xmlrpclib import Binary
 import types
 
 class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
