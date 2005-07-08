@@ -251,7 +251,8 @@ class RemoteControllerTool(UniqueObject, Folder):
         rpaths_to_publish is a dictionary. The dictionary keys are the rpath
         of where to publish the document. The rpath can be the rpath of a
         section or the rpath of a document. The dictionary values are either the
-        empty string, "before", "after" or "replace".
+        empty string, "before", "after" or "replace". Those values have a
+        meaning only if the rpath is the one of a document.
 
         "replace" is to be used so that the published document really replaces
         another document, be it folder or document. The targeted document is
