@@ -343,8 +343,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
             # Sending events so that subscribers can react on commands sent to the
             # remote controller tool.
-            info = {'rpath': doc_rpath,
-                    'dest_container': section_rpath,
+            info = {'dest_container': section_rpath,
                     'wait_for_approval': wait_for_approval,
                     'position': position,
                     # This document comes as a replacement of a different
@@ -387,8 +386,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
         # Sending events so that subscribers can react on commands sent to the
         # remote controller tool.
-        info = {'rpath': rpath,
-                'position_from': position,
+        info = {'position_from': position,
                 'position_to': new_position,
                 }
         event_tool = getEventService(self)
