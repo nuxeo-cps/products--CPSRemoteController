@@ -35,7 +35,7 @@ from Acquisition import aq_parent, aq_inner
 from OFS.Image import File
 import types
 import os.path
-from zLOG import LOG, DEBUG, ERROR, PROBLEM
+from zLOG import LOG, TRACE, DEBUG, ERROR, PROBLEM
 
 
 glog_key = 'RemoteControllerTool'
@@ -85,14 +85,17 @@ class RemoteControllerTool(UniqueObject, Folder):
         """Return the roles of the given user local to the specified context.
         """
         proxy = self.restrictedTraverse(rpath)
-        local_roles_struct = proxy.getCPSLocalRoles()
-        LOG(glog_key, DEBUG, "local_roles = %s" % str(local_roles_struct[0]))
-        user_local_roles = local_roles_struct[0]
-        user_key = 'user:%s' % username
-        if user_local_roles.get(user_key):
-            return user_local_roles[user_key][0]['roles']
-        else:
-            return []
+        dict_roles, local_roles_blocked = proxy.getCPSLocalRoles()
+        LOG(glog_key, TRACE, "dict_roles = %s" % dict_roles)
+        user_local_roles_struct = dict_roles.get('user:' + username, [])
+        LOG(glog_key, TRACE, "user_local_roles_struct = %s"
+            % user_local_roles_struct)
+        user_local_roles = []
+        for role_rpath_struct in user_local_roles_struct:
+            LOG(glog_key, TRACE, "role_rpath_struct = %s" % role_rpath_struct)
+            user_local_roles += role_rpath_struct['roles']
+        LOG(glog_key, TRACE, "user_local_roles = %s" % user_local_roles)
+        return user_local_roles
 
 
     security.declareProtected(ChangePermissions, 'checkPermission')
@@ -239,7 +242,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
     security.declareProtected(ModifyPortalContent, 'publishDocument')
-    def publishDocument(self, document_rpath, rpaths_to_publish,
+    def publishDocument(self, doc_rpath, rpaths_to_publish,
                         wait_for_approval=False, comments=""):
         """Publish the document specified by the given relative path.
 
@@ -258,8 +261,8 @@ class RemoteControllerTool(UniqueObject, Folder):
         portal = self.portal_url.getPortalObject()
         portal_ppath = portal.getPhysicalPath()
         wftool = self.portal_workflow
-        proxy = self.restrictedTraverse(document_rpath)
-        document_id = proxy.getId()
+        proxy = self.restrictedTraverse(doc_rpath)
+        doc_id = proxy.getId()
         context = proxy
         workflow_action = 'copy_submit'
         if wait_for_approval:
@@ -267,12 +270,15 @@ class RemoteControllerTool(UniqueObject, Folder):
         else:
             transition = 'publish'
         allowed_transitions = wftool.getAllowedPublishingTransitions(context)
-        LOG(glog_key, DEBUG, "allowed_transitions = %s" % str(allowed_transitions))
+        LOG(glog_key, TRACE, "allowed_transitions = %s" % str(allowed_transitions))
+        published_docs_rpaths = self.getPublishedDocuments(doc_rpath)
+        LOG(glog_key, TRACE, "published_docs_rpaths = %s"
+            % str(published_docs_rpaths))
 
         for target_rpath, placement in rpaths_to_publish.items():
             LOG(glog_key, DEBUG, "target_rpath / placement = %s / %s"
                 % (target_rpath, placement))
-            target_document = None
+            target_doc = None
             try:
                 object = portal.restrictedTraverse(target_rpath)
             except KeyError:
@@ -280,16 +286,16 @@ class RemoteControllerTool(UniqueObject, Folder):
                     % target_rpath)
                 continue
             if object.portal_type == 'Section':
-                LOG(glog_key, DEBUG, "Target document is a section")
+                LOG(glog_key, DEBUG, "Target doc is a section")
                 section_rpath = target_rpath
                 section = object
             else:
                 LOG(glog_key, DEBUG,
-                    "Target document is a document (not section)")
+                    "Target doc is a document (not section)")
                 try:
-                    target_document = portal.restrictedTraverse(target_rpath)
-                    target_document_ppath = target_document.getPhysicalPath()
-                    rppath = target_document_ppath[len(portal_ppath):]
+                    target_doc = portal.restrictedTraverse(target_rpath)
+                    target_doc_ppath = target_doc.getPhysicalPath()
+                    rppath = target_doc_ppath[len(portal_ppath):]
                     object = portal.restrictedTraverse(rppath[:-1])
                 except KeyError:
                     LOG(glog_key, DEBUG, 'publishDocument no object with rpath = %s'
@@ -303,7 +309,7 @@ class RemoteControllerTool(UniqueObject, Folder):
                         % target_rpath)
                     continue
             LOG(glog_key, DEBUG, "section_rpath = %s" % section_rpath)
-            published_document_id = wftool.findNewId(section, document_id)
+            published_doc_id = wftool.findNewId(section, doc_id)
             wftool.doActionFor(context, workflow_action,
                                dest_container=section_rpath,
                                initial_transition=transition,
@@ -313,29 +319,40 @@ class RemoteControllerTool(UniqueObject, Folder):
             # make it replace another one.
             position = None
             replace = False
-            if target_document is not None:
-                target_id = target_document.getId()
+            update = False
+            if target_doc is not None:
+                target_id = target_doc.getId()
                 target_pos = section.getObjectPosition(target_id)
                 if placement == 'before':
                     position = target_pos
                 elif placement == 'after':
                     position = target_pos + 1
                 elif placement == 'replace':
+                    target_doc_rpath = self.portal_url\
+                                       .getRelativeContentURL(target_doc)
                     position = target_pos
                     replace = True
-                    context = target_document
+                    if target_doc_rpath in published_docs_rpaths:
+                        update = True
+                    context = target_doc
                     wftool.doActionFor(context, 'unpublish', comment=comments)
                 LOG(glog_key, DEBUG, "publishDocument position = %s" % position)
                 if position is not None:
-                    section.moveObjectToPosition(document_id, position)
+                    section.moveObjectToPosition(doc_id, position)
 
             # Sending events so that subscribers can react on commands sent to the
             # remote controller tool.
-            info = {'rpath': document_rpath,
+            info = {'rpath': doc_rpath,
                     'dest_container': section_rpath,
                     'wait_for_approval': wait_for_approval,
                     'position': position,
+                    # This document comes as a replacement of a different
+                    # previous document that was located at the place where this
+                    # present document has been published.
                     'replace': replace,
+                    # This document comes as an update of a previous version of
+                    # the same document.
+                    'update': update,
                    }
             event_tool = getEventService(self)
             event_tool.notify(EVENT_PUBLISH_DOCUMENT, proxy, {})
@@ -442,16 +459,16 @@ class RemoteControllerTool(UniqueObject, Folder):
         doc_def = toLatin9(doc_def)
 
         # If no Title is given, the portal_type is used as a fallback title
-        document_title = doc_def.get('Title', portal_type)
+        doc_title = doc_def.get('Title', portal_type)
 
         # The Language attribute is a special case because Language has the
         # 'write_ignore_storage' option set it the metadata_schema. This is to
         # avoid unwanted effects. So the language has to be set at creation
         # time.
-        document_language = doc_def.get('Language', 'en')
+        doc_language = doc_def.get('Language', 'en')
         folder_proxy = self.restrictedTraverse(folder_rpath)
-        id = folder_proxy.computeId(compute_from=document_title)
-        folder_proxy.invokeFactory(portal_type, id, language=document_language)
+        id = folder_proxy.computeId(compute_from=doc_title)
+        folder_proxy.invokeFactory(portal_type, id, language=doc_language)
         doc_proxy = getattr(folder_proxy, id)
         doc_rpath = os.path.join(folder_rpath, id)
 
@@ -550,6 +567,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         except (WorkflowException, Unauthorized):
             pass
 
+
     security.declareProtected(DeleteObjects, 'deleteDocument')
     def deleteDocument(self, rpath):
         """Delete the document with the given rpath.
@@ -597,7 +615,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
     security.declarePrivate('_editDocument')
-    def _getOriginalOrPublishedDocuments(self, rpath, published_documents=True):
+    def _getOriginalOrPublishedDocuments(self, rpath, published_docs=True):
         """Return rpaths of the documents, published or not, through the history
         of the document specified by the given path.
         """
@@ -608,16 +626,16 @@ class RemoteControllerTool(UniqueObject, Folder):
         proxy = self.restrictedTraverse(rpath)
         states_info = proxy.getContentInfo(proxy=proxy, level=2)['states']
         LOG(glog_key, DEBUG, "states info = %s" % states_info)
-        published_documents_rpaths = []
+        published_docs_rpaths = []
         for state_info in states_info:
             state = state_info['review_state']
-            if (published_documents and state == 'published'
-                or not published_documents and state != 'published'):
+            if (published_docs and state == 'published'
+                or not published_docs and state != 'published'):
                 published_proxy = state_info['proxy']
                 published_proxy_path = '/'.join(
                     published_proxy.getPhysicalPath()[len(portal_ppath):])
-                published_documents_rpaths.append(published_proxy_path)
-        return published_documents_rpaths
+                published_docs_rpaths.append(published_proxy_path)
+        return published_docs_rpaths
 
 
 InitializeClass(RemoteControllerTool)

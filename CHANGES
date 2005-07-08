@@ -8,6 +8,8 @@ New features:
 Bug fixes:
 ~~~~~~~~~~
 - Fixed the getPublishedDocuments() availability statement.
+- Synced the getLocalRoles() method with the latest version of the
+  CPSDefault getCPSLocalRoles() method.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -

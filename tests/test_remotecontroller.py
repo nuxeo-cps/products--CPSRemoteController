@@ -29,6 +29,7 @@ from Testing import ZopeTestCase
 import CPSRemoteControllerTestCase
 from Products.CPSDefault.tests.CPSTestCase import MANAGER_ID
 from xmlrpclib import Binary
+import types
 
 class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
 
@@ -51,9 +52,20 @@ class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
         self.logout()
 
 
+    def testGetRoles(self):
+        roles = self.tool.getRoles(MANAGER_ID)
+        self.assertEquals(type(roles), types.ListType)
+
+
+    def testGetLocalRoles(self):
+        for folder_rpath in ('workspaces', 'sections'):
+            roles = self.tool.getLocalRoles(MANAGER_ID, folder_rpath)
+            self.assertEquals(type(roles), types.ListType)
+
+
     def testListContent(self):
-        folder_rpath = 'workspaces'
-        self.assert_(self.tool.listContent(folder_rpath))
+        for folder_rpath in ('workspaces', 'sections'):
+            self.assert_(self.tool.listContent(folder_rpath))
 
 
     def testCreateAndDeleteDocument(self):
