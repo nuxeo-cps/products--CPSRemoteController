@@ -356,7 +356,7 @@ class RemoteControllerTool(UniqueObject, Folder):
                     'update': update,
                    }
             event_tool = getEventService(self)
-            event_tool.notify(EVENT_PUBLISH_DOCUMENT, proxy, {})
+            event_tool.notify(EVENT_PUBLISH_DOCUMENT, proxy, info)
 
 
     security.declareProtected(ModifyPortalContent, 'unpublishDocument')
