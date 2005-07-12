@@ -3,16 +3,10 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
-- Added event notification for document moving and multiple documents
-  publishing.
+-
 Bug fixes:
 ~~~~~~~~~~
-- Fixed the getPublishedDocuments() availability statement.
-- Synced the getLocalRoles() method with the latest version of the
-  CPSDefault getCPSLocalRoles() method.
-- Made the methods of the remote controller tool usable by any user with the
-  "View" permission instead of various other permissions on the tool itself,
-  which was wrong. Then permissions are checked on each object specifically.
+-
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -

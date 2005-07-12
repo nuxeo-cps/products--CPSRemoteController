@@ -1,4 +1,26 @@
 *******************************************
+** CPSRemoteController V1.0.0 [R1 build 2005/07/12-14:11 by madarche]
+** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 24834
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+- Added event notification for document moving and multiple documents
+  publishing.
+Bug fixes:
+~~~~~~~~~~
+- Fixed the getPublishedDocuments() availability statement.
+- Synced the getLocalRoles() method with the latest version of the
+  CPSDefault getCPSLocalRoles() method.
+- Made the methods of the remote controller tool usable by any user with the
+  "View" permission instead of various other permissions on the tool itself,
+  which was wrong. Then permissions are checked on each object specifically.
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+
+*******************************************
 ** CPSRemoteController V0.3.2 [R1 build 2005/06/27-16:50 by madarche]
 ** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 24480
 Requires:
