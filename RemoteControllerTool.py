@@ -26,6 +26,7 @@ from Products.CPSCore.EventServiceTool import getEventService
 from Products.CPSUtil.id import generateId
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo, Unauthorized
+from Products.CPSCore.CPSCorePermissions import ChangeSubobjectsOrder
 from Products.CMFCore.WorkflowCore import WorkflowException
 from Products.CMFCore.permissions import ManagePortal, ChangePermissions, \
      AddPortalContent, ModifyPortalContent, DeleteObjects, View
@@ -383,17 +384,15 @@ class RemoteControllerTool(UniqueObject, Folder):
         wftool.doActionFor(context, workflow_action, comment=comments)
 
 
-    security.declareProtected(View, 'changeDocumentOrder')
+    security.declareProtected(View, 'changeDocumentPosition')
     def changeDocumentPosition(self, rpath, step):
         """Change the document position in its current folder.
         """
         proxy = self.restrictedTraverse(rpath)
-        if not _checkPermission(ModifyPortalContent, proxy):
-            raise Unauthorized("You need the ModifyPortalContent permission.")
         id = proxy.getId()
         context = aq_parent(aq_inner(proxy))
-        if not _checkPermission(ModifyPortalContent, context):
-            raise Unauthorized("You need the ModifyPortalContent permission.")
+        if not _checkPermission(ChangeSubobjectsOrder, context):
+            raise Unauthorized("You need the ChangeSubobjectsOrder permission.")
         position = context.getObjectPosition(id)
         new_position = position + step
         context.moveObjectToPosition(id, new_position)
