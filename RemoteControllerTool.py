@@ -504,12 +504,12 @@ class RemoteControllerTool(UniqueObject, Folder):
         """Modify the specified document with data from the given
         data dictionary.
         """
-        if not _checkPermission(ModifyPortalContent, proxy):
-            raise Unauthorized("You need the ModifyPortalContent permission.")
         LOG(glog_key, DEBUG, "editDocument doc_def = %s" % str(doc_def))
         doc_def = toLatin9(doc_def)
-        doc_proxy = self.restrictedTraverse(rpath)
-        self._editDocument(doc_proxy, doc_def, comments)
+        proxy = self.restrictedTraverse(rpath)
+        if not _checkPermission(ModifyPortalContent, proxy):
+            raise Unauthorized("You need the ModifyPortalContent permission.")
+        self._editDocument(proxy, doc_def, comments)
 
 
     security.declareProtected(View, 'editOrCreateDocument')
