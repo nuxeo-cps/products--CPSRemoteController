@@ -29,7 +29,7 @@ from AccessControl import ClassSecurityInfo, Unauthorized
 from Products.CMFCore.WorkflowCore import WorkflowException
 from Products.CMFCore.permissions import ManagePortal, ChangePermissions, \
      AddPortalContent, ModifyPortalContent, DeleteObjects, View
-from Products.CMFCore.utils import UniqueObject, getToolByName
+from Products.CMFCore.utils import UniqueObject, getToolByName, _checkPermission
 from OFS.Folder import Folder
 from Acquisition import aq_parent, aq_inner
 from OFS.Image import File
@@ -105,7 +105,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         proxy = self.restrictedTraverse(rpath)
         # checkPermission returns True if allowed and None otherwise, which is
         # not consistent.
-        allowed = self.portal_membership.checkPermission(permission, proxy)
+        allowed = _checkPermission(permission, proxy)
         return allowed == True
 
 
@@ -167,7 +167,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         return proxy.wl_isLocked()
 
 
-    security.declareProtected(ModifyPortalContent, 'lockDocument')
+    security.declareProtected(View, 'lockDocument')
     def lockDocument(self, rpath):
         """Lock the document and return the associated lock token or False if
         some problem arose.
@@ -185,6 +185,8 @@ class RemoteControllerTool(UniqueObject, Folder):
         """
         log_key = glog_key + ' lockDocument()'
         proxy = self.restrictedTraverse(rpath)
+        if not _checkPermission(ModifyPortalContent, proxy):
+            raise Unauthorized("You need the ModifyPortalContent permission.")
         if proxy.wl_isLocked():
             LOG(log_key, DEBUG, "document is already locked")
             return False
@@ -196,19 +198,21 @@ class RemoteControllerTool(UniqueObject, Folder):
         return lock_token
 
 
-    security.declareProtected(ModifyPortalContent, 'unlockDocument')
+    security.declareProtected(View, 'unlockDocument')
     def unlockDocument(self, rpath, lock_token):
         """Un-lock the document and return True or False depending of the
         success of the operation.
         """
         proxy = self.restrictedTraverse(rpath)
+        if not _checkPermission(ModifyPortalContent, proxy):
+            raise Unauthorized("You need the ModifyPortalContent permission.")
         if not proxy.wl_isLocked():
             return False
         proxy.wl_delLock(lock_token)
         return True
 
 
-    security.declareProtected(ModifyPortalContent, 'deleteDocumentLocks')
+    security.declareProtected(View, 'deleteDocumentLocks')
     def deleteDocumentLocks(self, rpath):
         """Delete all the locks owned by a user on the specified document.
 
@@ -216,6 +220,8 @@ class RemoteControllerTool(UniqueObject, Folder):
         application crashes and loses all the user locks.
         """
         proxy = self.restrictedTraverse(rpath)
+        if not _checkPermission(ModifyPortalContent, proxy):
+            raise Unauthorized("You need the ModifyPortalContent permission.")
         if not proxy.wl_isLocked():
             return False
         member = self.portal_membership.getAuthenticatedMember()
@@ -226,7 +232,7 @@ class RemoteControllerTool(UniqueObject, Folder):
                 del lock_mapping[lock_token]
 
 
-    security.declareProtected(ModifyPortalContent, 'approveDocument')
+    security.declareProtected(View, 'acceptDocument')
     def acceptDocument(self, rpath, comments=""):
         """Approve the document specified by the given relative path.
 
@@ -234,6 +240,8 @@ class RemoteControllerTool(UniqueObject, Folder):
         """
         wftool = self.portal_workflow
         proxy = self.restrictedTraverse(rpath)
+        if not _checkPermission(ModifyPortalContent, proxy):
+            raise Unauthorized("You need the ModifyPortalContent permission.")
         context = proxy
         workflow_action = 'accept'
         allowed_transitions = wftool.getAllowedPublishingTransitions(context)
@@ -241,7 +249,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         wftool.doActionFor(context, workflow_action, comment=comments)
 
 
-    security.declareProtected(ModifyPortalContent, 'publishDocument')
+    security.declareProtected(View, 'publishDocument')
     def publishDocument(self, doc_rpath, rpaths_to_publish,
                         wait_for_approval=False, comments=""):
         """Publish the document specified by the given relative path.
@@ -263,6 +271,8 @@ class RemoteControllerTool(UniqueObject, Folder):
         portal_ppath = portal.getPhysicalPath()
         wftool = self.portal_workflow
         proxy = self.restrictedTraverse(doc_rpath)
+        if not _checkPermission(ModifyPortalContent, proxy):
+            raise Unauthorized("You need the ModifyPortalContent permission.")
         doc_id = proxy.getId()
         context = proxy
         workflow_action = 'copy_submit'
@@ -358,7 +368,7 @@ class RemoteControllerTool(UniqueObject, Folder):
             event_tool.notify(EVENT_PUBLISH_DOCUMENT, proxy, info)
 
 
-    security.declareProtected(ModifyPortalContent, 'unpublishDocument')
+    security.declareProtected(View, 'unpublishDocument')
     def unpublishDocument(self, rpath, comments=""):
         """Unpublish the document specified by the given relative path.
 
@@ -366,6 +376,8 @@ class RemoteControllerTool(UniqueObject, Folder):
         """
         wftool = self.portal_workflow
         proxy = self.restrictedTraverse(rpath)
+        if not _checkPermission(ModifyPortalContent, proxy):
+            raise Unauthorized("You need the ModifyPortalContent permission.")
         context = proxy
         workflow_action = 'unpublish'
         allowed_transitions = wftool.getAllowedPublishingTransitions(context)
@@ -373,13 +385,17 @@ class RemoteControllerTool(UniqueObject, Folder):
         wftool.doActionFor(context, workflow_action, comment=comments)
 
 
-    security.declareProtected(ModifyPortalContent, 'changeDocumentOrder')
+    security.declareProtected(View, 'changeDocumentOrder')
     def changeDocumentPosition(self, rpath, step):
         """Change the document position in its current folder.
         """
         proxy = self.restrictedTraverse(rpath)
+        if not _checkPermission(ModifyPortalContent, proxy):
+            raise Unauthorized("You need the ModifyPortalContent permission.")
         id = proxy.getId()
         context = aq_parent(aq_inner(proxy))
+        if not _checkPermission(ModifyPortalContent, context):
+            raise Unauthorized("You need the ModifyPortalContent permission.")
         position = context.getObjectPosition(id)
         new_position = position + step
         context.moveObjectToPosition(id, new_position)
@@ -393,7 +409,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         event_tool.notify(EVENT_CHANGE_DOCUMENT_POSITION, proxy, info)
 
 
-    security.declareProtected(AddPortalContent, 'createDocument')
+    security.declareProtected(View, 'createDocument')
     def createDocument(self, portal_type, doc_def, folder_rpath, position=-1,
                        comments=""):
         """Create document with the given portal_type with data from the given
@@ -454,6 +470,10 @@ class RemoteControllerTool(UniqueObject, Folder):
         hires"},
         'workspaces', 2)
         """
+        folder_proxy = self.restrictedTraverse(folder_rpath)
+        if not _checkPermission(AddPortalContent, folder_proxy):
+            raise Unauthorized("You need the AddPortalContent permission.")
+
         LOG(glog_key, DEBUG, "editOrCreateDocument doc_def = %s" % str(doc_def))
         doc_def = toLatin9(doc_def)
 
@@ -465,7 +485,6 @@ class RemoteControllerTool(UniqueObject, Folder):
         # avoid unwanted effects. So the language has to be set at creation
         # time.
         doc_language = doc_def.get('Language', 'en')
-        folder_proxy = self.restrictedTraverse(folder_rpath)
         id = folder_proxy.computeId(compute_from=doc_title)
         folder_proxy.invokeFactory(portal_type, id, language=doc_language)
         doc_proxy = getattr(folder_proxy, id)
@@ -480,18 +499,20 @@ class RemoteControllerTool(UniqueObject, Folder):
         return doc_rpath
 
 
-    security.declareProtected(ModifyPortalContent, 'editDocument')
+    security.declareProtected(View, 'editDocument')
     def editDocument(self, rpath, doc_def={}, comments=""):
         """Modify the specified document with data from the given
         data dictionary.
         """
+        if not _checkPermission(ModifyPortalContent, proxy):
+            raise Unauthorized("You need the ModifyPortalContent permission.")
         LOG(glog_key, DEBUG, "editDocument doc_def = %s" % str(doc_def))
         doc_def = toLatin9(doc_def)
         doc_proxy = self.restrictedTraverse(rpath)
         self._editDocument(doc_proxy, doc_def, comments)
 
 
-    security.declareProtected(AddPortalContent, 'editOrCreateDocument')
+    security.declareProtected(View, 'editOrCreateDocument')
     def editOrCreateDocument(self, rpath, portal_type, doc_def, position=-1,
                              comments=""):
         """Create or edit a document with the given portal_type with data from
@@ -510,6 +531,8 @@ class RemoteControllerTool(UniqueObject, Folder):
             proxy = None
             LOG(glog_key, DEBUG, "editOrCreateDocument document does NOT exist")
         if proxy is not None and proxy.portal_type == portal_type:
+            if not _checkPermission(ModifyPortalContent, proxy):
+                raise Unauthorized("You need the ModifyPortalContent permission.")
             self._editDocument(proxy, doc_def)
             id = proxy.getId()
             utool = getToolByName(self, 'portal_url')
@@ -567,16 +590,18 @@ class RemoteControllerTool(UniqueObject, Folder):
             pass
 
 
-    security.declareProtected(DeleteObjects, 'deleteDocument')
+    security.declareProtected(View, 'deleteDocument')
     def deleteDocument(self, rpath):
         """Delete the document with the given rpath.
         """
         proxy = self.restrictedTraverse(rpath)
+        if not _checkPermission(DeleteObjects, proxy):
+            raise Unauthorized("You need the DeleteObjects permission.")
         context = aq_parent(aq_inner(proxy))
         context.manage_delObjects([proxy.getId()])
 
 
-    security.declareProtected(DeleteObjects, 'deleteDocuments')
+    security.declareProtected(View, 'deleteDocuments')
     def deleteDocuments(self, rpaths):
         """Delete the documents corresponding to the given rpaths.
         """
@@ -590,6 +615,8 @@ class RemoteControllerTool(UniqueObject, Folder):
         rpath.
         """
         proxy = self.restrictedTraverse(rpath)
+        if not _checkPermission(DeleteObjects, proxy):
+            raise Unauthorized("You need the DeleteObjects permission.")
         proxy.manage_delObjects(proxy.objectIds())
 
 
