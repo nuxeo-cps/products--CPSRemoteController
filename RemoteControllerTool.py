@@ -376,8 +376,6 @@ class RemoteControllerTool(UniqueObject, Folder):
         """
         wftool = self.portal_workflow
         proxy = self.restrictedTraverse(rpath)
-        if not _checkPermission(ModifyPortalContent, proxy):
-            raise Unauthorized("You need the ModifyPortalContent permission.")
         context = proxy
         workflow_action = 'unpublish'
         allowed_transitions = wftool.getAllowedPublishingTransitions(context)
