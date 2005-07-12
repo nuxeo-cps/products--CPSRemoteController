@@ -607,7 +607,7 @@ class RemoteControllerTool(UniqueObject, Folder):
             self.deleteDocument(rpath)
 
 
-    security.declareProtected(DeleteObjects, 'deleteDocumentsInDirectory')
+    security.declareProtected(View, 'deleteDocumentsInDirectory')
     def deleteDocumentsInDirectory(self, rpath):
         """Delete the documents located in directory corresponding to the given
         rpath.
