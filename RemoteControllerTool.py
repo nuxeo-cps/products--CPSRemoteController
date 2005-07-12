@@ -70,7 +70,7 @@ class RemoteControllerTool(UniqueObject, Folder):
     security = ClassSecurityInfo()
 
 
-    security.declareProtected(ChangePermissions, 'checkRoles')
+    security.declareProtected(View, 'checkRoles')
     def getRoles(self, username):
         """Return the roles of the given user.
         """
@@ -80,7 +80,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         return roles
 
 
-    security.declareProtected(ChangePermissions, 'getLocalRoles')
+    security.declareProtected(View, 'getLocalRoles')
     def getLocalRoles(self, username, rpath):
         """Return the roles of the given user local to the specified context.
         """
@@ -98,7 +98,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         return user_local_roles
 
 
-    security.declareProtected(ChangePermissions, 'checkPermission')
+    security.declareProtected(View, 'checkPermission')
     def checkPermission(self, rpath, permission):
         """Check the given permission for the current user on the given context.
         """

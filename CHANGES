@@ -10,6 +10,9 @@ Bug fixes:
 - Fixed the getPublishedDocuments() availability statement.
 - Synced the getLocalRoles() method with the latest version of the
   CPSDefault getCPSLocalRoles() method.
+- Made the methods getRoles(), getLocalRoles() and checkPermission() usable by
+  any user with the View permission instead of the ChangePermissions permission.
+  This is not a security risk and this is also more logical.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -
