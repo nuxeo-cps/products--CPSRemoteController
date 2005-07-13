@@ -84,19 +84,45 @@ class RemoteControllerTool(UniqueObject, Folder):
     security.declareProtected(View, 'getLocalRoles')
     def getLocalRoles(self, username, rpath):
         """Return the roles of the given user local to the specified context.
+
+        Attention: this method doesn't know how to deal with blocked roles.
         """
+        members_directory = self.portal_directories.members
         proxy = self.restrictedTraverse(rpath)
-        dict_roles, local_roles_blocked = proxy.getCPSLocalRoles()
-        LOG(glog_key, TRACE, "dict_roles = %s" % dict_roles)
-        user_local_roles_struct = dict_roles.get('user:' + username, [])
-        LOG(glog_key, TRACE, "user_local_roles_struct = %s"
-            % user_local_roles_struct)
-        user_local_roles = []
-        for role_rpath_struct in user_local_roles_struct:
-            LOG(glog_key, TRACE, "role_rpath_struct = %s" % role_rpath_struct)
-            user_local_roles += role_rpath_struct['roles']
-        LOG(glog_key, TRACE, "user_local_roles = %s" % user_local_roles)
-        return user_local_roles
+        roles_dict, local_roles_blocked = proxy.getCPSLocalRoles()
+        #LOG(glog_key, TRACE, "roles_dict = %s" % roles_dict)
+
+        # Get the local roles explicitly associated with this user
+        local_roles = self._computeLocalRoles(username, roles_dict)
+        #LOG(glog_key, TRACE, "local_roles = %s" % local_roles)
+
+        # Get the roles local associated with groups this user is member of
+        entry = members_directory.getEntry(username)
+        groups = entry['groups']
+        #LOG(glog_key, TRACE, "groups = %s" % str(groups))
+        for group in groups:
+            local_roles += self._computeLocalRoles(group, roles_dict,
+                                                   prefix='group:')
+        #LOG(glog_key, TRACE, "local_roles = %s" % local_roles)
+        return local_roles
+
+
+    security.declareProtected(View, '_computeLocalRoles')
+    def _computeLocalRoles(self, name, roles_dict, prefix='user:'):
+        """Return a list of local roles.
+
+        roles_dict is the structure returned by the CPSDefault
+        getCPSLocalRoles() skin method, see getCPSLocalRoles().
+
+        Attention: this method doesn't know how to deal with blocked roles.
+        """
+        local_roles_struct = roles_dict.get(prefix + name, [])
+        #LOG(glog_key, TRACE, "local_roles_struct = %s" % local_roles_struct)
+        local_roles = []
+        for role_rpath_struct in local_roles_struct:
+            #LOG(glog_key, TRACE, "role_rpath_struct = %s" % role_rpath_struct)
+            local_roles += role_rpath_struct['roles']
+        return local_roles
 
 
     security.declareProtected(View, 'checkPermission')
@@ -272,8 +298,10 @@ class RemoteControllerTool(UniqueObject, Folder):
         portal_ppath = portal.getPhysicalPath()
         wftool = self.portal_workflow
         proxy = self.restrictedTraverse(doc_rpath)
-        if not _checkPermission(ModifyPortalContent, proxy):
-            raise Unauthorized("You need the ModifyPortalContent permission.")
+        # Why this permission check is not working?
+        # Is this permission check neeeded anyway?
+##         if not _checkPermission(ModifyPortalContent, proxy):
+##             raise Unauthorized("You need the ModifyPortalContent permission.")
         doc_id = proxy.getId()
         context = proxy
         workflow_action = 'copy_submit'

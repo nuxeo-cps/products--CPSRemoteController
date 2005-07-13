@@ -6,7 +6,8 @@ New features:
 -
 Bug fixes:
 ~~~~~~~~~~
--
+- Fixed the fact that the getLocalRoles() method did not take roles acquired
+  through groups into account.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -
