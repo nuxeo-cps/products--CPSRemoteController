@@ -107,7 +107,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         return local_roles
 
 
-    security.declareProtected(View, '_computeLocalRoles')
+    security.declarePrivate('_computeLocalRoles')
     def _computeLocalRoles(self, name, roles_dict, prefix='user:'):
         """Return a list of local roles.
 
