@@ -30,6 +30,7 @@ from Products.CPSCore.CPSCorePermissions import ChangeSubobjectsOrder
 from Products.CMFCore.WorkflowCore import WorkflowException
 from Products.CMFCore.permissions import ManagePortal, ChangePermissions, \
      AddPortalContent, ModifyPortalContent, DeleteObjects, View
+from Products.CPSCore.CPSCorePermissions import ViewArchivedRevisions
 from Products.CMFCore.utils import UniqueObject, getToolByName, _checkPermission
 from OFS.Folder import Folder
 from Acquisition import aq_parent, aq_inner
@@ -190,6 +191,8 @@ class RemoteControllerTool(UniqueObject, Folder):
         """Return archived revisions urls."""
 
         proxy = self.restrictedTraverse(rpath)
+        if not _checkPermission(ViewArchivedRevisions, proxy):
+            raise Unauthorized("You need the ViewArchivedRevisions permission.")
         archived = proxy.getArchivedInfos()
         urls = ['/'.join([rpath, 'archivedRevision', str(d['rev'])])
                 for d in archived if d['is_frozen']
