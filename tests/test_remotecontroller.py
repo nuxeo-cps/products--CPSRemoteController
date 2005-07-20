@@ -210,6 +210,51 @@ class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
         self.assertEquals(len(proxy_list4) - 1, len(proxy_list5))
 
 
+    def testGetDocumentArchivedRevisionsUrls(self):
+        wftool = self.portal.portal_workflow
+        folder_rpath = 'workspaces'
+        sections_rpath = 'sections'
+        data_dict = {'Title': "The report from Monday meeting",
+                     'Description': "Another boring report",
+                     }
+        tool = self.tool
+        doc_rpath = tool.createDocument('File', data_dict, folder_rpath, 0)
+        proxy = self.portal.restrictedTraverse(doc_rpath)
+
+        archived = [d for d in proxy.getArchivedInfos() if d['is_frozen']]
+        self.assertEquals(len(archived), 0)
+
+        folder = proxy.aq_inner.aq_parent
+        comments = 'checkout'
+        newid = wftool.findNewId(folder, proxy.getId())
+        wftool.doActionFor(proxy, 'checkout_draft',
+                           dest_container=folder,
+                           initial_transition='checkout_draft_in',
+                           comment=comments)
+
+        draft = getattr(folder, newid)
+        locked_ob = draft.getLockedObjectFromDraft()
+
+        data_dict['Description'] = 'Revisions test'
+        doc = draft.getContent()
+        doc.edit(proxy=draft, **data_dict)
+
+        newid = locked_ob.getId()
+        comments = 'checkin'
+        wftool.doActionFor(draft, 'checkin_draft',
+                           dest_container=folder,
+                           dest_objects=[locked_ob],
+                           checkin_transition="unlock",
+                           comment=comments)
+
+        archived = [d for d in proxy.getArchivedInfos() if d['is_frozen']]
+        self.assertEquals(len(archived), 1)
+
+        self.assertEquals(proxy.getContent().Description(),
+                          data_dict['Description'])
+
+
+
 def test_suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(ProductTestCase))
@@ -217,4 +262,3 @@ def test_suite():
 
 if __name__ == '__main__':
     framework(descriptions=1, verbosity=2)
-

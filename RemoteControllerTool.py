@@ -185,6 +185,17 @@ class RemoteControllerTool(UniqueObject, Folder):
         LOG(glog_key, DEBUG, "history_simplified = %s" % history_simplified)
         return history_simplified
 
+    security.declareProtected(View, 'getDocumentArchivedRevisionsUrls')
+    def getDocumentArchivedRevisionsUrls(self, rpath):
+        """Return archived revisions urls."""
+
+        proxy = self.restrictedTraverse(rpath)
+        archived = proxy.getArchivedInfos()
+        urls = ['/'.join([rpath, 'archivedRevision', str(d['rev'])])
+                for d in archived if d['is_frozen']
+                ]
+        urls.reverse()
+        return urls
 
     security.declareProtected(View, 'isDocumentLocked')
     def isDocumentLocked(self, rpath):
@@ -713,4 +724,3 @@ def _stringToLatin9(s):
         s = s.replace(u'\u2019', u'\u0027')
         #&#8217;
         return s.encode('iso-8859-15', 'ignore')
-
