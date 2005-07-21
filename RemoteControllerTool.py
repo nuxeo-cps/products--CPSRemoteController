@@ -176,6 +176,8 @@ class RemoteControllerTool(UniqueObject, Folder):
         """Return the document history.
         """
         proxy = self.restrictedTraverse(rpath)
+        if not _checkPermission(View, proxy):
+            raise Unauthorized("You need the View permission.")
         history = proxy.getContentInfo(proxy=proxy, level=3)['history']
         LOG(glog_key, DEBUG, "history = %s" % history)
         # A simplified value of the history so that it can be transported over
