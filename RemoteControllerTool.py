@@ -180,8 +180,14 @@ class RemoteControllerTool(UniqueObject, Folder):
             raise Unauthorized("You need the View permission.")
 
         wtool = getToolByName(self, 'portal_workflow')
-        history = []
+        ttool = getToolByName(self, 'portal_trees')
 
+        folders_info = {}
+        for tree in ttool.objectValues():
+            for folder in tree.getList(filter=0):
+                folders_info[folder['rpath']] = folder
+
+        history_events = []
         review_history = wtool.getFullHistoryOf(proxy)
         if not review_history:
             review_history = wtool.getInfoFor(proxy, 'review_history', ())
@@ -209,23 +215,26 @@ class RemoteControllerTool(UniqueObject, Folder):
                 dest_title = folders_info.get(dest_container, {}).get(
                     'title', '?')
                 d['dest_title'] = dest_title
-            try:
-                dcontainer = d['dest_container']
-            except KeyError:
-                pass
-            else:
-                d['dest_container'] = str(dcontainer)
             d['time_str'] = self.getDateStr(d['time'])
-            history.append(d)
+            history_events.append(d)
 
         def cmp_date(a, b):
             return -cmp(a['time'], b['time'])
-        history.sort(cmp_date)
+        history_events.sort(cmp_date)
 
-        # remove 'time' as via xml-rpc we pass string version of
-        # time - time_str
-        for h in history:
-            del h['time']
+        history = []
+        for event in history_events:
+            hevent = {}
+            # use items to get copy
+            for key, val in event.items():
+                if key == 'time':
+                    continue
+                # XXX: Do we want to show string representation
+                # of object instead of just ''? This should be rpath.
+                if key == 'dest_container' and not isinstance(val, str):
+                    val = ''
+                hevent[key] = val
+            history.append(hevent)
 
         LOG(glog_key, DEBUG, "history = %s" % history)
         return history
