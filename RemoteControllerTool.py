@@ -261,6 +261,17 @@ class RemoteControllerTool(UniqueObject, Folder):
                 d['rev'] = rev_number
                 d['modified'] = self.getDateStr(rev_info['modified'])
 
+                d['attached_file_rpath'] = ''
+                rproxy = self.restrictedTraverse(d['rpath'])
+                doc = rproxy.getContent()
+                if doc.portal_type == 'NewsML File':
+                    zfile = doc.file_zip
+                    if zfile is not None:
+                        at_file_rpath = '/'.join([d['rpath'],
+                                                  'downloadFile/file_zip',
+                                                  zfile.title])
+                        d['attached_file_rpath'] = at_file_rpath
+
                 info.append(d)
 
         return info
