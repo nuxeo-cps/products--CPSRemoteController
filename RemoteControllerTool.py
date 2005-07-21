@@ -241,18 +241,29 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
     security.declareProtected(View, 'getDocumentArchivedRevisionsUrls')
-    def getDocumentArchivedRevisionsUrls(self, rpath):
-        """Return archived revisions urls."""
+    def getDocumentArchivedRevisionsInfo(self, rpath):
+        """Return archived revisions info."""
 
         proxy = self.restrictedTraverse(rpath)
         if not _checkPermission(ViewArchivedRevisions, proxy):
             raise Unauthorized("You need the ViewArchivedRevisions permission.")
         archived = proxy.getArchivedInfos()
-        urls = ['/'.join([rpath, 'archivedRevision', str(d['rev'])])
-                for d in archived if d['is_frozen']
-                ]
-        urls.reverse()
-        return urls
+
+        info = []
+        for rev_info in archived:
+            if rev_info['is_frozen']:
+                d = {}
+                rev_number = rev_info['rev']
+                d['rpath'] = '/'.join([rpath,
+                                       'archivedRevision',
+                                       str(rev_number)])
+                d['lang'] = rev_info['lang']
+                d['rev'] = rev_number
+                d['modified'] = self.getDateStr(rev_info['modified'])
+
+                info.append(d)
+
+        return info
 
     security.declareProtected(View, 'isDocumentLocked')
     def isDocumentLocked(self, rpath):

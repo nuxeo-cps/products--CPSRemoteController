@@ -210,7 +210,7 @@ class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
         self.assertEquals(len(proxy_list4) - 1, len(proxy_list5))
 
 
-    def testGetDocumentArchivedRevisionsUrls(self):
+    def testGetDocumentArchivedRevisionsInfo(self):
         wftool = self.portal.portal_workflow
         folder_rpath = 'workspaces'
         sections_rpath = 'sections'
@@ -249,6 +249,9 @@ class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
 
         archived = [d for d in proxy.getArchivedInfos() if d['is_frozen']]
         self.assertEquals(len(archived), 1)
+
+        revs_info = tool.getDocumentArchivedRevisionsInfo(doc_rpath)
+        self.assertEquals(len(revs_info), 1)
 
         self.assertEquals(proxy.getContent().Description(),
                           data_dict['Description'])
