@@ -28,7 +28,7 @@ import unittest
 from Testing import ZopeTestCase
 import CPSRemoteControllerTestCase
 from Products.CPSDefault.tests.CPSTestCase import MANAGER_ID
-import types
+
 
 class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
 
@@ -53,13 +53,13 @@ class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
 
     def testGetRoles(self):
         roles = self.tool.getRoles(MANAGER_ID)
-        self.assertEquals(type(roles), types.ListType)
+        self.assert_(isinstance(roles, list))
 
 
     def testGetLocalRoles(self):
         for folder_rpath in ('workspaces', 'sections'):
             roles = self.tool.getLocalRoles(MANAGER_ID, folder_rpath)
-            self.assertEquals(type(roles), types.ListType)
+            self.assert_(isinstance(roles, list))
 
 
     def testListContent(self):
