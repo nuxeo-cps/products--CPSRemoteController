@@ -182,9 +182,9 @@ class RemoteControllerTool(UniqueObject, Folder):
         LOG(glog_key, DEBUG, "history = %s" % history)
         # A simplified value of the history so that it can be transported over
         # XML-RPC.
-        history_simplified = {}
+        history_simplified = []
         for event in history:
-            history_simplified[event['action']] = event['time_str']
+            history_simplified.append({event['action'] : event['time_str']})
         LOG(glog_key, DEBUG, "history_simplified = %s" % history_simplified)
         return history_simplified
 

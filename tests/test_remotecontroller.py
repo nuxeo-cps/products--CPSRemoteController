@@ -254,6 +254,43 @@ class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
                           data_dict['Description'])
 
 
+    def testGetDocumentHistory(self):
+        wftool = self.portal.portal_workflow
+        folder_rpath = 'workspaces'
+        sections_rpath = 'sections'
+        data_dict = {'Title': "The report from Monday meeting",
+                     'Description': "Another boring report",
+                     }
+        tool = self.tool
+        doc_rpath = tool.createDocument('File', data_dict, folder_rpath, 0)
+        proxy = self.portal.restrictedTraverse(doc_rpath)
+
+        folder = proxy.aq_inner.aq_parent
+
+        for i in range(4):
+            comments = 'checkout' + str(i)
+            newid = wftool.findNewId(folder, proxy.getId())
+            wftool.doActionFor(proxy, 'checkout_draft',
+                               dest_container=folder,
+                               initial_transition='checkout_draft_in',
+                               comment=comments)
+
+            draft = getattr(folder, newid)
+            locked_ob = draft.getLockedObjectFromDraft()
+
+            newid = locked_ob.getId()
+            comments = 'checkin' + str(i)
+            wftool.doActionFor(draft, 'checkin_draft',
+                               dest_container=folder,
+                               dest_objects=[locked_ob],
+                               checkin_transition="unlock",
+                               comment=comments)
+
+        # check the actions quantity:
+        # 1 create + 1 modify + 4 checkout + 4 checkin
+        history = tool.getDocumentHistory(doc_rpath)
+        self.assertEquals(len(history), 10)
+
 
 def test_suite():
     suite = unittest.TestSuite()
