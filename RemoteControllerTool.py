@@ -178,15 +178,58 @@ class RemoteControllerTool(UniqueObject, Folder):
         proxy = self.restrictedTraverse(rpath)
         if not _checkPermission(View, proxy):
             raise Unauthorized("You need the View permission.")
-        history = proxy.getContentInfo(proxy=proxy, level=3)['history']
+
+        wtool = getToolByName(self, 'portal_workflow')
+        history = []
+
+        review_history = wtool.getFullHistoryOf(proxy)
+        if not review_history:
+            review_history = wtool.getInfoFor(proxy, 'review_history', ())
+            remove_redundant = 0
+        else:
+            remove_redundant = 1
+
+        for d in review_history:
+            if not (d.has_key('actor')
+                    and d.has_key('time')
+                    and d.has_key('action')):
+                continue
+            action = d['action']
+            # Internal transitions hidden from the user.
+            if action in ('unlock', 'checkout_draft_in'):
+                continue
+            # Skip redundant history (two transition when publishing).
+            if action == 'copy_submit' and remove_redundant:
+                continue
+            # Transitions involving a destination container.
+            if action in ('submit', 'copy_submit'):
+                d['has_dest'] = 1
+                dest_container = d.get('dest_container', '')
+
+                dest_title = folders_info.get(dest_container, {}).get(
+                    'title', '?')
+                d['dest_title'] = dest_title
+            try:
+                dcontainer = d['dest_container']
+            except KeyError:
+                pass
+            else:
+                d['dest_container'] = str(dcontainer)
+            d['time_str'] = self.getDateStr(d['time'])
+            history.append(d)
+
+        def cmp_date(a, b):
+            return -cmp(a['time'], b['time'])
+        history.sort(cmp_date)
+
+        # remove 'time' as via xml-rpc we pass string version of
+        # time - time_str
+        for h in history:
+            del h['time']
+
         LOG(glog_key, DEBUG, "history = %s" % history)
-        # A simplified value of the history so that it can be transported over
-        # XML-RPC.
-        history_simplified = []
-        for event in history:
-            history_simplified.append({event['action'] : event['time_str']})
-        LOG(glog_key, DEBUG, "history_simplified = %s" % history_simplified)
-        return history_simplified
+        return history
+
 
     security.declareProtected(View, 'getDocumentArchivedRevisionsUrls')
     def getDocumentArchivedRevisionsUrls(self, rpath):
