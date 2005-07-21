@@ -38,7 +38,7 @@ from OFS.Image import File
 import types
 import os.path
 from zLOG import LOG, TRACE, DEBUG, ERROR, PROBLEM
-
+from DateTime.DateTime import DateTimeError
 
 glog_key = 'RemoteControllerTool'
 
@@ -74,6 +74,28 @@ class RemoteControllerTool(UniqueObject, Folder):
 
     def _getPortalObject(self):
         return self.portal_url.getPortalObject()
+
+    def _getDateStr(self, dt, fmt='medium'):
+        """Implements medium format as seen in getDateStr skin script."""
+        portal = self._getPortalObject()
+        fmt = 'date_' + fmt
+        mcat = portal.translation_service
+        try:
+            dfmt = mcat(fmt)
+            ret = dt.strftime(dfmt)
+            # XXX remove this as soon as strftime is fixed
+            # space hack to fix %p strftime bug when LC_ALL=fr_FR
+            if (dfmt.endswith('%p') and not ret.endswith('M')):
+                h = int(dt.strftime('%H'))
+                if h > 12:
+                    ret += ' PM'
+                else:
+                    ret += ' AM'
+        except DateTimeError:
+            ret = 'Invalid'
+
+        return ret
+
 
     security.declareProtected(View, 'checkRoles')
     def getRoles(self, username):
@@ -222,7 +244,7 @@ class RemoteControllerTool(UniqueObject, Folder):
                 dest_title = folders_info.get(dest_container, {}).get(
                     'title', '?')
                 d['dest_title'] = dest_title
-            d['time_str'] = self.getDateStr(d['time'])
+            d['time_str'] = self._getDateStr(d['time'])
             history_events.append(d)
 
         def cmp_date(a, b):
@@ -267,7 +289,7 @@ class RemoteControllerTool(UniqueObject, Folder):
                                        str(rev_number)])
                 d['lang'] = rev_info['lang']
                 d['rev'] = rev_number
-                d['modified'] = self.getDateStr(rev_info['modified'])
+                d['modified'] = self._getDateStr(rev_info['modified'])
 
                 d['attached_file_rpath'] = ''
                 rproxy = portal.restrictedTraverse(d['rpath'])
