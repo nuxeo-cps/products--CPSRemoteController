@@ -35,7 +35,6 @@ from Products.CMFCore.utils import UniqueObject, getToolByName, _checkPermission
 from OFS.Folder import Folder
 from Acquisition import aq_parent, aq_inner
 from OFS.Image import File
-import types
 import os.path
 from zLOG import LOG, TRACE, DEBUG, ERROR, PROBLEM
 from DateTime.DateTime import DateTimeError
@@ -825,12 +824,12 @@ InitializeClass(RemoteControllerTool)
 
 
 def toLatin9(obj):
-    if type(obj) == types.DictType:
+    if isinstance(obj, dict):
         for k, v in obj.items():
-            if type(v) == types.UnicodeType:
+            if isinstance(v, unicode):
                 v = _stringToLatin9(v)
                 obj[k] = v
-    elif type(obj) == types.UnicodeType:
+    elif isinstance(obj, unicode):
         obj = _stringToLatin9(obj)
     return obj
 
