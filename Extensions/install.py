@@ -24,12 +24,12 @@ from zLOG import LOG, INFO, DEBUG
 # this should still work under pure CMF. This needs to be tested though.
 from Products.CPSInstaller.CPSInstaller import CPSInstaller
 
-class ProductInstaller(CPSInstaller):
+class Installer(CPSInstaller):
     pass
 
 def install(self):
 
-    installer = ProductInstaller(self, 'CPSRemoteController')
+    installer = Installer(self, 'CPSRemoteController')
     installer.log("Starting CPSRemoteController install")
 
 ##     skins = {
