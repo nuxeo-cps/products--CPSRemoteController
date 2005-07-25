@@ -3,11 +3,18 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
--
+- Added getDocumentArchivedRevisionsInfo method to return info about
+  revisions.
 Bug fixes:
 ~~~~~~~~~~
 - Fixed the fact that the getLocalRoles() method did not take roles acquired
   through groups into account.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
--
+- getDocumentHistory method abandoned expensive call to getContentInfo skin
+  script.
+- More security checks inside methods.
+- More unit tests.
+- Some code cleanup.
+- Added _getDateStr private method to be used instead of skin script
+  getDateStr to avoid expensive skin call.
