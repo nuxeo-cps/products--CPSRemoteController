@@ -1,4 +1,28 @@
 *******************************************
+** CPSRemoteController V1.2.0 [R1 build 2005/07/25-15:33 by alienoid]
+** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 25244
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+- Added getDocumentArchivedRevisionsInfo method to return info about
+  revisions.
+Bug fixes:
+~~~~~~~~~~
+- Fixed the fact that the getLocalRoles() method did not take roles acquired
+  through groups into account.
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+- getDocumentHistory method abandoned expensive call to getContentInfo skin
+  script.
+- More security checks inside methods.
+- More unit tests.
+- Some code cleanup.
+- Added _getDateStr private method to be used instead of skin script
+  getDateStr to avoid expensive skin call.
+
+*******************************************
 ** CPSRemoteController V1.0.0 [R1 build 2005/07/12-14:11 by madarche]
 ** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 24834
 Requires:
