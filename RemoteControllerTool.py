@@ -834,7 +834,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         if os.path.exists(fpath):
             version = open(fpath).readline().strip()
             if not version:
-                raise VersionNotFoundError, "No version information available"
+                raise VersionNotFoundError("No version information available")
             return version
 
         fpath = os.path.join(basepath, 'VERSION')
@@ -845,10 +845,10 @@ class RemoteControllerTool(UniqueObject, Folder):
                     version = version.strip()
                     return version
             else:
-                raise VersionNotFoundError, "No version information available"
+                raise VersionNotFoundError("No version information available")
 
         # no version files at all
-        raise VersionNotFoundError, "Can't find version file"
+        raise VersionNotFoundError("Can't find version file")
 
 
 InitializeClass(RemoteControllerTool)
