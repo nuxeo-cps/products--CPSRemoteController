@@ -63,7 +63,7 @@ class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
 
 
     def testListContent(self):
-        for folder_rpath in ('workspaces', 'sections'):
+        for folder_rpath in ('workspaces',):
             self.assert_(self.tool.listContent(folder_rpath))
 
 
