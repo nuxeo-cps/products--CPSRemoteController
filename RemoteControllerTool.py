@@ -826,7 +826,7 @@ class RemoteControllerTool(UniqueObject, Folder):
     def getProductVersion(self, product_name):
         """Returns version of given product.
 
-        Reads version.txt or VESION
+        Reads version.txt or VERSION
         """
         basepath = os.path.join(INSTANCE_HOME, 'Products', product_name)
 
