@@ -3,7 +3,8 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
--
+- Added getProductVersion method which examines either version.txt
+  or VERSION to provide product version information.
 Bug fixes:
 ~~~~~~~~~~
 -

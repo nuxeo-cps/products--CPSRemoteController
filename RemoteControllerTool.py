@@ -50,6 +50,8 @@ DOCUMENT_DEFAULT_FILE_KEY = 'file'
 EVENT_PUBLISH_DOCUMENT = 'remote_controller_publish_documents'
 EVENT_CHANGE_DOCUMENT_POSITION = 'remote_controller_change_document_position'
 
+class VersionNotFoundError(Exception):
+    pass
 
 class RemoteControllerTool(UniqueObject, Folder):
     """A tool providing an high-level API for manipulating documents.
@@ -818,6 +820,34 @@ class RemoteControllerTool(UniqueObject, Folder):
                     published_proxy.getPhysicalPath()[len(portal_ppath):])
                 published_docs_rpaths.append(published_proxy_path)
         return published_docs_rpaths
+
+    security.declareProtected(View, 'getProductVersion')
+    def getProductVersion(self, product_name):
+        """Returns version of given product.
+
+        Reads version.txt or VESION
+        """
+        basepath = os.path.join(INSTANCE_HOME, 'Products', product_name)
+
+        fpath = os.path.join(basepath, 'version.txt')
+        if os.path.exists(fpath):
+            version = open(fpath).readline().strip()
+            if not version:
+                raise VersionNotFoundError, "No version information available"
+            return version
+
+        fpath = os.path.join(basepath, 'VERSION')
+        if os.path.exists(fpath):
+            for line in file(fpath):
+                if line.lower().strip().startswith('pkg_version'):
+                    version = line.split('=')[1]
+                    version = version.strip()
+                    return version
+            else:
+                raise VersionNotFoundError, "No version information available"
+
+        # no version files at all
+        raise VersionNotFoundError, "Can't find version file"
 
 
 InitializeClass(RemoteControllerTool)
