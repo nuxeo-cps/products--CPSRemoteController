@@ -179,7 +179,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         p.listContent('workspaces/folder1')
         """
         portal = self._getPortalObject()
-        base_url = portal.portal_url.getBaseUrl()
+        base_url = portal.portal_url.getPortalPath() + '/'
 
         brains = portal.search(query={'cps_filter_sets': 'searchable'},
                                folder_prefix=rpath)
