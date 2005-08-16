@@ -1,0 +1,1309 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.3.10: http://docutils.sourceforge.net/" />
+<title>Understanding and using the CPS Remote Controller</title>
+<meta name="author" content="Dave Kuhlman" />
+<meta name="date" content="August 14, 2005" />
+<meta name="copyright" content="(C) Copyright 2005 Nuxeo SARL (http://nuxeo.com). This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License version 2 as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA." />
+<link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="understanding-and-using-the-cps-remote-controller">
+<h1 class="title">Understanding and using the CPS Remote Controller</h1>
+<table class="docinfo" frame="void" rules="none">
+<col class="docinfo-name" />
+<col class="docinfo-content" />
+<tbody valign="top">
+<tr><th class="docinfo-name">Author:</th>
+<td>Dave Kuhlman</td></tr>
+<tr><th class="docinfo-name">Address:</th>
+<td><pre class="address">
+<a class="first reference" href="mailto:dkuhlman&#64;rexx.com">dkuhlman&#64;rexx.com</a>
+<a class="last reference" href="http://www.rexx.com/~dkuhlman">http://www.rexx.com/~dkuhlman</a>
+</pre>
+</td></tr>
+<tr><th class="docinfo-name">Revision:</th>
+<td>1.0a</td></tr>
+<tr><th class="docinfo-name">Date:</th>
+<td>August 14, 2005</td></tr>
+<tr><th class="docinfo-name">Copyright:</th>
+<td>(C) Copyright 2005 Nuxeo SARL (<a class="reference" href="http://nuxeo.com">http://nuxeo.com</a>).
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+version 2 as published by the Free Software Foundation. This
+program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details. You should have
+received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation,
+Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.</td></tr>
+</tbody>
+</table>
+<div class="abstract topic">
+<p class="topic-title first">Abstract</p>
+<p>This document describes the CPSRemoteController
+product.  This product enables any XML-RPC clients (which
+includes python scripts, Java programs, etc.) to remotely
+control a CPS site and its content.</p>
+</div>
+<!-- $Id$ -->
+<div class="contents topic" id="contents">
+<p class="topic-title first"><a name="contents">Contents</a></p>
+<ul class="auto-toc simple">
+<li><a class="reference" href="#introducing-cpsremotecontroller" id="id1" name="id1">1&nbsp;&nbsp;&nbsp;Introducing CPSRemoteController</a><ul class="auto-toc">
+<li><a class="reference" href="#credits" id="id2" name="id2">1.1&nbsp;&nbsp;&nbsp;Credits</a></li>
+<li><a class="reference" href="#what-is-cpsremotecontroller" id="id3" name="id3">1.2&nbsp;&nbsp;&nbsp;What is CPSRemoteController?</a></li>
+<li><a class="reference" href="#where-to-find-cpsremotecontroller" id="id4" name="id4">1.3&nbsp;&nbsp;&nbsp;Where to find CPSRemoteController</a></li>
+</ul>
+</li>
+<li><a class="reference" href="#using-cpsremotecontroller" id="id5" name="id5">2&nbsp;&nbsp;&nbsp;Using CPSRemoteController</a><ul class="auto-toc">
+<li><a class="reference" href="#an-example-built-with-xmlrpclib" id="id6" name="id6">2.1&nbsp;&nbsp;&nbsp;An example built with xmlrpclib</a></li>
+<li><a class="reference" href="#an-example-built-with-twistedweb" id="id7" name="id7">2.2&nbsp;&nbsp;&nbsp;An example built with TwistedWeb</a></li>
+<li><a class="reference" href="#preliminary-hints-and-suggestions" id="id8" name="id8">2.3&nbsp;&nbsp;&nbsp;Preliminary hints and suggestions</a><ul class="auto-toc">
+<li><a class="reference" href="#object-ids" id="id9" name="id9">2.3.1&nbsp;&nbsp;&nbsp;Object IDs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference" href="#method-descriptions" id="id10" name="id10">3&nbsp;&nbsp;&nbsp;Method Descriptions</a><ul class="auto-toc">
+<li><a class="reference" href="#documents" id="id11" name="id11">3.1&nbsp;&nbsp;&nbsp;Documents</a><ul class="auto-toc">
+<li><a class="reference" href="#creating-editing-deleting-documents" id="id12" name="id12">3.1.1&nbsp;&nbsp;&nbsp;Creating, editing, deleting documents</a><ul class="auto-toc">
+<li><a class="reference" href="#changedocumentposition" id="id13" name="id13">3.1.1.1&nbsp;&nbsp;&nbsp;changeDocumentPosition</a></li>
+<li><a class="reference" href="#createdocument" id="id14" name="id14">3.1.1.2&nbsp;&nbsp;&nbsp;createDocument</a></li>
+<li><a class="reference" href="#deletedocument" id="id15" name="id15">3.1.1.3&nbsp;&nbsp;&nbsp;deleteDocument</a></li>
+<li><a class="reference" href="#deletedocuments" id="id16" name="id16">3.1.1.4&nbsp;&nbsp;&nbsp;deleteDocuments</a></li>
+<li><a class="reference" href="#deletedocumentsindirectory" id="id17" name="id17">3.1.1.5&nbsp;&nbsp;&nbsp;deleteDocumentsInDirectory</a></li>
+<li><a class="reference" href="#editdocument" id="id18" name="id18">3.1.1.6&nbsp;&nbsp;&nbsp;editDocument</a></li>
+<li><a class="reference" href="#editorcreatedocument" id="id19" name="id19">3.1.1.7&nbsp;&nbsp;&nbsp;editOrCreateDocument</a></li>
+</ul>
+</li>
+<li><a class="reference" href="#queries-on-documents" id="id20" name="id20">3.1.2&nbsp;&nbsp;&nbsp;Queries on documents</a><ul class="auto-toc">
+<li><a class="reference" href="#getdocumenthistory" id="id21" name="id21">3.1.2.1&nbsp;&nbsp;&nbsp;getDocumentHistory</a></li>
+<li><a class="reference" href="#getdocumentstate" id="id22" name="id22">3.1.2.2&nbsp;&nbsp;&nbsp;getDocumentState</a></li>
+<li><a class="reference" href="#getoriginaldocument" id="id23" name="id23">3.1.2.3&nbsp;&nbsp;&nbsp;getOriginalDocument</a></li>
+<li><a class="reference" href="#getpublisheddocuments" id="id24" name="id24">3.1.2.4&nbsp;&nbsp;&nbsp;getPublishedDocuments</a></li>
+<li><a class="reference" href="#isdocumentlocked" id="id25" name="id25">3.1.2.5&nbsp;&nbsp;&nbsp;isDocumentLocked</a></li>
+<li><a class="reference" href="#listcontent" id="id26" name="id26">3.1.2.6&nbsp;&nbsp;&nbsp;listContent</a></li>
+</ul>
+</li>
+<li><a class="reference" href="#controlling-access-to-documents" id="id27" name="id27">3.1.3&nbsp;&nbsp;&nbsp;Controlling access to documents</a><ul class="auto-toc">
+<li><a class="reference" href="#deletedocumentlocks" id="id28" name="id28">3.1.3.1&nbsp;&nbsp;&nbsp;deleteDocumentLocks</a></li>
+<li><a class="reference" href="#lockdocument" id="id29" name="id29">3.1.3.2&nbsp;&nbsp;&nbsp;lockDocument</a></li>
+<li><a class="reference" href="#unlockdocument" id="id30" name="id30">3.1.3.3&nbsp;&nbsp;&nbsp;unlockDocument</a></li>
+</ul>
+</li>
+<li><a class="reference" href="#publishing-documents" id="id31" name="id31">3.1.4&nbsp;&nbsp;&nbsp;Publishing documents</a><ul class="auto-toc">
+<li><a class="reference" href="#acceptdocument" id="id32" name="id32">3.1.4.1&nbsp;&nbsp;&nbsp;acceptDocument</a></li>
+<li><a class="reference" href="#publishdocument" id="id33" name="id33">3.1.4.2&nbsp;&nbsp;&nbsp;publishDocument</a></li>
+<li><a class="reference" href="#unpublishdocument" id="id34" name="id34">3.1.4.3&nbsp;&nbsp;&nbsp;unpublishDocument</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference" href="#roles-and-permissions" id="id35" name="id35">3.2&nbsp;&nbsp;&nbsp;Roles and permissions</a><ul class="auto-toc">
+<li><a class="reference" href="#queries" id="id36" name="id36">3.2.1&nbsp;&nbsp;&nbsp;Queries</a><ul class="auto-toc">
+<li><a class="reference" href="#checkpermission" id="id37" name="id37">3.2.1.1&nbsp;&nbsp;&nbsp;checkPermission</a></li>
+<li><a class="reference" href="#getlocalroles" id="id38" name="id38">3.2.1.2&nbsp;&nbsp;&nbsp;getLocalRoles</a></li>
+<li><a class="reference" href="#getroles" id="id39" name="id39">3.2.1.3&nbsp;&nbsp;&nbsp;getRoles</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference" href="#adding-new-methods-to-cpsremotecontroller" id="id40" name="id40">4&nbsp;&nbsp;&nbsp;Adding New Methods to CPSRemoteController</a><ul class="auto-toc">
+<li><a class="reference" href="#advance-planning" id="id41" name="id41">4.1&nbsp;&nbsp;&nbsp;Advance planning</a></li>
+<li><a class="reference" href="#licensing" id="id42" name="id42">4.2&nbsp;&nbsp;&nbsp;Licensing</a></li>
+<li><a class="reference" href="#getcomplexdocumenthistory" id="id43" name="id43">4.3&nbsp;&nbsp;&nbsp;getComplexDocumentHistory</a></li>
+<li><a class="reference" href="#rejectdocument" id="id44" name="id44">4.4&nbsp;&nbsp;&nbsp;rejectDocument</a></li>
+<li><a class="reference" href="#adduser" id="id45" name="id45">4.5&nbsp;&nbsp;&nbsp;addUser</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="introducing-cpsremotecontroller">
+<h1><a class="toc-backref" href="#id1" name="introducing-cpsremotecontroller">1&nbsp;&nbsp;&nbsp;Introducing CPSRemoteController</a></h1>
+<div class="section" id="credits">
+<h2><a class="toc-backref" href="#id2" name="credits">1.1&nbsp;&nbsp;&nbsp;Credits</a></h2>
+<p>Thanks to Nuxeo and the developers there for <a class="reference" href="http://svn.nuxeo.org/trac/pub">CPSRemoteController</a>.
+This document would not be possible without that implementation.
+Significant portions of the documentation on individual methods
+was copied from the <a class="reference" href="http://svn.nuxeo.org/trac/pub">CPSRemoteController</a> module.  Thanks for those
+very helpful comments.  Also, it is likely that any errors in this
+document have been introduced by me and should not be attributed
+to the implementors of <a class="reference" href="http://svn.nuxeo.org/trac/pub">CPSRemoteController</a>.</p>
+</div>
+<div class="section" id="what-is-cpsremotecontroller">
+<h2><a class="toc-backref" href="#id3" name="what-is-cpsremotecontroller">1.2&nbsp;&nbsp;&nbsp;What is CPSRemoteController?</a></h2>
+<p><a class="reference" href="http://svn.nuxeo.org/trac/pub">CPSRemoteController</a> provides a way to run Python scripts, outside
+of the <a class="reference" href="http://www.cps-project.org">CPS</a> environment that manipulate a CPS portal, including the
+users, groups, documents, and other objects at that site.</p>
+<p>Why you might want to use <a class="reference" href="http://svn.nuxeo.org/trac/pub">CPSRemoteController</a> -- Some possible of
+benefits:</p>
+<ul class="simple">
+<li>Since the protocol used by CPSRemoteController is <a class="reference" href="http://www.xmlrpc.com/">XML-RPC</a> and
+is usable across the Web, you can control your CPS site from
+anywhere that you have access to the site through the Web.</li>
+<li>Because there is <a class="reference" href="http://www.xmlrpc.com/">XML-RPC</a> client support for a variety of
+languages, for example Java, C/C++, PHP, etc in addition to
+Python. For more information on XML-RPC implementations see
+<a class="reference" href="http://www.xmlrpc.com/">XML-RPC</a> Thus, You are likely to be able to write your client in
+the language of your choice and on the platform that fits your
+needs.</li>
+<li>If an application provides an <a class="reference" href="http://www.xmlrpc.com/">XML-RPC</a> interface, you might be
+able to control a CPS site from within that foreign application.</li>
+<li>Task automation -- You may be able to write scripts that
+automate tasks which would be tedious if done manually at your
+CPS site from within the Web browser.  For example, you might be
+able to write a script that adds a batch of documents to your
+site or that adds a set of users to the site.  Some of these
+tasks, however, may require extensions to <a class="reference" href="http://svn.nuxeo.org/trac/pub">CPSRemoteController</a>.</li>
+</ul>
+<p>Extensions to <a class="reference" href="http://svn.nuxeo.org/trac/pub">CPSRemoteController</a> -- In addition, you may be able
+to implement additional methods not currently supported by
+<a class="reference" href="http://svn.nuxeo.org/trac/pub">CPSRemoteController</a>.  We'll see how to do that in section <a class="reference" href="#adding-new-methods-to-cpsremotecontroller">Adding
+New Methods to CPSRemoteController</a>.</p>
+</div>
+<div class="section" id="where-to-find-cpsremotecontroller">
+<h2><a class="toc-backref" href="#id4" name="where-to-find-cpsremotecontroller">1.3&nbsp;&nbsp;&nbsp;Where to find CPSRemoteController</a></h2>
+<p>By the time you read this, <a class="reference" href="http://svn.nuxeo.org/trac/pub">CPSRemoteController</a> may already be
+included in the <a class="reference" href="http://www.cps-project.org">CPS</a> distribution.  If not, it is available
+through SVN at <a class="reference" href="http://svn.nuxeo.org/trac/pub">http://svn.nuxeo.org/trac/pub</a>.</p>
+</div>
+</div>
+<div class="section" id="using-cpsremotecontroller">
+<h1><a class="toc-backref" href="#id5" name="using-cpsremotecontroller">2&nbsp;&nbsp;&nbsp;Using CPSRemoteController</a></h1>
+<p>There is already some documentation on <a class="reference" href="http://svn.nuxeo.org/trac/pub">CPSRemoteController</a>:</p>
+<ul>
+<li><p class="first">Brief comments on how to make calls into CPSRemoteController are
+in  <tt class="docutils literal"><span class="pre">Products/CPSRemoteController/RemoteControllerTool.py</span></tt>.</p>
+</li>
+<li><p class="first">Comments on each method that is exposed are the method's
+implementation.  Although you can read the in-line documentation
+in the source code, it may make for more convenient reading if
+you generate HTML documentation for the methods.  I used
+<a class="reference" href="http://happydoc.sourceforge.net/">happydoc</a>.  Generate the documentation for CPSRemoteController
+using something like the following:</p>
+<pre class="literal-block">
+cd my_cps_site/Products/CPSRemoteController
+happydoc RemoteControllerTool.py
+</pre>
+<p>By default, <a class="reference" href="http://happydoc.sourceforge.net/">happydoc</a> places the generated files in a directory
+named <tt class="docutils literal"><span class="pre">doc</span></tt>.  <a class="reference" href="http://happydoc.sourceforge.net/">happydoc</a> may already be installed on your
+machine.  If not and if you are on a Debian GNU/Linux machine,
+you can install <a class="reference" href="http://happydoc.sourceforge.net/">happydoc</a> with something like the following:</p>
+<blockquote>
+<p>apt-get install python-happydoc</p>
+</blockquote>
+<p>For help on other platforms, check the <a class="reference" href="http://happydoc.sourceforge.net/">happydoc</a> Web site.</p>
+</li>
+</ul>
+<div class="section" id="an-example-built-with-xmlrpclib">
+<h2><a class="toc-backref" href="#id6" name="an-example-built-with-xmlrpclib">2.1&nbsp;&nbsp;&nbsp;An example built with xmlrpclib</a></h2>
+<p>Calling a method on CPSRemoteController is fairly easy.  Here is
+an example based on the use of the standard python module
+<a class="reference" href="http://docs.python.org/lib/module-xmlrpclib.html">xmlrpclib</a> that you can use as a template:</p>
+<pre class="literal-block">
+from xmlrpclib import ServerProxy
+proxy = ServerProxy('http://username:password&#64;thrush:8085/mysite/portal_remote_controller') # 1
+path_to_doc = 'workspaces/members/username/document-1'
+doc_def = {                                                                                 # 2
+    'content': 'Test #1',
+}
+comments = 'CPSRemoteController test #1\n'
+proxy.editDocument(path_to_doc, doc_def, comments)                                          # 3
+</pre>
+<p>Explanation:</p>
+<ol class="arabic simple">
+<li>In the call that creates the proxy, change the user name,
+password, machine/location, port, and CPS site.</li>
+<li>Create any needed data structures for the specific method to be
+called.  See the documentation below on each method.  In this
+case, for the call to <tt class="docutils literal"><span class="pre">editDocument</span></tt>, we create a dictionary
+containing a key <tt class="docutils literal"><span class="pre">content</span></tt> whose value is new value for the
+<tt class="docutils literal"><span class="pre">content</span></tt> field in the document.  Hint: Look in the ZMI (Zope
+Management Interface) <tt class="docutils literal"><span class="pre">/mysite/portal_schemas/document</span></tt> under
+the <tt class="docutils literal"><span class="pre">Schemas</span></tt> tab.</li>
+<li>Call the method, passing in the needed parameters.  In this
+example, the parameters are (1) the path to the document to be
+modified, (2) a data structure containing the update, and (3)
+comments.</li>
+</ol>
+<p><em>Note:</em> Use of the ServerProxy class as described here is
+dependant on the specific implementation library used here, in
+particular <a class="reference" href="http://docs.python.org/lib/module-xmlrpclib.html">xmlrpclib</a>. There are other python XML-RPC
+implementations for Python that might be better suited than
+<a class="reference" href="http://docs.python.org/lib/module-xmlrpclib.html">xmlrpclib</a>, for example see
+<a class="reference" href="http://twisted.sourceforge.net/TwistedDocs-1.2.0/howto/xmlrpc.html">Creating XML-RPC Servers and Clients with Twisted</a>.
+One deficiency with the <a class="reference" href="http://docs.python.org/lib/module-xmlrpclib.html">xmlrpclib</a> implementation is not be able to
+send XML-RPC queries through a proxy.</p>
+</div>
+<div class="section" id="an-example-built-with-twistedweb">
+<h2><a class="toc-backref" href="#id7" name="an-example-built-with-twistedweb">2.2&nbsp;&nbsp;&nbsp;An example built with TwistedWeb</a></h2>
+<p>So, here is a client built on <a class="reference" href="http://twistedmatrix.com/">Twisted</a>.  Note that this
+implementation requires a replacement to and extension of several
+classes in <tt class="docutils literal"><span class="pre">twisted.web.xmlrpc</span></tt> from <a class="reference" href="http://twistedmatrix.com/projects/web/">TwistedWeb</a>.  The extension
+supports the use of user IDs and passwords.  By the time you read
+this, that extension may already be in the distribution of
+<a class="reference" href="http://twistedmatrix.com/projects/web/">TwistedWeb</a>.  Here are those replacement classes and a sample
+client that you can use as a template for your <a class="reference" href="http://twistedmatrix.com/">Twisted</a> clients:</p>
+<pre class="literal-block">
+#!/usr/bin/env python
+
+import sys
+import base64, urlparse
+from twisted.web import xmlrpc
+from twisted.internet import reactor, defer
+
+
+class QueryProtocol(xmlrpc.QueryProtocol):
+    def connectionMade(self):
+        self.sendCommand('POST', self.factory.url)
+        self.sendHeader('User-Agent', 'Twisted/XMLRPClib')
+        self.sendHeader('Host', self.factory.host)
+        if self.factory.authString is not None:
+            cred = base64.encodestring(self.factory.authString)
+            self.sendHeader('Authorization', 'Basic ' + cred[:-1])
+        self.sendHeader('Content-type', 'text/xml')
+        self.sendHeader('Content-length', str(len(self.factory.payload)))
+        self.endHeaders()
+        self.transport.write(self.factory.payload)
+
+
+class QueryFactory(xmlrpc.QueryFactory):
+    protocol = QueryProtocol
+    def __init__(self, url, host, method, authString=None, *args):
+        self.authString = authString
+        xmlrpc.QueryFactory.__init__(self, url, host, method, *args)
+
+
+class Proxy:
+    &quot;&quot;&quot;A Proxy for making remote XML-RPC calls.
+    Pass the URL of the remote XML-RPC server to the constructor.
+    Use proxy.callRemote('foobar', *args) to call remote method
+    'foobar' with *args.
+    &quot;&quot;&quot;
+    def __init__(self, url):
+        parts = urlparse.urlparse(url)
+        self.url = urlparse.urlunparse(('', '')+parts[2:])
+        self.auth = None
+        if self.url == &quot;&quot;:
+            self.url = &quot;/&quot;
+        if ':' in parts[1]:
+            if '&#64;' in parts[1]:
+                self.auth, address = parts[1].split('&#64;')
+            else:
+                address = parts[1]
+                self.authHost = None
+            self.host, self.port = address.split(':')
+            if self.auth is not None:
+                self.authHost = '&#64;'.join([self.auth, self.host])
+            self.port = int(self.port)
+        else:
+            self.host, self.port = parts[1], None
+        self.secure = parts[0] == 'https'
+
+    def callRemote(self, method, *args):
+        factory = QueryFactory(self.url, self.host,
+                               method, self.auth, *args)
+        if self.secure:
+            from twisted.internet import ssl
+            reactor.connectSSL(self.host, self.port or 443,
+                               factory, ssl.ClientContextFactory())
+        else:
+            reactor.connectTCP(self.host, self.port or 80, factory)
+        return factory.deferred
+
+
+class Test:
+
+    def printValue(self, value):
+        value.sort()
+        print 'Items:'
+        for item in value:
+            print '    %s' % item
+
+    def printError(self, error):
+        print 'error', error
+
+    def getData(self, user, password):
+        url = 'http://%s:%s&#64;thrush:8085/cps1/portal_remote_controller' % \
+            (user, password, )
+        self.proxy = Proxy(url)
+        arg1 = 'workspaces/members/%s' % user
+        d = self.proxy.callRemote('listContent', arg1)
+        d.addCallbacks(self.printValue, self.printError)
+        return d
+
+
+def test_listContent():
+    g = Test()
+    user = 'user1'
+    password = 'user1_password'
+    d = g.getData(user, password)
+    user = 'user2'
+    password = 'user2_password'
+    d = g.getData(user, password)
+    reactor.callLater(1, reactor.stop)
+    reactor.run()
+
+
+if __name__ == '__main__':
+    test_listContent()
+</pre>
+<p>Notes:</p>
+<ul class="simple">
+<li>Classes <tt class="docutils literal"><span class="pre">QueryProtocol</span></tt>, <tt class="docutils literal"><span class="pre">QueryFactory</span></tt>, and <tt class="docutils literal"><span class="pre">Proxy</span></tt>
+replace classes in <tt class="docutils literal"><span class="pre">twisted/web/xmlrpc.py</span></tt>.  These
+replacements add the capability to pass a user name and password
+to the <a class="reference" href="http://www.xmlrpc.com/">XML-RPC</a> server.  You will want to check your <a class="reference" href="http://twistedmatrix.com/projects/web/">TwistedWeb</a>
+distribution to determine if that capability has already been
+added.</li>
+<li>Methods <tt class="docutils literal"><span class="pre">Test.printValue</span></tt> is the callback that will be called
+and will be passed the value returned by the XML-RPC server. In
+our case, the server is a CPS site.</li>
+<li>Method <tt class="docutils literal"><span class="pre">Test.getData</span></tt> creates a proxy, calls method
+<tt class="docutils literal"><span class="pre">callRemote</span></tt> to create a deferred object, adds two callback
+functions to that deferred object, then returns that object.</li>
+<li>Function <tt class="docutils literal"><span class="pre">test_listContent</span></tt> creates an instance of our
+<tt class="docutils literal"><span class="pre">Test</span></tt> class, calls method <tt class="docutils literal"><span class="pre">getData</span></tt> in that class to obtain
+the deferred object, and schedules it to be run.</li>
+</ul>
+<p>More information on the <a class="reference" href="http://twistedmatrix.com/">Twisted</a> programming paradigm and the use
+of deferred objects can be found at <a class="reference" href="http://twistedmatrix.com/projects/core/documentation/howto/index.html">Twisted Documentation</a>.  For
+more on the use of XML-RPC with <a class="reference" href="http://twistedmatrix.com/">Twisted</a> see <a class="reference" href="http://twisted.sourceforge.net/TwistedDocs-1.2.0/howto/xmlrpc.html">Creating XML-RPC
+Servers and Clients with Twisted</a>.</p>
+</div>
+<div class="section" id="preliminary-hints-and-suggestions">
+<h2><a class="toc-backref" href="#id8" name="preliminary-hints-and-suggestions">2.3&nbsp;&nbsp;&nbsp;Preliminary hints and suggestions</a></h2>
+<div class="section" id="object-ids">
+<h3><a class="toc-backref" href="#id9" name="object-ids">2.3.1&nbsp;&nbsp;&nbsp;Object IDs</a></h3>
+<p>For documents, CPS takes the document title, performs a conversion
+on the title, then uses that converted string for the object ID.
+You must use the document ID, not the title, to perform operations
+on existing objects.</p>
+<p>How to learn the ID of an object -- You can learn the ID of a
+document, folder, etc in one of the following ways:</p>
+<ul class="simple">
+<li>The last part of the URL of your document is its ID.</li>
+<li>In the ZMI, by looking at the object, for example, look under:<ul>
+<li><tt class="docutils literal"><span class="pre">my_cps_site/sections</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">my_cps_site/workspaces</span></tt></li>
+</ul>
+</li>
+<li>In your CPS portal, by clicking on the &quot;Folder contents&quot; action,
+selecting the object, then clicking on &quot;Change object id&quot;.</li>
+</ul>
+<p>The function used to perform the conversion from title to ID is:
+<tt class="docutils literal"><span class="pre">generateId</span></tt> in <tt class="docutils literal"><span class="pre">my_zope_instance/Products/CPSUtil/id.py</span></tt>. You
+may want to read the documentation in the source and the source
+itself for that function if you have questions about this
+conversion process.</p>
+<p>Although the behavior of <tt class="docutils literal"><span class="pre">generateId</span></tt> can be modified by
+parameters, here are a few rules that my version of CPS seems to
+be following:</p>
+<ul class="simple">
+<li>The allowable characters are letters, digits, underscores, and
+dashes.</li>
+<li>Blanks are replaced with dashes.  Most other un-allowed characters
+are removed.  Multiple, contiguous blanks are replaced with a
+single dash.</li>
+<li>Upper case letters are converted to lower case.</li>
+<li>Words are not cut.</li>
+<li>The generated ID has a maximum length.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="method-descriptions">
+<h1><a class="toc-backref" href="#id10" name="method-descriptions">3&nbsp;&nbsp;&nbsp;Method Descriptions</a></h1>
+<p>This section describes each of the methods exposed and supported
+by CPSRemoteController.</p>
+<p>The code examples that we give are implement on top of <a class="reference" href="http://docs.python.org/lib/module-xmlrpclib.html">xmlrpclib</a>.</p>
+<div class="section" id="documents">
+<h2><a class="toc-backref" href="#id11" name="documents">3.1&nbsp;&nbsp;&nbsp;Documents</a></h2>
+<div class="section" id="creating-editing-deleting-documents">
+<h3><a class="toc-backref" href="#id12" name="creating-editing-deleting-documents">3.1.1&nbsp;&nbsp;&nbsp;Creating, editing, deleting documents</a></h3>
+<div class="section" id="changedocumentposition">
+<h4><a class="toc-backref" href="#id13" name="changedocumentposition">3.1.1.1&nbsp;&nbsp;&nbsp;changeDocumentPosition</a></h4>
+<p>Prototype:</p>
+<pre class="literal-block">
+changeDocumentPosition(
+        self,
+        rpath,
+        step,
+        )
+</pre>
+<p>Change the position of the document within its containing folder.
+For example, this operation changes the order in which documents
+are displayed when you click on &quot;Folder contents&quot; in your site.
+<strong>Warning:</strong>  This method can only be called on ordered folders and
+would produce errors if called, for example, on BTreeFolders.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><em>rpath</em> (a string) is of the form &quot;sections/section1/doc1&quot; or
+&quot;sections/folder/doc2&quot;.  Remember that the title and ID of the
+object may be different.  See section <a class="reference" href="#object-ids">Object IDs</a> for more on
+this.</li>
+<li><em>step</em> (an integer) is the increment to be added to the
+target document's current position.</li>
+</ul>
+<p>Exceptions:</p>
+<ul class="simple">
+<li>Unauthorized(&quot;You need the ChangeSubobjectsOrder permission.&quot;)</li>
+</ul>
+</div>
+<div class="section" id="createdocument">
+<h4><a class="toc-backref" href="#id14" name="createdocument">3.1.1.2&nbsp;&nbsp;&nbsp;createDocument</a></h4>
+<p>Prototype:</p>
+<pre class="literal-block">
+createDocument(
+        self,
+        portal_type,
+        doc_def,
+        folder_rpath,
+        position=-1,
+        comments=&quot;&quot;,
+        )
+</pre>
+<p>Create document with the given portal_type with data from the
+given data dictionary.</p>
+<p>The method returns the rpath of the created document.</p>
+<p>Parameters:</p>
+<ul>
+<li><p class="first"><em>portal_type</em> is the type of document to be created.  In your
+CPS portal, click on the <tt class="docutils literal"><span class="pre">New</span></tt> action to get a list of
+document types that can be created in a particular folder.  You
+can learn more about these document types in
+<tt class="docutils literal"><span class="pre">my_cps_site/portal_schemas</span></tt> in the ZMI.</p>
+</li>
+<li><p class="first"><em>doc_def</em> (a dictionary) contains values to be inserted in the
+new object.  The keys in the dictionary are the names of the
+properties in the new object and the values are the values
+assigned for each property.  The following properties are always
+valid:</p>
+<ul class="simple">
+<li><em>Title</em></li>
+<li><em>Description</em></li>
+</ul>
+<p>You can learn about additional properties specific to each
+document type by looking in <tt class="docutils literal"><span class="pre">my_cps_site/portal_schemas</span></tt> in
+the ZMI, then clicking on a specific document definition.</p>
+</li>
+<li><p class="first"><em>folder_rpath</em> (a string) is the path to the folder in which the
+document is to be created.  An example is
+&quot;workspaces/members/a_user_name&quot;.</p>
+</li>
+<li><p class="first"><em>position</em> (an integer) is optional. It is used to specify the
+position of the new document within exiting documents in the
+folder.  A value of zero places the new document at the top.  A
+value of -1 (the default) places the document after all existing
+documents.</p>
+</li>
+<li><p class="first"><em>comments</em> (a string) supplies optional comments.</p>
+</li>
+</ul>
+<p>Exceptions:</p>
+<ul class="simple">
+<li>Unauthorized( &quot;You need the AddPortalContent permission.&quot; )</li>
+</ul>
+<p>Examples -- These examples were copied from the in-line
+documentation, then reformatted and modified:</p>
+<pre class="literal-block">
+from xmlrpclib import ServerProxy
+p = ServerProxy('http://manager:xxxxx&#64;myserver.net:8080/cps/portal_remote_controller')
+
+doc_def = {'Title': &quot;The report from Monday meeting&quot;,
+    'Description': &quot;Another boring report&quot;
+    }
+p.createDocument('File', doc_def, 'workspaces')
+
+doc_def = {'Title': &quot;The company hires&quot;,
+    'Description': &quot;The company goes well and hires&quot;
+    }
+p.createDocument('News Item', doc_def, 'workspaces')
+
+doc_def = {'Title': &quot;The report from Monday meeting&quot;,
+    'Description': &quot;Another boring report&quot;
+    }
+p.createDocument('File', doc_def, 'workspaces')
+
+doc_def = {'Title': &quot;The company hires&quot;,
+    'Description': &quot;The company goes well and hires&quot;
+    }
+p.createDocument('News Item', doc_def, 'workspaces', 0)
+
+from xmlrpclib import ServerProxy, Binary
+f = open('MyImage.png', 'r')
+binary = Binary(f.read())
+f.close()
+doc_def = {'Title': &quot;The report from Monday meeting&quot;,
+    'Description': &quot;Another boring report&quot;,
+    'file_name': &quot;MyImage.png&quot;,
+    'file': binary,
+    }
+p.createDocument('File', doc_def, 'workspaces')
+
+doc_def = {'Title': &quot;The company hires&quot;,
+    'Description': &quot;The company goes well and hires&quot;
+    }
+p.createDocument('News Item', doc_def, 'workspaces', 2)
+
+from xmlrpclib import ServerProxy, Binary
+f = open('MyImage.png', 'r')
+binary = Binary(f.read())
+f.close()
+doc_def = {'Title': &quot;The report from Monday meeting&quot;,
+    'Description': &quot;Another boring report&quot;,
+    'file_name': &quot;MyImage.png&quot;,
+    'file_key': 'file_zip',
+    'file': binary,
+    }
+p.createDocument('File', doc_def, 'workspaces')
+
+doc_def = {'Title': &quot;The company hires&quot;,
+    'Description': &quot;The company goes well and hires&quot;
+    }
+p.createDocument('News Item', doc_def, 'workspaces', 2)
+</pre>
+<p>And, here is one additional example.  This one creates an object
+of type <tt class="docutils literal"><span class="pre">Document</span></tt>, adds some content in the document, and
+specifies the content format:</p>
+<pre class="literal-block">
+#
+# Create new document in the user's private directory.
+#
+def test_createDocument(user, title, description):
+    constr = 'http://%s:%s%s&#64;thrush:8085/cps1/portal_remote_controller' % \
+        (user, user, user, )
+    proxy = ServerProxy(constr)
+    content_template = '''\
+Content:
+
+- Title: %s
+
+- Description: %s
+'''
+    content = content_template % (title, description, )
+    doc_def = {'Title': title,
+        'Description': description,
+        'content': content,
+        'content_format': 'stx',
+        }
+    doc_rpath = 'workspaces/members/%s' % user
+    result = proxy.createDocument('Document', doc_def, doc_rpath)
+    print 'result: &quot;%s&quot;' % result
+</pre>
+<p>Explanation:</p>
+<ul>
+<li><p class="first">We specify the values of the <tt class="docutils literal"><span class="pre">content</span></tt> and <tt class="docutils literal"><span class="pre">content_format</span></tt>
+properties. Your question at this point might be: (1) How did we
+learn the names/IDs of the properties for this document type?
+And, (2) how do we find out what values these properties can
+take. Here are a few guides to help you find out:</p>
+<ul class="simple">
+<li>The property names -- In the above example, we created an
+object of type <tt class="docutils literal"><span class="pre">Document</span></tt>. So, in the ZMI, we look at
+<tt class="docutils literal"><span class="pre">my_cps_site/portal_schemas/document</span></tt>, then click on the
+&quot;Schema&quot; tab.  What we see is a list of the IDs of the objects
+in any object of type <tt class="docutils literal"><span class="pre">Document</span></tt>.</li>
+<li>The property values -- To learn this I first determined the
+widget type of the <tt class="docutils literal"><span class="pre">content</span></tt> property by looking in
+<tt class="docutils literal"><span class="pre">my_cps_site/portal_layouts/document/w__content</span></tt> in the ZMI.
+I found that the type of the widget used to display
+<tt class="docutils literal"><span class="pre">content</span></tt> is <tt class="docutils literal"><span class="pre">CPSTextWidget</span></tt>. Then, I looked at the
+<tt class="docutils literal"><span class="pre">render</span></tt> method in class <tt class="docutils literal"><span class="pre">CPSTextWidget</span></tt> in
+<tt class="docutils literal"><span class="pre">my_zope_instance/Products/CPSSchemas/ExtendedWidgets.py</span></tt>.
+If you read that code, you will find that the format keys are
+&quot;pre&quot;, &quot;stx&quot;, &quot;text&quot;, and &quot;html&quot; (where &quot;stx&quot; means &quot;Zope
+Structured Text&quot;).</li>
+</ul>
+<p>Hopefully, you will be able to do similar investigative work to
+learn about the properties of other object types.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="deletedocument">
+<h4><a class="toc-backref" href="#id15" name="deletedocument">3.1.1.3&nbsp;&nbsp;&nbsp;deleteDocument</a></h4>
+<p>Prototype:</p>
+<pre class="literal-block">
+deleteDocument(self, rpath)
+</pre>
+<p>Delete the document with the given rpath.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><em>rpath</em> (a string) is the path to the document to be deleted.</li>
+</ul>
+<p>Exceptions</p>
+<ul class="simple">
+<li>Unauthorized( &quot;You need the DeleteObjects permission.&quot; )</li>
+<li>KeyError - 'document-11' -- The document does not exist in the
+specified folder.</li>
+</ul>
+<p>Example:</p>
+<pre class="literal-block">
+#
+#     Delete a document.
+#
+def test_deleteDocument(user, title, description):
+    constr = 'http://%s:%s%s&#64;thrush:8085/cps1/portal_remote_controller' % \
+        (user, user, user, )
+    proxy = ServerProxy(constr)
+    doc_rpath = 'workspaces/members/%s/%s' % (user, title, )
+    print 'deleting -- doc_rpath: %s' % doc_rpath
+    proxy.deleteDocument(doc_rpath)
+</pre>
+</div>
+<div class="section" id="deletedocuments">
+<h4><a class="toc-backref" href="#id16" name="deletedocuments">3.1.1.4&nbsp;&nbsp;&nbsp;deleteDocuments</a></h4>
+<p>Prototype:</p>
+<pre class="literal-block">
+deleteDocuments(self, rpaths)
+</pre>
+<p>Delete the documents corresponding to the given rpaths.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><em>rpaths</em> (a tuple or list of strings) contains the paths of the
+documents to be deleted.</li>
+</ul>
+<p>Example:</p>
+<pre class="literal-block">
+#     Delete a set of documents.
+#     The documents are specified as titles = 'doc1:doc2:doc3 ...'
+#
+def test_deleteDocuments(user, titles, description):
+    constr = 'http://%s:%s%s&#64;thrush:8085/cps1/portal_remote_controller' % \
+        (user, user, user, )
+    proxy = ServerProxy(constr)
+    doc_rpaths = []
+    title_list = titles.split(':')
+    for title in title_list:
+        rpath = 'workspaces/members/%s/%s' % (user, title, )
+        doc_rpaths.append(rpath)
+    print 'deleting -- doc_rpaths: %s' % doc_rpaths
+    proxy.deleteDocuments(doc_rpaths)
+</pre>
+</div>
+<div class="section" id="deletedocumentsindirectory">
+<h4><a class="toc-backref" href="#id17" name="deletedocumentsindirectory">3.1.1.5&nbsp;&nbsp;&nbsp;deleteDocumentsInDirectory</a></h4>
+<p>deleteDocumentsInDirectory(self, rpath)</p>
+<p>Delete the documents located in directory corresponding to the given rpath.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><em>rpath</em> (a string) is the path to the directory containing the
+documents to be deleted.</li>
+</ul>
+<p>Exceptions:</p>
+<ul class="simple">
+<li>Unauthorized( &quot;You need the DeleteObjects permission.&quot; )</li>
+</ul>
+</div>
+<div class="section" id="editdocument">
+<h4><a class="toc-backref" href="#id18" name="editdocument">3.1.1.6&nbsp;&nbsp;&nbsp;editDocument</a></h4>
+<p>Prototype:</p>
+<pre class="literal-block">
+editDocument(
+        self,
+        rpath,
+        doc_def={},
+        comments=&quot;&quot;,
+        )
+</pre>
+<p>Modify the specified document with data from the given data dictionary.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><em>doc_rpath</em> (a string) is the path to the folder in which the
+document is to be created.  An example is
+&quot;workspaces/members/a_user_name/a_doc_id&quot;.</li>
+<li><em>doc_def</em> (a dictionary) contains values to be inserted in the new
+object.  The keys in the dictionary are the names of the
+properties in the object and the values are the values assigned
+for each property.  See section <a class="reference" href="#createdocument">createDocument</a> for more
+information on the contents of this dictionary.</li>
+<li><em>comments</em> (a string) supplies optional comments.</li>
+</ul>
+<p>Exceptions:</p>
+<ul class="simple">
+<li>Unauthorized( &quot;You need the ModifyPortalContent permission.&quot; )</li>
+</ul>
+<p>Example:</p>
+<pre class="literal-block">
+#     Edit/modify the content of an existing document in the
+#     user's private directory.
+#
+def test_editDocument(user, title, description):
+    constr = 'http://%s:%s%s&#64;thrush:8085/cps1/portal_remote_controller' % \
+        (user, user, user, )
+    proxy = ServerProxy(constr)
+    content_template = '''\
+This is edited content.
+
+Content:
+
+- Title: %s
+
+- Description: %s
+'''
+    content = content_template % (title, description, )
+    doc_def = {'Title': title,
+        'Description': description,
+        'content': content,
+        'content_format': 'stx',
+        }
+    doc_rpath = 'workspaces/members/%s/%s' % (user, title, )
+    position = 1
+    comment = 'Comment for %s' % title
+    print 'editing document -- doc_rpath: %s  doc_def: %s' % \
+        (doc_rpath, doc_def, )
+    result = proxy.editDocument(doc_rpath, doc_def, comment)
+    print 'result: &quot;%s&quot;' % result
+</pre>
+</div>
+<div class="section" id="editorcreatedocument">
+<h4><a class="toc-backref" href="#id19" name="editorcreatedocument">3.1.1.7&nbsp;&nbsp;&nbsp;editOrCreateDocument</a></h4>
+<p>Prototype:</p>
+<pre class="literal-block">
+editOrCreateDocument(
+        self,
+        rpath,
+        portal_type,
+        doc_def,
+        position=-1,
+        comments=&quot;&quot;,
+        )
+</pre>
+<p>Create or edit a document with the given portal_type with data
+from the given data dictionary.</p>
+<p>The method returns the rpath of the created or edited document.</p>
+<p>Parameters -- Same as for <a class="reference" href="#createdocument">createDocument</a>.</p>
+<p>Exceptions:</p>
+<ul class="simple">
+<li>Unauthorized( &quot;You need the ModifyPortalContent permission.&quot; )</li>
+</ul>
+</div>
+</div>
+<div class="section" id="queries-on-documents">
+<h3><a class="toc-backref" href="#id20" name="queries-on-documents">3.1.2&nbsp;&nbsp;&nbsp;Queries on documents</a></h3>
+<div class="section" id="getdocumenthistory">
+<h4><a class="toc-backref" href="#id21" name="getdocumenthistory">3.1.2.1&nbsp;&nbsp;&nbsp;getDocumentHistory</a></h4>
+<p>Prototype:</p>
+<pre class="literal-block">
+getDocumentHistory(self, rpath)
+</pre>
+<p>Return the document history.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><em>rpath</em> (a string) is the path to the document whose history is
+to be retrieved.</li>
+</ul>
+<p>Example:</p>
+<pre class="literal-block">
+#     Get document history.
+#
+def test_getDocumentHistory(user, rpath):
+    constr = 'http://%s:%s%s&#64;thrush:8085/cps1/portal_remote_controller' % \
+        (user, user, user, )
+    proxy = ServerProxy(constr)
+    print 'getting doc history -- user: %s  rpath: %s' % \
+        (user, rpath, )
+    history_simplified = proxy.getDocumentHistory(rpath)
+    print 'history:'
+    for action, time in history_simplified.items():
+        print '    action: %s  time: %s' % (action, time, )
+</pre>
+</div>
+<div class="section" id="getdocumentstate">
+<h4><a class="toc-backref" href="#id22" name="getdocumentstate">3.1.2.2&nbsp;&nbsp;&nbsp;getDocumentState</a></h4>
+<p>Prototype:</p>
+<pre class="literal-block">
+getDocumentState(self, rpath)
+</pre>
+<p>Return the workflow state of the document specified by the given
+relative path.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><em>rpath</em> (a string) is of the form &quot;workspaces/doc1&quot; or
+&quot;sections/doc2&quot;.</li>
+</ul>
+</div>
+<div class="section" id="getoriginaldocument">
+<h4><a class="toc-backref" href="#id23" name="getoriginaldocument">3.1.2.3&nbsp;&nbsp;&nbsp;getOriginalDocument</a></h4>
+<p>Prototype:</p>
+<pre class="literal-block">
+getOriginalDocument(self, rpath)
+</pre>
+<p>Return the path to the original document that was used to publish
+the document specified by the given path.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><em>rpath</em> (a string) is the path to the published document and is
+of the form &quot;sections/doc1&quot;.</li>
+</ul>
+</div>
+<div class="section" id="getpublisheddocuments">
+<h4><a class="toc-backref" href="#id24" name="getpublisheddocuments">3.1.2.4&nbsp;&nbsp;&nbsp;getPublishedDocuments</a></h4>
+<p>Prototype:</p>
+<pre class="literal-block">
+getPublishedDocuments(self, rpath)
+</pre>
+<p>Return a list of rpaths of documents which are published versions
+of the document specified by the given path.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><em>rpath</em> (a string) is of the form &quot;workspaces/a_member/doc1&quot;.</li>
+</ul>
+</div>
+<div class="section" id="isdocumentlocked">
+<h4><a class="toc-backref" href="#id25" name="isdocumentlocked">3.1.2.5&nbsp;&nbsp;&nbsp;isDocumentLocked</a></h4>
+<p>Prototype:</p>
+<pre class="literal-block">
+isDocumentLocked(self, rpath)
+</pre>
+<p>Return whether the document is locked (in the WebDAV sense) or
+not.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><em>rpath</em> (a string) -- The path to the document.</li>
+</ul>
+<p>Example -- See <a class="reference" href="#lockdocument">lockDocument</a>.</p>
+</div>
+<div class="section" id="listcontent">
+<h4><a class="toc-backref" href="#id26" name="listcontent">3.1.2.6&nbsp;&nbsp;&nbsp;listContent</a></h4>
+<p>Prototype:</p>
+<pre class="literal-block">
+listContent(self, rpath)
+</pre>
+<p>Return a list of documents contained in the folder specified by
+the given relative path.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><em>rpath</em> (a string) is of the form &quot;workspaces&quot; or
+&quot;workspaces/members/some_member_name&quot;.</li>
+</ul>
+<p>Example:</p>
+<pre class="literal-block">
+from xmlrpclib import ServerProxy
+
+def test():
+    proxy = ServerProxy('http://some_user:xxxxx&#64;thrush:8085/cps1/portal_remote_controller')
+    workspaces = proxy.listContent('workspaces')
+    folder_contents = proxy.listContent('workspaces/members/some_user')
+    print 'folder_contents:'
+    for count, item in enumerate(folder_contents):
+        print '    %d. %s' % (count, item, )
+
+test()
+</pre>
+</div>
+</div>
+<div class="section" id="controlling-access-to-documents">
+<h3><a class="toc-backref" href="#id27" name="controlling-access-to-documents">3.1.3&nbsp;&nbsp;&nbsp;Controlling access to documents</a></h3>
+<div class="section" id="deletedocumentlocks">
+<h4><a class="toc-backref" href="#id28" name="deletedocumentlocks">3.1.3.1&nbsp;&nbsp;&nbsp;deleteDocumentLocks</a></h4>
+<p>Prototype:</p>
+<pre class="literal-block">
+deleteDocumentLocks(self, rpath)
+</pre>
+<p>Delete all the locks owned by a user on the specified document.</p>
+<p>Calling this method should be avoided but might be useful when a
+client application crashes and loses all the user locks.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><em>rpath</em> (a string) is the path to the document whose locks are
+to be deleted.</li>
+</ul>
+<p>Exceptions:</p>
+<ul class="simple">
+<li>Unauthorized( &quot;You need the ModifyPortalContent permission.&quot; )</li>
+</ul>
+</div>
+<div class="section" id="lockdocument">
+<h4><a class="toc-backref" href="#id29" name="lockdocument">3.1.3.2&nbsp;&nbsp;&nbsp;lockDocument</a></h4>
+<p>Prototype:</p>
+<pre class="literal-block">
+lockDocument(self, rpath)
+</pre>
+<p>Lock the document and return the associated lock token or return
+False if some problem occurs.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><em>rpath</em> (a string) is the path to the document to be locked.</li>
+</ul>
+<p>Example:</p>
+<pre class="literal-block">
+from xmlrpclib import ServerProxy
+
+def test():
+    proxy = ServerProxy('http://some_user:xxxxx&#64;thrush:8085/cps1/portal_remote_controller')
+    rpath = 'workspaces/members/some_user/document-105'
+    result = proxy.isDocumentLocked(rpath)
+    print '1. result: %s' % result
+    lock = proxy.lockDocument(rpath)
+    result = proxy.isDocumentLocked(rpath)
+    print '2. result: %s' % result
+    proxy.unlockDocument(rpath, lock)
+    result = proxy.isDocumentLocked(rpath)
+    print '3. result: %s' % result
+
+test()
+</pre>
+<p>Exceptions:</p>
+<ul class="simple">
+<li>Unauthorized( &quot;You need the ModifyPortalContent permission.&quot; )</li>
+</ul>
+</div>
+<div class="section" id="unlockdocument">
+<h4><a class="toc-backref" href="#id30" name="unlockdocument">3.1.3.3&nbsp;&nbsp;&nbsp;unlockDocument</a></h4>
+<p>Prototype:</p>
+<pre class="literal-block">
+unlockDocument(self, rpath, lock_token)
+</pre>
+<p>Un-lock the document and return True if the operation succeeds,
+else return False.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><em>rpath</em> (a string) is the path to the document to be locked.</li>
+<li><em>lock_token</em> is the token returned by a call to <a class="reference" href="#lockdocument">lockDocument</a>.</li>
+</ul>
+<p>Exceptions:</p>
+<ul class="simple">
+<li>Unauthorized( &quot;You need the ModifyPortalContent permission.&quot; )</li>
+</ul>
+<p>Example -- See <a class="reference" href="#lockdocument">lockDocument</a>.</p>
+</div>
+</div>
+<div class="section" id="publishing-documents">
+<h3><a class="toc-backref" href="#id31" name="publishing-documents">3.1.4&nbsp;&nbsp;&nbsp;Publishing documents</a></h3>
+<div class="section" id="acceptdocument">
+<h4><a class="toc-backref" href="#id32" name="acceptdocument">3.1.4.1&nbsp;&nbsp;&nbsp;acceptDocument</a></h4>
+<p>Prototype:</p>
+<pre class="literal-block">
+acceptDocument(
+        self,
+        rpath,
+        comments=&quot;&quot;,
+        )
+</pre>
+<p>Approve the document specified by the given relative path.  This
+method performs the same operation as the <tt class="docutils literal"><span class="pre">Accept</span></tt> action under
+<tt class="docutils literal"><span class="pre">Object</span> <span class="pre">actions</span></tt>.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><em>rpath</em> (a string) is of the form &quot;sections/section1/doc1&quot; or
+&quot;sections/folder/doc2&quot;.  Remember that the title and ID of the
+object may be different.  See section <a class="reference" href="#object-ids">Object IDs</a> for more on
+this.</li>
+<li><em>comments</em> (a string) supplies optional comments.</li>
+</ul>
+<p>As of this writing, <a class="reference" href="http://svn.nuxeo.org/trac/pub">CPSRemoteController</a> does not expose a
+<tt class="docutils literal"><span class="pre">rejectDocument</span></tt> method.  If you need that functionality, see
+section <a class="reference" href="#rejectdocument">rejectDocument</a>.</p>
+<p>Exceptions:</p>
+<ul class="simple">
+<li>Unauthorized( &quot;You need the ModifyPortalContent permission.&quot; )</li>
+</ul>
+</div>
+<div class="section" id="publishdocument">
+<h4><a class="toc-backref" href="#id33" name="publishdocument">3.1.4.2&nbsp;&nbsp;&nbsp;publishDocument</a></h4>
+<p>Prototype:</p>
+<pre class="literal-block">
+publishDocument(
+        self,
+        doc_rpath,
+        rpaths_to_publish,
+        wait_for_approval=False,
+        comments=&quot;&quot;,
+        )
+</pre>
+<p>Publish the document specified by the given relative path.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li>document_rpath (a string) is of the form &quot;workspaces/doc1&quot; or
+&quot;workspaces/folder/doc2&quot;.</li>
+<li>rpaths_to_publish (a dictionary) -- The dictionary keys are the
+rpath of where to publish the document. The rpath can be the
+rpath of a section or the rpath of a document. The dictionary
+values are either the empty string, &quot;before&quot;, &quot;after&quot; or
+&quot;replace&quot;. Those values have a meaning only if the rpath is the
+one of a document.  &quot;replace&quot; is to be used so that the
+published document really replaces another document, be it
+folder or document. The targeted document is deleted and the
+document to published is inserted at the position of the now
+deleted targeted document.</li>
+<li><em>wait_for_approval</em> (a boolean) specifies whether the document
+must be approved (accepted) in order for it to move to the
+published state.</li>
+<li><em>comments</em> (a string) supplies optional comments.</li>
+</ul>
+</div>
+<div class="section" id="unpublishdocument">
+<h4><a class="toc-backref" href="#id34" name="unpublishdocument">3.1.4.3&nbsp;&nbsp;&nbsp;unpublishDocument</a></h4>
+<p>Prototype:</p>
+<pre class="literal-block">
+unpublishDocument(self, rpath, comments=&quot;&quot;)
+</pre>
+<p>Unpublish the document specified by the given relative path.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><em>rpath</em> (a string) is of the form &quot;sections/doc1&quot; or
+&quot;sections/folder1/doc2&quot;.</li>
+<li><em>comments</em> (a string) supplies optional comments.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="roles-and-permissions">
+<h2><a class="toc-backref" href="#id35" name="roles-and-permissions">3.2&nbsp;&nbsp;&nbsp;Roles and permissions</a></h2>
+<div class="section" id="queries">
+<h3><a class="toc-backref" href="#id36" name="queries">3.2.1&nbsp;&nbsp;&nbsp;Queries</a></h3>
+<div class="section" id="checkpermission">
+<h4><a class="toc-backref" href="#id37" name="checkpermission">3.2.1.1&nbsp;&nbsp;&nbsp;checkPermission</a></h4>
+<p>Prototype:</p>
+<pre class="literal-block">
+checkPermission(
+        self,
+        rpath,
+        permission,
+        )
+</pre>
+<p>Check the given permission for the current user on the given context.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><em>rpath</em> (a string) is of the form &quot;sections/section1/doc1&quot; or
+&quot;sections/folder/doc2&quot;.  Remember that the title and ID of the
+object may be different.  See section <a class="reference" href="#object-ids">Object IDs</a> for more on
+this.</li>
+<li><em>permission</em> (a string) is the permission against which the
+document's permission is to be compared.</li>
+</ul>
+</div>
+<div class="section" id="getlocalroles">
+<h4><a class="toc-backref" href="#id38" name="getlocalroles">3.2.1.2&nbsp;&nbsp;&nbsp;getLocalRoles</a></h4>
+<p>Prototype:</p>
+<pre class="literal-block">
+getLocalRoles(self, username, rpath)
+</pre>
+<p>Return the roles of the given user local to the specified context.</p>
+<p><em>N.B.</em>: This method doesn't know how to deal with blocked roles.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><em>username</em> (a string) is the name of a user.</li>
+<li><em>rpath</em> (a string) is the path to the document for which
+information is to be retrieved.</li>
+</ul>
+</div>
+<div class="section" id="getroles">
+<h4><a class="toc-backref" href="#id39" name="getroles">3.2.1.3&nbsp;&nbsp;&nbsp;getRoles</a></h4>
+<p>Prototype:</p>
+<pre class="literal-block">
+getRoles(self, username)
+</pre>
+<p>Return the roles of the given user.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><em>username</em> (a string) is the name of a user.</li>
+</ul>
+<p>Example:</p>
+<pre class="literal-block">
+#     Change document position.
+#
+def test_getRoles(username):
+    constr = 'http://%s:%s%s&#64;thrush:8085/cps1/portal_remote_controller' % \
+        (username, username, username, )
+    proxy = ServerProxy(constr)
+    print 'getting user roles -- user: %s' % username
+    roles = proxy.getRoles(username)
+    print 'roles: %s' % roles
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="adding-new-methods-to-cpsremotecontroller">
+<h1><a class="toc-backref" href="#id40" name="adding-new-methods-to-cpsremotecontroller">4&nbsp;&nbsp;&nbsp;Adding New Methods to CPSRemoteController</a></h1>
+<p>For our example, we will implement a method that will create a new
+user.</p>
+<div class="section" id="advance-planning">
+<h2><a class="toc-backref" href="#id41" name="advance-planning">4.1&nbsp;&nbsp;&nbsp;Advance planning</a></h2>
+<p>Preparing for upgrades to CPSRemoteController -- We will want to
+preserve our added methods when CPSRemoteController is upgraded.
+Therefore, we'd like to put our additional methods in a separate
+class and in a separate module.  Unfortunately, I have not figured
+out how to do that.  I've tried both (1) placing additional
+methods in a sub-class of <tt class="docutils literal"><span class="pre">RemoteControllerTool</span></tt> and (2) adding
+methods in a new class registered as a tool with
+<a class="reference" href="http://svn.nuxeo.org/trac/pub">CPSRemoteController</a>.  Neither of these approaches worked.  If you
+know how to do something like this, please send me an email,
+explaining your solution.</p>
+<p>And so, in the examples below, where we add a new method, we will
+simply add it at the end of class <tt class="docutils literal"><span class="pre">RemoteControllerTool</span></tt> and
+mark them off clearly with comments.</p>
+</div>
+<div class="section" id="licensing">
+<h2><a class="toc-backref" href="#id42" name="licensing">4.2&nbsp;&nbsp;&nbsp;Licensing</a></h2>
+<p>IANALB (I am not a lawyer but ...) -- Since you are extending
+<a class="reference" href="http://svn.nuxeo.org/trac/pub">CPSRemoteController</a> and since that code is covered by the GNU
+General Public License, you will need to preserve and honor that
+license in your extensions.</p>
+</div>
+<div class="section" id="getcomplexdocumenthistory">
+<h2><a class="toc-backref" href="#id43" name="getcomplexdocumenthistory">4.3&nbsp;&nbsp;&nbsp;getComplexDocumentHistory</a></h2>
+<p>The first example is trivial.  It involves simply modifying the
+existing implementation of <tt class="docutils literal"><span class="pre">getDocumentHistory</span></tt> so that it
+returns a little more information.</p>
+<p>Here is the old, existing implementation:</p>
+<pre class="literal-block">
+security.declareProtected(View, 'getDocumentHistory')
+def getDocumentHistory(self, rpath):
+    &quot;&quot;&quot;Return the document history.
+    &quot;&quot;&quot;
+    proxy = self.restrictedTraverse(rpath)
+    history = proxy.getContentInfo(proxy=proxy, level=3)['history']
+    LOG(glog_key, DEBUG, &quot;history = %s&quot; % history)
+    # A simplified value of the history so that it can be transported over
+    # XML-RPC.
+    history_simplified = {}
+    for event in history:
+        history_simplified[event['action']] = event['time_str']
+    LOG(glog_key, DEBUG, &quot;history_simplified = %s&quot; % history_simplified)
+    return history_simplified
+</pre>
+<p>And, here is the new, extended implementation:</p>
+<pre class="literal-block">
+#
+# Start additional methods
+#
+security.declareProtected(View, 'getComplexDocumentHistory')
+def getComplexDocumentHistory(self, rpath):
+    &quot;&quot;&quot;Return the document history.
+    &quot;&quot;&quot;
+    proxy = self.restrictedTraverse(rpath)
+    history = proxy.getContentInfo(proxy=proxy, level=3)['history']
+    LOG(glog_key, DEBUG, &quot;history = %s&quot; % history)
+    # A simplified value of the history so that it can be transported over
+    # XML-RPC.
+    history_simplified = {}
+    history_complex = []                          # [1]
+    for event in history:                         # [2]
+        history_simplified[event['action']] = event['time_str']
+        history_complex.append((event['action'], event['time_str'], ))
+    LOG(glog_key, DEBUG, &quot;history_simplified = %s&quot; % history_simplified)
+    return history_simplified, history_complex    # [3]
+#
+# End additional methods
+#
+</pre>
+<p>Notes:</p>
+<ol class="arabic simple">
+<li>We create a new variable which will hold our richer history
+information.</li>
+<li>For each item in the history, we add a tuple to
+<tt class="docutils literal"><span class="pre">history_complex</span></tt> containing two items: (1) the modification
+action and (2) the modification time.</li>
+<li>We return a tuple (XML-RPC will convert it to a list)
+containing both the simple and the more complete history
+information.</li>
+</ol>
+<p>We could further modify <tt class="docutils literal"><span class="pre">getComplexDocumentHistory</span></tt> so that it returns
+additional information from the event object.  A hint -- The event
+object is a dictionary that contains the following keys:</p>
+<ul class="simple">
+<li>dest_container</li>
+<li>comments</li>
+<li>rpath</li>
+<li>language_revs</li>
+<li>workflow_id</li>
+<li>actor</li>
+<li>time</li>
+<li>action</li>
+<li>review_state</li>
+<li>time_str</li>
+</ul>
+</div>
+<div class="section" id="rejectdocument">
+<h2><a class="toc-backref" href="#id44" name="rejectdocument">4.4&nbsp;&nbsp;&nbsp;rejectDocument</a></h2>
+<p>This is another simple example.  We merely copy the
+<tt class="docutils literal"><span class="pre">acceptDocument</span></tt> method, then change &quot;accept&quot; to &quot;reject&quot;.  Here
+is our new method:</p>
+<pre class="literal-block">
+#
+# Start additional methods
+#
+security.declareProtected(View, 'rejectDocument')
+def rejectDocument(self, rpath, comments=&quot;&quot;):
+    &quot;&quot;&quot;Approve the document specified by the given relative path.
+
+    rpath is of the form &quot;sections/doc1&quot; or &quot;sections/folder/doc2&quot;.
+    &quot;&quot;&quot;
+    wftool = self.portal_workflow
+    proxy = self.restrictedTraverse(rpath)
+    if not _checkPermission(ModifyPortalContent, proxy):
+        raise Unauthorized(&quot;You need the ModifyPortalContent permission.&quot;)
+    context = proxy
+    workflow_action = 'reject'
+    allowed_transitions = wftool.getAllowedPublishingTransitions(context)
+    LOG(glog_key, DEBUG, &quot;allowed_transitions = %s&quot; % str(allowed_transitions))
+    wftool.doActionFor(context, workflow_action, comment=comments)
+#
+# End additional methods
+#
+</pre>
+</div>
+<div class="section" id="adduser">
+<h2><a class="toc-backref" href="#id45" name="adduser">4.5&nbsp;&nbsp;&nbsp;addUser</a></h2>
+<p>Suppose that you want to add a number of users to your portal.
+Further, suppose that you have information about these users (e.g.
+login ID, first name, last name, email address) in a file.  Adding
+users to a CPS site by hand is laborious.  So, perhaps a
+RemoteController method could help.</p>
+<p>Here is an implementation:</p>
+<pre class="literal-block">
+#
+# Start additional methods
+#
+security.declareProtected(View, 'addUser')
+def addUser(self, userId, userPassword, userRoles=None, email='',
+        firstName='', lastName=''):
+    &quot;&quot;&quot;Add a new user to the portal.
+    By default, the new user will have a Member role.
+    &quot;&quot;&quot;
+    mtool = getToolByName(self, 'portal_membership')
+    if not userRoles:
+        userRoles = ('Member', )
+    userDomains = []
+    mtool.addMember(userId, userPassword, userRoles, userDomains)
+    member = mtool.getMemberById(userId)
+    if member is None or not hasattr(aq_base(member), 'getMemberId'):
+        raise ValueError(&quot;Cannot add member '%s'&quot; % userId)
+    memberProperties = {
+        'email': email,
+        'givenName': firstName,
+        'sn': lastName,
+        }
+    member.setMemberProperties(memberProperties)
+#
+# End additional methods
+#
+</pre>
+<p>Notes:</p>
+<ul class="simple">
+<li>I'm not an expert on CPS internals.  So, you are likely to be
+able to write a better implementation than the above.</li>
+<li>This implementation was copied from <tt class="docutils literal"><span class="pre">_createEntry</span></tt> in
+<tt class="docutils literal"><span class="pre">CPSDirectory/MembersDirectory.py</span></tt>.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="footer">
+<hr class="footer" />
+<a class="reference" href="cps_remote_controller.txt">View document source</a>.
+Generated by <a class="reference" href="http://docutils.sourceforge.net/">Docutils</a> from <a class="reference" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> source.
+
+</div>
+</body>
+</html>

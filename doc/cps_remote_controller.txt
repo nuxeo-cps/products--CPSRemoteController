@@ -1,0 +1,1378 @@
+=================================================
+Understanding and using the CPS Remote Controller
+=================================================
+
+:author: Dave Kuhlman
+:address: dkuhlman@rexx.com
+    http://www.rexx.com/~dkuhlman
+
+:revision: 1.0a
+:date: August 14, 2005
+
+:copyright: (C) Copyright 2005 Nuxeo SARL (http://nuxeo.com).
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License
+    version 2 as published by the Free Software Foundation. This
+    program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details. You should have
+    received a copy of the GNU General Public License along with
+    this program; if not, write to the Free Software Foundation,
+    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+:abstract: This document describes the CPSRemoteController
+    product.  This product enables any XML-RPC clients (which
+    includes python scripts, Java programs, etc.) to remotely
+    control a CPS site and its content.
+
+.. $Id$
+
+.. sectnum::    :depth: 4
+
+.. contents::   :depth: 4
+
+
+
+Introducing CPSRemoteController
+===============================
+
+Credits
+-------
+
+Thanks to Nuxeo and the developers there for CPSRemoteController_.
+This document would not be possible without that implementation.
+Significant portions of the documentation on individual methods
+was copied from the CPSRemoteController_ module.  Thanks for those
+very helpful comments.  Also, it is likely that any errors in this
+document have been introduced by me and should not be attributed
+to the implementors of CPSRemoteController_.
+
+
+What is CPSRemoteController?
+----------------------------
+
+CPSRemoteController_ provides a way to run Python scripts, outside
+of the CPS_ environment that manipulate a CPS portal, including the
+users, groups, documents, and other objects at that site.
+
+Why you might want to use CPSRemoteController_ -- Some possible of
+benefits:
+
+- Since the protocol used by CPSRemoteController is XML-RPC_ and
+  is usable across the Web, you can control your CPS site from
+  anywhere that you have access to the site through the Web.
+
+- Because there is XML-RPC_ client support for a variety of
+  languages, for example Java, C/C++, PHP, etc in addition to
+  Python. For more information on XML-RPC implementations see
+  XML-RPC_ Thus, You are likely to be able to write your client in
+  the language of your choice and on the platform that fits your
+  needs.
+
+- If an application provides an XML-RPC_ interface, you might be
+  able to control a CPS site from within that foreign application.
+
+- Task automation -- You may be able to write scripts that
+  automate tasks which would be tedious if done manually at your
+  CPS site from within the Web browser.  For example, you might be
+  able to write a script that adds a batch of documents to your
+  site or that adds a set of users to the site.  Some of these
+  tasks, however, may require extensions to CPSRemoteController_.
+
+Extensions to CPSRemoteController_ -- In addition, you may be able
+to implement additional methods not currently supported by
+CPSRemoteController_.  We'll see how to do that in section `Adding
+New Methods to CPSRemoteController`_.
+
+
+Where to find CPSRemoteController
+---------------------------------
+
+By the time you read this, CPSRemoteController_ may already be
+included in the CPS_ distribution.  If not, it is available
+through SVN at http://svn.nuxeo.org/trac/pub.
+
+
+Using CPSRemoteController
+=========================
+
+There is already some documentation on CPSRemoteController_:
+
+- Brief comments on how to make calls into CPSRemoteController are
+  in  ``Products/CPSRemoteController/RemoteControllerTool.py``.
+
+- Comments on each method that is exposed are the method's
+  implementation.  Although you can read the in-line documentation
+  in the source code, it may make for more convenient reading if
+  you generate HTML documentation for the methods.  I used
+  happydoc_.  Generate the documentation for CPSRemoteController
+  using something like the following::
+
+      cd my_cps_site/Products/CPSRemoteController
+      happydoc RemoteControllerTool.py
+
+  By default, happydoc_ places the generated files in a directory
+  named ``doc``.  happydoc_ may already be installed on your
+  machine.  If not and if you are on a Debian GNU/Linux machine,
+  you can install happydoc_ with something like the following:
+
+      apt-get install python-happydoc
+
+  For help on other platforms, check the happydoc_ Web site.
+
+.. _happydoc: http://happydoc.sourceforge.net/
+
+
+An example built with xmlrpclib
+-------------------------------
+
+Calling a method on CPSRemoteController is fairly easy.  Here is
+an example based on the use of the standard python module
+xmlrpclib_ that you can use as a template::
+
+    from xmlrpclib import ServerProxy
+    proxy = ServerProxy('http://username:password@thrush:8085/mysite/portal_remote_controller') # 1
+    path_to_doc = 'workspaces/members/username/document-1'
+    doc_def = {                                                                                 # 2
+        'content': 'Test #1',
+    }
+    comments = 'CPSRemoteController test #1\n'
+    proxy.editDocument(path_to_doc, doc_def, comments)                                          # 3
+
+
+Explanation:
+
+1. In the call that creates the proxy, change the user name,
+   password, machine/location, port, and CPS site.
+
+2. Create any needed data structures for the specific method to be
+   called.  See the documentation below on each method.  In this
+   case, for the call to ``editDocument``, we create a dictionary
+   containing a key ``content`` whose value is new value for the
+   ``content`` field in the document.  Hint: Look in the ZMI (Zope
+   Management Interface) ``/mysite/portal_schemas/document`` under
+   the ``Schemas`` tab.
+
+3. Call the method, passing in the needed parameters.  In this
+   example, the parameters are (1) the path to the document to be
+   modified, (2) a data structure containing the update, and (3)
+   comments.
+
+*Note:* Use of the ServerProxy class as described here is
+dependant on the specific implementation library used here, in
+particular xmlrpclib_. There are other python XML-RPC
+implementations for Python that might be better suited than
+xmlrpclib_, for example see
+`Creating XML-RPC Servers and Clients with Twisted`_.
+One deficiency with the xmlrpclib_ implementation is not be able to
+send XML-RPC queries through a proxy.
+
+
+An example built with TwistedWeb
+--------------------------------
+
+So, here is a client built on Twisted_.  Note that this
+implementation requires a replacement to and extension of several
+classes in ``twisted.web.xmlrpc`` from TwistedWeb_.  The extension
+supports the use of user IDs and passwords.  By the time you read
+this, that extension may already be in the distribution of
+TwistedWeb_.  Here are those replacement classes and a sample
+client that you can use as a template for your Twisted_ clients::
+
+    #!/usr/bin/env python
+
+    import sys
+    import base64, urlparse
+    from twisted.web import xmlrpc
+    from twisted.internet import reactor, defer
+
+
+    class QueryProtocol(xmlrpc.QueryProtocol):
+        def connectionMade(self):
+            self.sendCommand('POST', self.factory.url)
+            self.sendHeader('User-Agent', 'Twisted/XMLRPClib')
+            self.sendHeader('Host', self.factory.host)
+            if self.factory.authString is not None:
+                cred = base64.encodestring(self.factory.authString)
+                self.sendHeader('Authorization', 'Basic ' + cred[:-1])
+            self.sendHeader('Content-type', 'text/xml')
+            self.sendHeader('Content-length', str(len(self.factory.payload)))
+            self.endHeaders()
+            self.transport.write(self.factory.payload)
+
+
+    class QueryFactory(xmlrpc.QueryFactory):
+        protocol = QueryProtocol
+        def __init__(self, url, host, method, authString=None, *args):
+            self.authString = authString
+            xmlrpc.QueryFactory.__init__(self, url, host, method, *args)
+
+
+    class Proxy:
+        """A Proxy for making remote XML-RPC calls.
+        Pass the URL of the remote XML-RPC server to the constructor.
+        Use proxy.callRemote('foobar', *args) to call remote method
+        'foobar' with *args.
+        """
+        def __init__(self, url):
+            parts = urlparse.urlparse(url)
+            self.url = urlparse.urlunparse(('', '')+parts[2:])
+            self.auth = None
+            if self.url == "":
+                self.url = "/"
+            if ':' in parts[1]:
+                if '@' in parts[1]:
+                    self.auth, address = parts[1].split('@')
+                else:
+                    address = parts[1]
+                    self.authHost = None
+                self.host, self.port = address.split(':')
+                if self.auth is not None:
+                    self.authHost = '@'.join([self.auth, self.host])
+                self.port = int(self.port)
+            else:
+                self.host, self.port = parts[1], None
+            self.secure = parts[0] == 'https'
+
+        def callRemote(self, method, *args):
+            factory = QueryFactory(self.url, self.host,
+                                   method, self.auth, *args)
+            if self.secure:
+                from twisted.internet import ssl
+                reactor.connectSSL(self.host, self.port or 443,
+                                   factory, ssl.ClientContextFactory())
+            else:
+                reactor.connectTCP(self.host, self.port or 80, factory)
+            return factory.deferred
+
+
+    class Test:
+
+        def printValue(self, value):
+            value.sort()
+            print 'Items:'
+            for item in value:
+                print '    %s' % item
+
+        def printError(self, error):
+            print 'error', error
+
+        def getData(self, user, password):
+            url = 'http://%s:%s@thrush:8085/cps1/portal_remote_controller' % \
+                (user, password, )
+            self.proxy = Proxy(url)
+            arg1 = 'workspaces/members/%s' % user
+            d = self.proxy.callRemote('listContent', arg1)
+            d.addCallbacks(self.printValue, self.printError)
+            return d
+
+
+    def test_listContent():
+        g = Test()
+        user = 'user1'
+        password = 'user1_password'
+        d = g.getData(user, password)
+        user = 'user2'
+        password = 'user2_password'
+        d = g.getData(user, password)
+        reactor.callLater(1, reactor.stop)
+        reactor.run()
+
+
+    if __name__ == '__main__':
+        test_listContent()
+
+
+Notes:
+
+- Classes ``QueryProtocol``, ``QueryFactory``, and ``Proxy``
+  replace classes in ``twisted/web/xmlrpc.py``.  These
+  replacements add the capability to pass a user name and password
+  to the XML-RPC_ server.  You will want to check your TwistedWeb_
+  distribution to determine if that capability has already been
+  added.
+
+- Methods ``Test.printValue`` is the callback that will be called
+  and will be passed the value returned by the XML-RPC server. In
+  our case, the server is a CPS site.
+
+- Method ``Test.getData`` creates a proxy, calls method
+  ``callRemote`` to create a deferred object, adds two callback
+  functions to that deferred object, then returns that object.
+
+- Function ``test_listContent`` creates an instance of our
+  ``Test`` class, calls method ``getData`` in that class to obtain
+  the deferred object, and schedules it to be run.
+
+More information on the Twisted_ programming paradigm and the use
+of deferred objects can be found at `Twisted Documentation`_.  For
+more on the use of XML-RPC with Twisted_ see `Creating XML-RPC
+Servers and Clients with Twisted`_.
+
+.. _`Twisted Documentation`:
+    http://twistedmatrix.com/projects/core/documentation/howto/index.html
+
+.. _`Creating XML-RPC Servers and Clients with Twisted`:
+    http://twisted.sourceforge.net/TwistedDocs-1.2.0/howto/xmlrpc.html
+
+
+Preliminary hints and suggestions
+---------------------------------
+
+Object IDs
+++++++++++
+
+For documents, CPS takes the document title, performs a conversion
+on the title, then uses that converted string for the object ID.
+You must use the document ID, not the title, to perform operations
+on existing objects.
+
+How to learn the ID of an object -- You can learn the ID of a
+document, folder, etc in one of the following ways:
+
+- The last part of the URL of your document is its ID.
+
+- In the ZMI, by looking at the object, for example, look under:
+
+  - ``my_cps_site/sections``
+
+  - ``my_cps_site/workspaces``
+
+- In your CPS portal, by clicking on the "Folder contents" action,
+  selecting the object, then clicking on "Change object id".
+
+The function used to perform the conversion from title to ID is:
+``generateId`` in ``my_zope_instance/Products/CPSUtil/id.py``. You
+may want to read the documentation in the source and the source
+itself for that function if you have questions about this
+conversion process.
+
+Although the behavior of ``generateId`` can be modified by
+parameters, here are a few rules that my version of CPS seems to
+be following:
+
+- The allowable characters are letters, digits, underscores, and
+  dashes.
+
+- Blanks are replaced with dashes.  Most other un-allowed characters
+  are removed.  Multiple, contiguous blanks are replaced with a
+  single dash.
+
+- Upper case letters are converted to lower case.
+
+- Words are not cut.
+
+- The generated ID has a maximum length.
+
+
+Method Descriptions
+===================
+
+This section describes each of the methods exposed and supported
+by CPSRemoteController.
+
+The code examples that we give are implement on top of xmlrpclib_.
+
+
+Documents
+---------
+
+Creating, editing, deleting documents
++++++++++++++++++++++++++++++++++++++
+
+
+changeDocumentPosition
+^^^^^^^^^^^^^^^^^^^^^^
+
+Prototype::
+
+    changeDocumentPosition(
+            self,
+            rpath,
+            step,
+            )
+
+
+Change the position of the document within its containing folder.
+For example, this operation changes the order in which documents
+are displayed when you click on "Folder contents" in your site.
+**Warning:**  This method can only be called on ordered folders and
+would produce errors if called, for example, on BTreeFolders.
+
+Parameters:
+
+- *rpath* (a string) is of the form "sections/section1/doc1" or
+  "sections/folder/doc2".  Remember that the title and ID of the
+  object may be different.  See section `Object IDs`_ for more on
+  this.
+
+- *step* (an integer) is the increment to be added to the
+  target document's current position.
+
+Exceptions:
+
+- Unauthorized("You need the ChangeSubobjectsOrder permission.")
+
+
+createDocument
+^^^^^^^^^^^^^^
+
+Prototype::
+
+    createDocument(
+            self,
+            portal_type,
+            doc_def,
+            folder_rpath,
+            position=-1,
+            comments="",
+            )
+
+
+Create document with the given portal_type with data from the
+given data dictionary.
+
+The method returns the rpath of the created document.
+
+Parameters:
+
+- *portal_type* is the type of document to be created.  In your
+  CPS portal, click on the ``New`` action to get a list of
+  document types that can be created in a particular folder.  You
+  can learn more about these document types in
+  ``my_cps_site/portal_schemas`` in the ZMI.
+
+- *doc_def* (a dictionary) contains values to be inserted in the
+  new object.  The keys in the dictionary are the names of the
+  properties in the new object and the values are the values
+  assigned for each property.  The following properties are always
+  valid:
+
+  + *Title*
+
+  + *Description*
+
+  You can learn about additional properties specific to each
+  document type by looking in ``my_cps_site/portal_schemas`` in
+  the ZMI, then clicking on a specific document definition.
+
+- *folder_rpath* (a string) is the path to the folder in which the
+  document is to be created.  An example is
+  "workspaces/members/a_user_name".
+
+- *position* (an integer) is optional. It is used to specify the
+  position of the new document within exiting documents in the
+  folder.  A value of zero places the new document at the top.  A
+  value of -1 (the default) places the document after all existing
+  documents.
+
+- *comments* (a string) supplies optional comments.
+
+Exceptions:
+
+- Unauthorized( "You need the AddPortalContent permission." )
+
+Examples -- These examples were copied from the in-line
+documentation, then reformatted and modified::
+
+    from xmlrpclib import ServerProxy
+    p = ServerProxy('http://manager:xxxxx@myserver.net:8080/cps/portal_remote_controller')
+
+    doc_def = {'Title': "The report from Monday meeting",
+        'Description': "Another boring report"
+        }
+    p.createDocument('File', doc_def, 'workspaces')
+
+    doc_def = {'Title': "The company hires",
+        'Description': "The company goes well and hires"
+        }
+    p.createDocument('News Item', doc_def, 'workspaces')
+
+    doc_def = {'Title': "The report from Monday meeting",
+        'Description': "Another boring report"
+        }
+    p.createDocument('File', doc_def, 'workspaces')
+
+    doc_def = {'Title': "The company hires",
+        'Description': "The company goes well and hires"
+        }
+    p.createDocument('News Item', doc_def, 'workspaces', 0)
+
+    from xmlrpclib import ServerProxy, Binary
+    f = open('MyImage.png', 'r')
+    binary = Binary(f.read())
+    f.close()
+    doc_def = {'Title': "The report from Monday meeting",
+        'Description': "Another boring report",
+        'file_name': "MyImage.png",
+        'file': binary,
+        }
+    p.createDocument('File', doc_def, 'workspaces')
+
+    doc_def = {'Title': "The company hires",
+        'Description': "The company goes well and hires"
+        }
+    p.createDocument('News Item', doc_def, 'workspaces', 2)
+
+    from xmlrpclib import ServerProxy, Binary
+    f = open('MyImage.png', 'r')
+    binary = Binary(f.read())
+    f.close()
+    doc_def = {'Title': "The report from Monday meeting",
+        'Description': "Another boring report",
+        'file_name': "MyImage.png",
+        'file_key': 'file_zip',
+        'file': binary,
+        }
+    p.createDocument('File', doc_def, 'workspaces')
+
+    doc_def = {'Title': "The company hires",
+        'Description': "The company goes well and hires"
+        }
+    p.createDocument('News Item', doc_def, 'workspaces', 2)
+
+And, here is one additional example.  This one creates an object
+of type ``Document``, adds some content in the document, and
+specifies the content format::
+
+    #
+    # Create new document in the user's private directory.
+    #
+    def test_createDocument(user, title, description):
+        constr = 'http://%s:%s%s@thrush:8085/cps1/portal_remote_controller' % \
+            (user, user, user, )
+        proxy = ServerProxy(constr)
+        content_template = '''\
+    Content:
+
+    - Title: %s
+
+    - Description: %s
+    '''
+        content = content_template % (title, description, )
+        doc_def = {'Title': title,
+            'Description': description,
+            'content': content,
+            'content_format': 'stx',
+            }
+        doc_rpath = 'workspaces/members/%s' % user
+        result = proxy.createDocument('Document', doc_def, doc_rpath)
+        print 'result: "%s"' % result
+
+Explanation:
+
+- We specify the values of the ``content`` and ``content_format``
+  properties. Your question at this point might be: (1) How did we
+  learn the names/IDs of the properties for this document type?
+  And, (2) how do we find out what values these properties can
+  take. Here are a few guides to help you find out:
+
+  + The property names -- In the above example, we created an
+    object of type ``Document``. So, in the ZMI, we look at
+    ``my_cps_site/portal_schemas/document``, then click on the
+    "Schema" tab.  What we see is a list of the IDs of the objects
+    in any object of type ``Document``.
+
+  + The property values -- To learn this I first determined the
+    widget type of the ``content`` property by looking in
+    ``my_cps_site/portal_layouts/document/w__content`` in the ZMI.
+    I found that the type of the widget used to display
+    ``content`` is ``CPSTextWidget``. Then, I looked at the
+    ``render`` method in class ``CPSTextWidget`` in
+    ``my_zope_instance/Products/CPSSchemas/ExtendedWidgets.py``.
+    If you read that code, you will find that the format keys are
+    "pre", "stx", "text", and "html" (where "stx" means "Zope
+    Structured Text").
+
+  Hopefully, you will be able to do similar investigative work to
+  learn about the properties of other object types.
+
+
+deleteDocument
+^^^^^^^^^^^^^^
+
+Prototype::
+
+    deleteDocument(self, rpath)
+
+
+Delete the document with the given rpath.
+
+Parameters:
+
+- *rpath* (a string) is the path to the document to be deleted.
+
+Exceptions
+
+- Unauthorized( "You need the DeleteObjects permission." )
+
+- KeyError - 'document-11' -- The document does not exist in the
+  specified folder.
+
+Example::
+
+    #
+    #     Delete a document.
+    #
+    def test_deleteDocument(user, title, description):
+        constr = 'http://%s:%s%s@thrush:8085/cps1/portal_remote_controller' % \
+            (user, user, user, )
+        proxy = ServerProxy(constr)
+        doc_rpath = 'workspaces/members/%s/%s' % (user, title, )
+        print 'deleting -- doc_rpath: %s' % doc_rpath
+        proxy.deleteDocument(doc_rpath)
+
+
+deleteDocuments
+^^^^^^^^^^^^^^^
+
+Prototype::
+
+    deleteDocuments(self, rpaths)
+
+
+Delete the documents corresponding to the given rpaths.
+
+Parameters:
+
+- *rpaths* (a tuple or list of strings) contains the paths of the
+  documents to be deleted.
+
+
+Example::
+
+    #     Delete a set of documents.
+    #     The documents are specified as titles = 'doc1:doc2:doc3 ...'
+    #
+    def test_deleteDocuments(user, titles, description):
+        constr = 'http://%s:%s%s@thrush:8085/cps1/portal_remote_controller' % \
+            (user, user, user, )
+        proxy = ServerProxy(constr)
+        doc_rpaths = []
+        title_list = titles.split(':')
+        for title in title_list:
+            rpath = 'workspaces/members/%s/%s' % (user, title, )
+            doc_rpaths.append(rpath)
+        print 'deleting -- doc_rpaths: %s' % doc_rpaths
+        proxy.deleteDocuments(doc_rpaths)
+
+
+
+deleteDocumentsInDirectory
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+deleteDocumentsInDirectory(self, rpath)
+
+Delete the documents located in directory corresponding to the given rpath.
+
+Parameters:
+
+- *rpath* (a string) is the path to the directory containing the
+  documents to be deleted.
+
+Exceptions:
+
+- Unauthorized( "You need the DeleteObjects permission." )
+
+
+editDocument
+^^^^^^^^^^^^
+
+Prototype::
+
+    editDocument(
+            self,
+            rpath,
+            doc_def={},
+            comments="",
+            )
+
+Modify the specified document with data from the given data dictionary.
+
+Parameters:
+
+- *doc_rpath* (a string) is the path to the folder in which the
+  document is to be created.  An example is
+  "workspaces/members/a_user_name/a_doc_id".
+
+- *doc_def* (a dictionary) contains values to be inserted in the new
+  object.  The keys in the dictionary are the names of the
+  properties in the object and the values are the values assigned
+  for each property.  See section createDocument_ for more
+  information on the contents of this dictionary.
+
+- *comments* (a string) supplies optional comments.
+
+
+Exceptions:
+
+- Unauthorized( "You need the ModifyPortalContent permission." )
+
+Example::
+
+    #     Edit/modify the content of an existing document in the
+    #     user's private directory.
+    #
+    def test_editDocument(user, title, description):
+        constr = 'http://%s:%s%s@thrush:8085/cps1/portal_remote_controller' % \
+            (user, user, user, )
+        proxy = ServerProxy(constr)
+        content_template = '''\
+    This is edited content.
+
+    Content:
+
+    - Title: %s
+
+    - Description: %s
+    '''
+        content = content_template % (title, description, )
+        doc_def = {'Title': title,
+            'Description': description,
+            'content': content,
+            'content_format': 'stx',
+            }
+        doc_rpath = 'workspaces/members/%s/%s' % (user, title, )
+        position = 1
+        comment = 'Comment for %s' % title
+        print 'editing document -- doc_rpath: %s  doc_def: %s' % \
+            (doc_rpath, doc_def, )
+        result = proxy.editDocument(doc_rpath, doc_def, comment)
+        print 'result: "%s"' % result
+
+
+editOrCreateDocument
+^^^^^^^^^^^^^^^^^^^^
+
+Prototype::
+
+    editOrCreateDocument(
+            self,
+            rpath,
+            portal_type,
+            doc_def,
+            position=-1,
+            comments="",
+            )
+
+
+Create or edit a document with the given portal_type with data
+from the given data dictionary.
+
+The method returns the rpath of the created or edited document.
+
+Parameters -- Same as for createDocument_.
+
+Exceptions:
+
+- Unauthorized( "You need the ModifyPortalContent permission." )
+
+
+Queries on documents
+++++++++++++++++++++
+
+getDocumentHistory
+^^^^^^^^^^^^^^^^^^
+
+Prototype::
+
+    getDocumentHistory(self, rpath)
+
+Return the document history.
+
+Parameters:
+
+- *rpath* (a string) is the path to the document whose history is
+  to be retrieved.
+
+
+Example::
+
+    #     Get document history.
+    #
+    def test_getDocumentHistory(user, rpath):
+        constr = 'http://%s:%s%s@thrush:8085/cps1/portal_remote_controller' % \
+            (user, user, user, )
+        proxy = ServerProxy(constr)
+        print 'getting doc history -- user: %s  rpath: %s' % \
+            (user, rpath, )
+        history_simplified = proxy.getDocumentHistory(rpath)
+        print 'history:'
+        for action, time in history_simplified.items():
+            print '    action: %s  time: %s' % (action, time, )
+
+
+
+getDocumentState
+^^^^^^^^^^^^^^^^
+
+Prototype::
+
+    getDocumentState(self, rpath)
+
+Return the workflow state of the document specified by the given
+relative path.
+
+Parameters:
+
+- *rpath* (a string) is of the form "workspaces/doc1" or
+  "sections/doc2".
+
+
+getOriginalDocument
+^^^^^^^^^^^^^^^^^^^
+
+Prototype::
+
+    getOriginalDocument(self, rpath)
+
+
+Return the path to the original document that was used to publish
+the document specified by the given path.
+
+Parameters:
+
+- *rpath* (a string) is the path to the published document and is
+  of the form "sections/doc1".
+
+
+getPublishedDocuments
+^^^^^^^^^^^^^^^^^^^^^
+
+Prototype::
+
+    getPublishedDocuments(self, rpath)
+
+
+Return a list of rpaths of documents which are published versions
+of the document specified by the given path.
+
+Parameters:
+
+- *rpath* (a string) is of the form "workspaces/a_member/doc1".
+
+
+isDocumentLocked
+^^^^^^^^^^^^^^^^
+
+Prototype::
+
+    isDocumentLocked(self, rpath)
+
+Return whether the document is locked (in the WebDAV sense) or
+not.
+
+Parameters:
+
+- *rpath* (a string) -- The path to the document.
+
+Example -- See lockDocument_.
+
+
+listContent
+^^^^^^^^^^^
+
+Prototype::
+
+    listContent(self, rpath)
+
+
+Return a list of documents contained in the folder specified by
+the given relative path.
+
+Parameters:
+
+- *rpath* (a string) is of the form "workspaces" or
+  "workspaces/members/some_member_name".
+
+Example::
+
+    from xmlrpclib import ServerProxy
+
+    def test():
+        proxy = ServerProxy('http://some_user:xxxxx@thrush:8085/cps1/portal_remote_controller')
+        workspaces = proxy.listContent('workspaces')
+        folder_contents = proxy.listContent('workspaces/members/some_user')
+        print 'folder_contents:'
+        for count, item in enumerate(folder_contents):
+            print '    %d. %s' % (count, item, )
+
+    test()
+
+
+Controlling access to documents
++++++++++++++++++++++++++++++++
+
+deleteDocumentLocks
+^^^^^^^^^^^^^^^^^^^
+
+Prototype::
+
+    deleteDocumentLocks(self, rpath)
+
+
+Delete all the locks owned by a user on the specified document.
+
+Calling this method should be avoided but might be useful when a
+client application crashes and loses all the user locks.
+
+Parameters:
+
+- *rpath* (a string) is the path to the document whose locks are
+  to be deleted.
+
+Exceptions:
+
+- Unauthorized( "You need the ModifyPortalContent permission." )
+
+
+lockDocument
+^^^^^^^^^^^^
+
+Prototype::
+
+    lockDocument(self, rpath)
+
+
+Lock the document and return the associated lock token or return
+False if some problem occurs.
+
+Parameters:
+
+- *rpath* (a string) is the path to the document to be locked.
+
+
+Example::
+
+    from xmlrpclib import ServerProxy
+
+    def test():
+        proxy = ServerProxy('http://some_user:xxxxx@thrush:8085/cps1/portal_remote_controller')
+        rpath = 'workspaces/members/some_user/document-105'
+        result = proxy.isDocumentLocked(rpath)
+        print '1. result: %s' % result
+        lock = proxy.lockDocument(rpath)
+        result = proxy.isDocumentLocked(rpath)
+        print '2. result: %s' % result
+        proxy.unlockDocument(rpath, lock)
+        result = proxy.isDocumentLocked(rpath)
+        print '3. result: %s' % result
+
+    test()
+
+
+Exceptions:
+
+- Unauthorized( "You need the ModifyPortalContent permission." )
+
+
+unlockDocument
+^^^^^^^^^^^^^^
+
+Prototype::
+
+    unlockDocument(self, rpath, lock_token)
+
+Un-lock the document and return True if the operation succeeds,
+else return False.
+
+Parameters:
+
+- *rpath* (a string) is the path to the document to be locked.
+
+- *lock_token* is the token returned by a call to lockDocument_.
+
+Exceptions:
+
+- Unauthorized( "You need the ModifyPortalContent permission." )
+
+Example -- See lockDocument_.
+
+
+Publishing documents
+++++++++++++++++++++
+
+acceptDocument
+^^^^^^^^^^^^^^
+
+Prototype::
+
+    acceptDocument(
+            self,
+            rpath,
+            comments="",
+            )
+
+
+Approve the document specified by the given relative path.  This
+method performs the same operation as the ``Accept`` action under
+``Object actions``.
+
+Parameters:
+
+- *rpath* (a string) is of the form "sections/section1/doc1" or
+  "sections/folder/doc2".  Remember that the title and ID of the
+  object may be different.  See section `Object IDs`_ for more on
+  this.
+
+- *comments* (a string) supplies optional comments.
+
+As of this writing, CPSRemoteController_ does not expose a
+``rejectDocument`` method.  If you need that functionality, see
+section rejectDocument_.
+
+Exceptions:
+
+- Unauthorized( "You need the ModifyPortalContent permission." )
+
+
+publishDocument
+^^^^^^^^^^^^^^^
+
+Prototype::
+
+    publishDocument(
+            self,
+            doc_rpath,
+            rpaths_to_publish,
+            wait_for_approval=False,
+            comments="",
+            )
+
+
+Publish the document specified by the given relative path.
+
+Parameters:
+
+- document_rpath (a string) is of the form "workspaces/doc1" or
+  "workspaces/folder/doc2".
+
+- rpaths_to_publish (a dictionary) -- The dictionary keys are the
+  rpath of where to publish the document. The rpath can be the
+  rpath of a section or the rpath of a document. The dictionary
+  values are either the empty string, "before", "after" or
+  "replace". Those values have a meaning only if the rpath is the
+  one of a document.  "replace" is to be used so that the
+  published document really replaces another document, be it
+  folder or document. The targeted document is deleted and the
+  document to published is inserted at the position of the now
+  deleted targeted document.
+
+- *wait_for_approval* (a boolean) specifies whether the document
+  must be approved (accepted) in order for it to move to the
+  published state.
+
+- *comments* (a string) supplies optional comments.
+
+
+unpublishDocument
+^^^^^^^^^^^^^^^^^
+
+Prototype::
+
+    unpublishDocument(self, rpath, comments="")
+
+
+Unpublish the document specified by the given relative path.
+
+Parameters:
+
+- *rpath* (a string) is of the form "sections/doc1" or
+  "sections/folder1/doc2".
+
+- *comments* (a string) supplies optional comments.
+
+
+Roles and permissions
+---------------------
+
+Queries
++++++++
+
+checkPermission
+^^^^^^^^^^^^^^^
+
+Prototype::
+
+    checkPermission(
+            self,
+            rpath,
+            permission,
+            )
+
+Check the given permission for the current user on the given context.
+
+Parameters:
+
+- *rpath* (a string) is of the form "sections/section1/doc1" or
+  "sections/folder/doc2".  Remember that the title and ID of the
+  object may be different.  See section `Object IDs`_ for more on
+  this.
+
+- *permission* (a string) is the permission against which the
+  document's permission is to be compared.
+
+
+getLocalRoles
+^^^^^^^^^^^^^
+
+Prototype::
+
+    getLocalRoles(self, username, rpath)
+
+
+Return the roles of the given user local to the specified context.
+
+*N.B.*: This method doesn't know how to deal with blocked roles.
+
+Parameters:
+
+- *username* (a string) is the name of a user.
+
+- *rpath* (a string) is the path to the document for which
+  information is to be retrieved.
+
+
+getRoles
+^^^^^^^^
+
+Prototype::
+
+    getRoles(self, username)
+
+
+Return the roles of the given user.
+
+Parameters:
+
+- *username* (a string) is the name of a user.
+
+Example::
+
+    #     Change document position.
+    #
+    def test_getRoles(username):
+        constr = 'http://%s:%s%s@thrush:8085/cps1/portal_remote_controller' % \
+            (username, username, username, )
+        proxy = ServerProxy(constr)
+        print 'getting user roles -- user: %s' % username
+        roles = proxy.getRoles(username)
+        print 'roles: %s' % roles
+
+
+
+Adding New Methods to CPSRemoteController
+=========================================
+
+For our example, we will implement a method that will create a new
+user.
+
+Advance planning
+----------------
+
+Preparing for upgrades to CPSRemoteController -- We will want to
+preserve our added methods when CPSRemoteController is upgraded.
+Therefore, we'd like to put our additional methods in a separate
+class and in a separate module.  Unfortunately, I have not figured
+out how to do that.  I've tried both (1) placing additional
+methods in a sub-class of ``RemoteControllerTool`` and (2) adding
+methods in a new class registered as a tool with
+CPSRemoteController_.  Neither of these approaches worked.  If you
+know how to do something like this, please send me an email,
+explaining your solution.
+
+And so, in the examples below, where we add a new method, we will
+simply add it at the end of class ``RemoteControllerTool`` and
+mark them off clearly with comments.
+
+
+Licensing
+---------
+
+IANALB (I am not a lawyer but ...) -- Since you are extending
+CPSRemoteController_ and since that code is covered by the GNU
+General Public License, you will need to preserve and honor that
+license in your extensions.
+
+
+getComplexDocumentHistory
+-------------------------
+
+The first example is trivial.  It involves simply modifying the
+existing implementation of ``getDocumentHistory`` so that it
+returns a little more information.
+
+Here is the old, existing implementation::
+
+    security.declareProtected(View, 'getDocumentHistory')
+    def getDocumentHistory(self, rpath):
+        """Return the document history.
+        """
+        proxy = self.restrictedTraverse(rpath)
+        history = proxy.getContentInfo(proxy=proxy, level=3)['history']
+        LOG(glog_key, DEBUG, "history = %s" % history)
+        # A simplified value of the history so that it can be transported over
+        # XML-RPC.
+        history_simplified = {}
+        for event in history:
+            history_simplified[event['action']] = event['time_str']
+        LOG(glog_key, DEBUG, "history_simplified = %s" % history_simplified)
+        return history_simplified
+
+And, here is the new, extended implementation::
+
+    #
+    # Start additional methods
+    #
+    security.declareProtected(View, 'getComplexDocumentHistory')
+    def getComplexDocumentHistory(self, rpath):
+        """Return the document history.
+        """
+        proxy = self.restrictedTraverse(rpath)
+        history = proxy.getContentInfo(proxy=proxy, level=3)['history']
+        LOG(glog_key, DEBUG, "history = %s" % history)
+        # A simplified value of the history so that it can be transported over
+        # XML-RPC.
+        history_simplified = {}
+        history_complex = []                          # [1]
+        for event in history:                         # [2]
+            history_simplified[event['action']] = event['time_str']
+            history_complex.append((event['action'], event['time_str'], ))
+        LOG(glog_key, DEBUG, "history_simplified = %s" % history_simplified)
+        return history_simplified, history_complex    # [3]
+    #
+    # End additional methods
+    #
+
+Notes:
+
+1. We create a new variable which will hold our richer history
+   information.
+
+2. For each item in the history, we add a tuple to
+   ``history_complex`` containing two items: (1) the modification
+   action and (2) the modification time.
+
+3. We return a tuple (XML-RPC will convert it to a list)
+   containing both the simple and the more complete history
+   information.
+
+We could further modify ``getComplexDocumentHistory`` so that it returns
+additional information from the event object.  A hint -- The event
+object is a dictionary that contains the following keys:
+
+- dest_container
+
+- comments
+
+- rpath
+
+- language_revs
+
+- workflow_id
+
+- actor
+
+- time
+
+- action
+
+- review_state
+
+- time_str
+
+
+
+rejectDocument
+--------------
+
+This is another simple example.  We merely copy the
+``acceptDocument`` method, then change "accept" to "reject".  Here
+is our new method::
+
+    #
+    # Start additional methods
+    #
+    security.declareProtected(View, 'rejectDocument')
+    def rejectDocument(self, rpath, comments=""):
+        """Approve the document specified by the given relative path.
+
+        rpath is of the form "sections/doc1" or "sections/folder/doc2".
+        """
+        wftool = self.portal_workflow
+        proxy = self.restrictedTraverse(rpath)
+        if not _checkPermission(ModifyPortalContent, proxy):
+            raise Unauthorized("You need the ModifyPortalContent permission.")
+        context = proxy
+        workflow_action = 'reject'
+        allowed_transitions = wftool.getAllowedPublishingTransitions(context)
+        LOG(glog_key, DEBUG, "allowed_transitions = %s" % str(allowed_transitions))
+        wftool.doActionFor(context, workflow_action, comment=comments)
+    #
+    # End additional methods
+    #
+
+
+
+addUser
+-------
+
+Suppose that you want to add a number of users to your portal.
+Further, suppose that you have information about these users (e.g.
+login ID, first name, last name, email address) in a file.  Adding
+users to a CPS site by hand is laborious.  So, perhaps a
+RemoteController method could help.
+
+Here is an implementation::
+
+    #
+    # Start additional methods
+    #
+    security.declareProtected(View, 'addUser')
+    def addUser(self, userId, userPassword, userRoles=None, email='',
+            firstName='', lastName=''):
+        """Add a new user to the portal.
+        By default, the new user will have a Member role.
+        """
+        mtool = getToolByName(self, 'portal_membership')
+        if not userRoles:
+            userRoles = ('Member', )
+        userDomains = []
+        mtool.addMember(userId, userPassword, userRoles, userDomains)
+        member = mtool.getMemberById(userId)
+        if member is None or not hasattr(aq_base(member), 'getMemberId'):
+            raise ValueError("Cannot add member '%s'" % userId)
+        memberProperties = {
+            'email': email,
+            'givenName': firstName,
+            'sn': lastName,
+            }
+        member.setMemberProperties(memberProperties)
+    #
+    # End additional methods
+    #
+
+Notes:
+
+- I'm not an expert on CPS internals.  So, you are likely to be
+  able to write a better implementation than the above.
+
+- This implementation was copied from ``_createEntry`` in
+  ``CPSDirectory/MembersDirectory.py``.
+
+
+
+
+
+.. _CPSRemoteController: http://svn.nuxeo.org/trac/pub
+
+.. _CPS: http://www.cps-project.org
+
+.. _XML-RPC: http://www.xmlrpc.com/
+
+.. _xmlrpclib: http://docs.python.org/lib/module-xmlrpclib.html
+
+.. _Twisted: http://twistedmatrix.com/
+
+.. _TwistedWeb: http://twistedmatrix.com/projects/web/
