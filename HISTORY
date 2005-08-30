@@ -1,4 +1,21 @@
 *******************************************
+** CPSRemoteController V1.3.0 [R1 build 2005/08/30-14:17 by alienoid]
+** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 26239
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+- Added getProductVersion method which examines either version.txt
+  or VERSION to provide product version information.
+Bug fixes:
+~~~~~~~~~~
+-
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+
+*******************************************
 ** CPSRemoteController V1.2.0 [R1 build 2005/07/25-15:33 by alienoid]
 ** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 25244
 Requires:
