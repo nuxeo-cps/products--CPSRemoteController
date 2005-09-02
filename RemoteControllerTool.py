@@ -72,6 +72,13 @@ class RemoteControllerTool(UniqueObject, Folder):
     meta_type = 'CPS Remote Controller Tool'
     security = ClassSecurityInfo()
 
+    _properties = (
+        {'id': 'dav_lock_timeout',
+         'type': 'string', 'mode':'w',
+         'label': 'WebDAV lock timeout(secs): '},
+        )
+
+    dav_lock_timeout = '1200';
 
     def _getPortalObject(self):
         return self.portal_url.getPortalObject()
@@ -318,9 +325,12 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
     security.declareProtected(View, 'lockDocument')
-    def lockDocument(self, rpath):
+    def lockDocument(self, rpath, timeout=None):
         """Lock the document and return the associated lock token or False if
         some problem arose.
+
+        `timeout` is a string containing number of seconds to hold a lock,
+        maximum (2L**32)-1.
 
         Example:
         >>> p.isDocumentLocked('workspaces/pr1')
@@ -343,7 +353,15 @@ class RemoteControllerTool(UniqueObject, Folder):
             return False
         member = self.portal_membership.getAuthenticatedMember()
         user = member.getUser()
-        lock = LockItem(user, user)
+
+        lock_timeout = 'Seconds-'
+
+        if timeout is None:
+            lock_timeout += self.getProperty('dav_lock_timeout')
+        else:
+            lock_timeout += timeout
+
+        lock = LockItem(user, user, timeout=lock_timeout)
         lock_token = lock.getLockToken()
         proxy.wl_setLock(lock_token, lock)
         return lock_token
