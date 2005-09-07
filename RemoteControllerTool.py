@@ -524,6 +524,9 @@ class RemoteControllerTool(UniqueObject, Folder):
                 LOG(glog_key, DEBUG, "publishDocument position = %s" % position)
                 if position is not None:
                     section.moveObjectToPosition(doc_id, position)
+            else:
+                # the path to publish is section - move document to top
+                section.moveObjectsToTop(doc_id)
 
             # Sending events so that subscribers can react on commands sent to the
             # remote controller tool.
