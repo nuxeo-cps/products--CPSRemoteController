@@ -1,4 +1,24 @@
 *******************************************
+** CPSRemoteController V1.3.1 [R1 build 2005/09/08-13:56 by alienoid]
+** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 26601
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+-
+Bug fixes:
+~~~~~~~~~~
+-
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+- lockDocument method now contains optional string parameter `timeout`,
+  as well as tool now has `WebDAV lock timeout` property. Method parameter
+  'overrides' tool property.
+- If path to publish is section, publishDocument method now by default will
+  move published document to the top of section.
+
+*******************************************
 ** CPSRemoteController V1.3.0 [R1 build 2005/08/30-14:17 by alienoid]
 ** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 26239
 Requires:

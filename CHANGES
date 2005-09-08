@@ -9,8 +9,4 @@ Bug fixes:
 -
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
-- lockDocument method now contains optional string parameter `timeout`,
-  as well as tool now has `WebDAV lock timeout` property. Method parameter
-  'overrides' tool property.
-- If path to publish is section, publishDocument method now by default will
-  move published document to the top of section.
+-
