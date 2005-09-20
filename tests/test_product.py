@@ -21,9 +21,9 @@
 
 import os, sys
 import os.path
+
 if __name__ == '__main__':
     execfile(os.path.join(sys.path[0], 'framework.py'))
-
 import unittest
 from Testing import ZopeTestCase
 import CPSRemoteControllerTestCase
@@ -293,6 +293,12 @@ class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
         # 1 create + 1 modify + 4 checkout + 4 checkin
         history = tool.getDocumentHistory(doc_rpath)
         self.assertEquals(len(history), 10)
+
+
+    def test_getProductVersion(self):
+        from CPSUtil.integration import ProductError
+        self.assert_(self.tool.getProductVersion('CPSUtil'))
+        self.assert_(self.tool.getProductVersion('CPSRemoteController'))
 
 
 def test_suite():

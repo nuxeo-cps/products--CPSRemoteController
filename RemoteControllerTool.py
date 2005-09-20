@@ -20,10 +20,12 @@
 """
 """
 
+import os.path
 from xmlrpclib import Binary
 from webdav.LockItem import LockItem
 from Products.CPSCore.EventServiceTool import getEventService
 from Products.CPSUtil.id import generateId
+from Products.CPSUtil.integration import getProductVersion
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo, Unauthorized
 from Products.CPSCore.CPSCorePermissions import ChangeSubobjectsOrder
@@ -35,7 +37,6 @@ from Products.CMFCore.utils import UniqueObject, getToolByName, _checkPermission
 from OFS.Folder import Folder
 from Acquisition import aq_parent, aq_inner
 from OFS.Image import File
-import os.path
 from zLOG import LOG, TRACE, DEBUG, ERROR, PROBLEM
 from DateTime.DateTime import DateTimeError
 
@@ -49,9 +50,6 @@ DOCUMENT_DEFAULT_FILE_KEY = 'file'
 
 EVENT_PUBLISH_DOCUMENT = 'remote_controller_publish_documents'
 EVENT_CHANGE_DOCUMENT_POSITION = 'remote_controller_change_document_position'
-
-class VersionNotFoundError(Exception):
-    pass
 
 class RemoteControllerTool(UniqueObject, Folder):
     """A tool providing an high-level API for manipulating documents.
@@ -843,33 +841,16 @@ class RemoteControllerTool(UniqueObject, Folder):
                 published_docs_rpaths.append(published_proxy_path)
         return published_docs_rpaths
 
+
     security.declareProtected(View, 'getProductVersion')
     def getProductVersion(self, product_name):
-        """Returns version of given product.
+        """Return the version of the product corresponding to the given product
+        name.
 
-        Reads version.txt or VERSION
+        This method tries first to read a potential version.txt file, and then a
+        potential VERSION file.
         """
-        basepath = os.path.join(INSTANCE_HOME, 'Products', product_name)
-
-        fpath = os.path.join(basepath, 'version.txt')
-        if os.path.exists(fpath):
-            version = open(fpath).readline().strip()
-            if not version:
-                raise VersionNotFoundError("No version information available")
-            return version
-
-        fpath = os.path.join(basepath, 'VERSION')
-        if os.path.exists(fpath):
-            for line in file(fpath):
-                if line.lower().strip().startswith('pkg_version'):
-                    version = line.split('=')[1]
-                    version = version.strip()
-                    return version
-            else:
-                raise VersionNotFoundError("No version information available")
-
-        # no version files at all
-        raise VersionNotFoundError("Can't find version file")
+        return getProductVersion(product_name)
 
 
 InitializeClass(RemoteControllerTool)
