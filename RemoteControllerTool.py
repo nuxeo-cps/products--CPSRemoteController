@@ -301,6 +301,8 @@ class RemoteControllerTool(UniqueObject, Folder):
                 d['attached_file_rpath'] = ''
                 rproxy = portal.restrictedTraverse(d['rpath'])
                 doc = rproxy.getContent()
+
+                # XXX: Remove this client specific code
                 if doc.portal_type == 'NewsML File':
                     zfile = doc.file_zip
                     if zfile is not None:

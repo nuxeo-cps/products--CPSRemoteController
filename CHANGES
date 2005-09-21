@@ -6,7 +6,7 @@ New features:
 -
 Bug fixes:
 ~~~~~~~~~~
-- Removed deprecation warning in use of ToolInit.
+- Fixed deprecation warnings.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 - Factorized the getProductVersion method in CPSUtil.integration.getProductVersion.
