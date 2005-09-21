@@ -34,6 +34,5 @@ def initialize(registrar):
         # XXX: Use 'CPS Tools' when and if possible
         'CPS  Remote Controller Tool',
         tools=tools,
-        product_name='CPSRemoteController',
         icon='tool.png',
         ).initialize(registrar)
