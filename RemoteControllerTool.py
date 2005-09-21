@@ -28,11 +28,11 @@ from Products.CPSUtil.id import generateId
 from Products.CPSUtil.integration import getProductVersion
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo, Unauthorized
-from Products.CPSCore.CPSCorePermissions import ChangeSubobjectsOrder
 from Products.CMFCore.WorkflowCore import WorkflowException
 from Products.CMFCore.permissions import ManagePortal, ChangePermissions, \
      AddPortalContent, ModifyPortalContent, DeleteObjects, View
-from Products.CPSCore.CPSCorePermissions import ViewArchivedRevisions
+from Products.CPSCore.permissions import ChangeSubobjectsOrder
+from Products.CPSCore.permissions import ViewArchivedRevisions
 from Products.CMFCore.utils import UniqueObject, getToolByName, _checkPermission
 from OFS.Folder import Folder
 from Acquisition import aq_parent, aq_inner
