@@ -2,10 +2,10 @@
 # This should work even when there is a symbolic link in the path.
 # 
 
-#INSTANCE_HOME=$(shell python -c "import os.path; print os.path.normpath('$(PWD)/../../..')")
-#SOFTWARE_HOME=$(INSTANCE_HOME)/lib/python
+INSTANCE_HOME=$(shell python -c "import os.path; print os.path.normpath('$(PWD)/../../..')")
+SOFTWARE_HOME=$(INSTANCE_HOME)/lib/python
 PYTHON=$(INSTANCE_HOME)/bin/python
-#PYTHONPATH=$(INSTANCE_HOME)/lib/python2.1
+PYTHONPATH=$(INSTANCE_HOME)/lib/python2.1
 
 .PHONY: test clean coverage
 
