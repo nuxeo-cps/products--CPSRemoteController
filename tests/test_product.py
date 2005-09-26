@@ -28,6 +28,7 @@ import unittest
 from Testing import ZopeTestCase
 import CPSRemoteControllerTestCase
 from Products.CPSDefault.tests.CPSTestCase import MANAGER_ID
+from Products.CMFCore.utils import getToolByName
 
 
 class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
@@ -294,12 +295,26 @@ class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
         history = tool.getDocumentHistory(doc_rpath)
         self.assertEquals(len(history), 10)
 
+    def testAddAndDeleteMember(self):
+        tool = self.tool
+        mtool = getToolByName(tool, 'portal_membership')
+        userid = 'randomuser001'
+        passwd = '%s%s' % (userid, userid, )
+        firstName = 'Random'
+        lastName = 'User'
+        email = '%s@somewhere.com' % userid
+        tool.addMember(userid, passwd, email=email,
+            firstName= firstName, lastName=lastName)
+        user = mtool.getMemberById(userid)
+        self.failIf((user is None))
+        tool.deleteMembers(userid)
+        user = mtool.getMemberById(userid)
+        self.failUnless((user is None))
 
     def test_getProductVersion(self):
         from CPSUtil.integration import ProductError
         self.assert_(self.tool.getProductVersion('CPSUtil'))
         self.assert_(self.tool.getProductVersion('CPSRemoteController'))
-
 
 def test_suite():
     suite = unittest.TestSuite()

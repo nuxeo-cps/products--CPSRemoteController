@@ -6,8 +6,8 @@ Understanding and using the CPS Remote Controller
 :address: dkuhlman@rexx.com
     http://www.rexx.com/~dkuhlman
 
-:revision: 1.0a
-:date: August 14, 2005
+:revision: 1.1a
+:date: Sept. 26, 2005
 
 :copyright: (C) Copyright 2005 Nuxeo SARL (http://nuxeo.com).
     This program is free software; you can redistribute it and/or
@@ -89,9 +89,22 @@ New Methods to CPSRemoteController`_.
 Where to find CPSRemoteController
 ---------------------------------
 
-By the time you read this, CPSRemoteController_ may already be
-included in the CPS_ distribution.  If not, it is available
-through SVN at http://svn.nuxeo.org/trac/pub.
+CPSRemoteController_ is included in the latest version of the CPS_
+distribution.  The latest version is also available through SVN at
+http://svn.nuxeo.org/trac/pub.
+
+
+Installing CPSRemoteController
+------------------------------
+
+Use ``portal_quickinstaller`` in the ZMI:
+
+1. In the ZMI, click on ``portal_quickinstaller`` in the left-hand
+   panel.
+
+2. Click the checkbox next to CPSRemoteController.
+
+3. Click the ``Install`` button.
 
 
 Using CPSRemoteController
@@ -1161,6 +1174,109 @@ Example::
         print 'roles: %s' % roles
 
 
+Managing members
+----------------
+
+Adding and deleting members
++++++++++++++++++++++++++++
+
+addMember
+^^^^^^^^^
+
+Prototype::
+
+    def addMember(self, userId,
+            userPassword,
+            userRoles=None,
+            email='',
+            firstName='',
+            lastName='')
+
+Add a new member to the portal.
+
+Parameters:
+
+- *userId* (a string) is the user ID for the new member.
+
+- *userPassword* (a string) is the password for the new member.
+
+- *userRoles* (a tuple or list of strings) are the initial roles
+  for the new member.  The default is ('Member', ).
+
+- *email* (a string) is the email address for the new member.
+
+- *firstName* (a string) is the new member's first name.
+
+- *lastName* (a string) is the new member's last name.
+
+Notes:
+
+- You will need to connect (through XMLRPC) with manager
+  privileges in order to use this method.
+
+- The member's private directory does not seem to be created until
+  the first time that the member logs on to the portal.
+
+- The code that actually does the work is in
+  ``CMFCore.MembershipTool.addMember``, if you need to read the
+  source.
+
+Example::
+
+    def test_addMember(userId, userPassword, firstName, lastName):
+        user = 'manager'
+        constr = 'http://%s:%s%s@thrush:8085/cps1/portal_remote_controller' % \
+            (user, user, user, )
+        proxy = ServerProxy(constr)
+        userRoles = ('Member',)
+        email = '%s@somehost.com' % userId
+        proxy.addMember(userId, userPassword, userRoles, email,
+            firstName, lastName)
+
+
+deleteMembers
+^^^^^^^^^^^^^
+
+Prototype::
+
+    def deleteMembers(self, member_ids,
+            delete_memberareas=1,
+            delete_localroles=1)
+
+Delete one or more members from the portal.
+
+Parameters:
+
+- *member_ids* (a string or a list of strings) is the ID or a list
+  of IDs of the members to be deleted.
+
+- *delete_memberareas* (a boolean), if true, specifies that the
+  deleted member's private space should also be deleted.
+
+- *delete_localroles* (a boolean), if true, specifies that the
+  local roles of the deleted members should also be deleted.
+
+Notes:
+
+- You will need to connect (through XMLRPC) with manager
+  privileges in order to use this method.
+
+- The code that actually does the work is in
+  ``CMFCore.MembershipTool.deleteMembers``, if you need to read
+  the source.
+
+Example::
+
+    def test_deleteMembers(userIds):
+        user = 'manager'
+        constr = Constr % (user, user, user, )
+        proxy = ServerProxy(constr)
+        # Convert the user IDs into a list of strings.
+        userIds = userIds.split()
+        # Delete the members, but do not delete their private spaces.
+        proxy.deleteMembers(userIds, False)
+
+
 
 Adding New Methods to CPSRemoteController
 =========================================
@@ -1318,48 +1434,8 @@ is our new method::
 addUser
 -------
 
-Suppose that you want to add a number of users to your portal.
-Further, suppose that you have information about these users (e.g.
-login ID, first name, last name, email address) in a file.  Adding
-users to a CPS site by hand is laborious.  So, perhaps a
-RemoteController method could help.
-
-Here is an implementation::
-
-    #
-    # Start additional methods
-    #
-    security.declareProtected(View, 'addUser')
-    def addUser(self, userId, userPassword, userRoles=None, email='',
-            firstName='', lastName=''):
-        """Add a new user to the portal.
-        By default, the new user will have a Member role.
-        """
-        mtool = getToolByName(self, 'portal_membership')
-        if not userRoles:
-            userRoles = ('Member', )
-        userDomains = []
-        mtool.addMember(userId, userPassword, userRoles, userDomains)
-        member = mtool.getMemberById(userId)
-        if member is None or not hasattr(aq_base(member), 'getMemberId'):
-            raise ValueError("Cannot add member '%s'" % userId)
-        memberProperties = {
-            'email': email,
-            'givenName': firstName,
-            'sn': lastName,
-            }
-        member.setMemberProperties(memberProperties)
-    #
-    # End additional methods
-    #
-
-Notes:
-
-- I'm not an expert on CPS internals.  So, you are likely to be
-  able to write a better implementation than the above.
-
-- This implementation was copied from ``_createEntry`` in
-  ``CPSDirectory/MembersDirectory.py``.
+This capability has now been added to CPSRemoteController_.  See
+addMember_ and deleteMembers_.
 
 
 

@@ -3,7 +3,8 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
--
+- Added new methods that can be accessed via XML-RPC: (1)
+  addMember, (2) deleteMembers.
 Bug fixes:
 ~~~~~~~~~~
 -

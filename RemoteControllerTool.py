@@ -35,7 +35,7 @@ from Products.CPSCore.permissions import ChangeSubobjectsOrder
 from Products.CPSCore.permissions import ViewArchivedRevisions
 from Products.CMFCore.utils import UniqueObject, getToolByName, _checkPermission
 from OFS.Folder import Folder
-from Acquisition import aq_parent, aq_inner
+from Acquisition import aq_parent, aq_inner, aq_base
 from OFS.Image import File
 from zLOG import LOG, TRACE, DEBUG, ERROR, PROBLEM
 from DateTime.DateTime import DateTimeError
@@ -819,6 +819,83 @@ class RemoteControllerTool(UniqueObject, Folder):
         """
         return self._getOriginalOrPublishedDocuments(rpath)
 
+
+
+    security.declareProtected(View, 'addMember')
+    def addMember(self, userId, userPassword, userRoles=None, email='',
+            firstName='', lastName=''):
+        """Add a new member to the portal.
+        By default, the new member will have a Member role.
+
+        Parameters
+
+            userId -- The ID of the new user.
+
+            userPassword -- The initial password of the new user.
+
+            userRoles -- A tuple of roles (tuple of strings).
+
+            email -- The email address the new member (a string).
+
+            firstName -- The first name of the new member (a string).
+
+            lastName -- The last name of the new member (a string).
+
+        Example::
+
+            def test_addMember(userId, userPassword, firstName, lastName):
+                user = 'manager'
+                constr = 'http://%s:%s%s@thrush:8085/cps1/portal_remote_controller' % \
+                    (user, user, user, )
+                proxy = ServerProxy(constr)
+                userRoles = ('Member',)
+                email = '%s@somehost.com' % userId
+                proxy.addMember(userId, userPassword, userRoles, email,
+                    firstName, lastName)
+        """
+        #LOG(glog_key, DEBUG, "addMember userId: %s" % userId)
+        mtool = getToolByName(self, 'portal_membership')
+        if not userRoles:
+            userRoles = ('Member', )
+        userDomains = []
+        mtool.addMember(userId, userPassword, userRoles, userDomains)
+        member = mtool.getMemberById(userId)
+        if member is None or not hasattr(aq_base(member), 'getMemberId'):
+            raise ValueError("Cannot add member '%s'" % userId)
+        memberProperties = {
+            'email': email,
+            'givenName': firstName,
+            'sn': lastName,
+            }
+        member.setMemberProperties(memberProperties)
+
+    security.declareProtected(View, 'deleteMembers')
+    def deleteMembers(self, member_ids, delete_memberareas=1,
+            delete_localroles=1):
+        """Delete members from the portal.
+
+        Parameters
+
+            member_ids -- Can be either a single id (string) or a list of ids.
+
+            delete_memberareas -- If true, delete member areas.
+
+            delete_localroles -- If true, delete local roles.
+
+        Example::
+
+            def test_deleteMembers(userIds):
+                user = 'manager'
+                constr = Constr % (user, user, user, )
+                proxy = ServerProxy(constr)
+                # Convert the user IDs into a list of strings.
+                userIds = userIds.split()
+                # Delete the members, but do not delete their private spaces.
+                proxy.deleteMembers(userIds, False)
+        """
+        mtool = getToolByName(self, 'portal_membership')
+        mtool.deleteMembers(member_ids, delete_memberareas=delete_memberareas,
+            delete_localroles=delete_localroles)
 
     security.declarePrivate('_editDocument')
     def _getOriginalOrPublishedDocuments(self, rpath, published_docs=True):
