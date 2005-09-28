@@ -30,7 +30,8 @@ from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo, Unauthorized
 from Products.CMFCore.WorkflowCore import WorkflowException
 from Products.CMFCore.permissions import ManagePortal, ChangePermissions, \
-     AddPortalContent, ModifyPortalContent, DeleteObjects, View
+     AddPortalContent, ModifyPortalContent, DeleteObjects, View, \
+     ManageUsers
 from Products.CPSCore.permissions import ChangeSubobjectsOrder
 from Products.CPSCore.permissions import ViewArchivedRevisions
 from Products.CMFCore.utils import UniqueObject, getToolByName, _checkPermission
@@ -821,25 +822,25 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
 
-    security.declareProtected(View, 'addMember')
+    security.declareProtected(ManageUsers, 'addMember')
     def addMember(self, userId, userPassword, userRoles=None, email='',
             firstName='', lastName=''):
         """Add a new member to the portal.
         By default, the new member will have a Member role.
 
-        Parameters
+        Parameters:
 
-            userId -- The ID of the new user.
+        userId -- The ID of the new user.
 
-            userPassword -- The initial password of the new user.
+        userPassword -- The initial password of the new user.
 
-            userRoles -- A tuple of roles (tuple of strings).
+        userRoles -- A tuple of roles (tuple of strings).
 
-            email -- The email address the new member (a string).
+        email -- The email address the new member (a string).
 
-            firstName -- The first name of the new member (a string).
+        firstName -- The first name of the new member (a string).
 
-            lastName -- The last name of the new member (a string).
+        lastName -- The last name of the new member (a string).
 
         Example::
 
@@ -869,18 +870,20 @@ class RemoteControllerTool(UniqueObject, Folder):
             }
         member.setMemberProperties(memberProperties)
 
-    security.declareProtected(View, 'deleteMembers')
+    security.declareProtected(ManageUsers, 'deleteMembers')
     def deleteMembers(self, member_ids, delete_memberareas=1,
             delete_localroles=1):
-        """Delete members from the portal.
+        """
+        Delete members from the
+        portal.
 
-        Parameters
+        Parameters:
 
-            member_ids -- Can be either a single id (string) or a list of ids.
+        member_ids -- Can be either a single id (string) or a list of ids.
 
-            delete_memberareas -- If true, delete member areas.
+        delete_memberareas -- If true, delete member areas.
 
-            delete_localroles -- If true, delete local roles.
+        delete_localroles -- If true, delete local roles.
 
         Example::
 

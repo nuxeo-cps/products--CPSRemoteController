@@ -5,6 +5,8 @@ New features:
 ~~~~~~~~~~~~~
 - Added new methods that can be accessed via XML-RPC: (1)
   addMember, (2) deleteMembers.
+- Restricted use of addMember and deleteMembers to
+  manager/ManageUser privileges.
 Bug fixes:
 ~~~~~~~~~~
 -

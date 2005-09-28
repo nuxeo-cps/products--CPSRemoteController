@@ -1211,8 +1211,8 @@ Parameters:
 
 Notes:
 
-- You will need to connect (through XMLRPC) with manager
-  privileges in order to use this method.
+- You will need to connect (through XMLRPC) with ManageUser or
+  manager privileges in order to use this method.
 
 - The member's private directory does not seem to be created until
   the first time that the member logs on to the portal.
@@ -1258,8 +1258,8 @@ Parameters:
 
 Notes:
 
-- You will need to connect (through XMLRPC) with manager
-  privileges in order to use this method.
+- You will need to connect (through XMLRPC) with ManageUser or
+  manager privileges in order to use this method.
 
 - The code that actually does the work is in
   ``CMFCore.MembershipTool.deleteMembers``, if you need to read
