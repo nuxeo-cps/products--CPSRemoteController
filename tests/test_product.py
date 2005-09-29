@@ -146,6 +146,29 @@ class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
         self.failIf(self.tool.isDocumentLocked(doc_rpath))
 
 
+    def testUnlockDocument(self):
+        folder_rpath = 'workspaces'
+        proxy_list1 = self.tool.listContent(folder_rpath)
+        data_dict = {'Title': "The report from Monday meeting",
+                     'Description': "Another boring report",
+                     }
+        doc_rpath = self.tool.createDocument('File', data_dict,
+                                             folder_rpath, 0)
+        self.failIf(self.tool.isDocumentLocked(doc_rpath))
+        lock_tocken = self.tool.lockDocument(doc_rpath)
+
+        # lock_token is present
+        self.tool.unlockDocument(doc_rpath, lock_tocken)
+        self.failIf(self.tool.isDocumentLocked(doc_rpath))
+
+        self.tool.lockDocument(doc_rpath)
+        self.assert_(self.tool.isDocumentLocked(doc_rpath))
+
+        # lock_token is missed
+        self.tool.unlockDocument(doc_rpath)
+        self.failIf(self.tool.isDocumentLocked(doc_rpath))
+
+
     def testEditOrcreateDocument(self):
         folder_rpath = 'workspaces'
         proxy_list1 = self.tool.listContent(folder_rpath)

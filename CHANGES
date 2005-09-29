@@ -15,3 +15,5 @@ New internal features:
 - Removed useless unit tests files now that we use the Zope standardized way of
   running tests:
   $ bin/zopectl test -vv --dir Products/CPSRemoteController
+- lock_token is now optional parameter in unlockDocument method.
+  If not passed all locks are removed from document(proxy).

@@ -369,9 +369,11 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
     security.declareProtected(View, 'unlockDocument')
-    def unlockDocument(self, rpath, lock_token):
+    def unlockDocument(self, rpath, lock_token=None):
         """Un-lock the document and return True or False depending of the
         success of the operation.
+
+        If lock_token is None clear all locks on document.
         """
         portal = self._getPortalObject()
         proxy = portal.restrictedTraverse(rpath)
@@ -379,7 +381,11 @@ class RemoteControllerTool(UniqueObject, Folder):
             raise Unauthorized("You need the ModifyPortalContent permission.")
         if not proxy.wl_isLocked():
             return False
-        proxy.wl_delLock(lock_token)
+
+        if lock_token is None:
+            proxy.wl_clearLocks()
+        else:
+            proxy.wl_delLock(lock_token)
         return True
 
 
