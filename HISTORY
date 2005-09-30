@@ -1,4 +1,26 @@
 *******************************************
+** CPSRemoteController V1.5.0 [R1 build 2005/09/30-14:23 by alienoid]
+** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 27775
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+- Added new methods that can be accessed via XML-RPC: (1)
+  addMember, (2) deleteMembers.
+- Restricted use of addMember and deleteMembers to
+  manager/ManageUser privileges.
+Bug fixes:
+~~~~~~~~~~
+-
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+- Removed useless unit tests files now that we use the Zope standardized way of
+  running tests:
+  $ bin/zopectl test -vv --dir Products/CPSRemoteController
+- lock_token is now optional parameter in unlockDocument method.
+  If not passed all locks are removed from document(proxy).
+*******************************************
 ** CPSRemoteController V1.4.0 [R1 build 2005/09/21-15:30 by fguillaume]
 ** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 27414
 Requires:
