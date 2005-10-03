@@ -828,7 +828,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
 
-    security.declareProtected(ManageUsers, 'addMember')
+    security.declareProtected(ManagePortal, 'addMember')
     def addMember(self, userId, userPassword, userRoles=None, email='',
             firstName='', lastName=''):
         """Add a new member to the portal.
@@ -876,7 +876,7 @@ class RemoteControllerTool(UniqueObject, Folder):
             }
         member.setMemberProperties(memberProperties)
 
-    security.declareProtected(ManageUsers, 'deleteMembers')
+    security.declareProtected(ManagePortal, 'deleteMembers')
     def deleteMembers(self, member_ids, delete_memberareas=1,
             delete_localroles=1):
         """
