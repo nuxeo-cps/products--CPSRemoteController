@@ -6,8 +6,7 @@ New features:
 -
 Bug fixes:
 ~~~~~~~~~~
-- Security: addMember and deleteMembers must only be accessible to portal
-  managers.
+-
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -
