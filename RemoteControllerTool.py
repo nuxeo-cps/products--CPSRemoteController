@@ -28,10 +28,12 @@ from Products.CPSUtil.id import generateId
 from Products.CPSUtil.integration import getProductVersion
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo, Unauthorized
+from AccessControl.SecurityManagement import newSecurityManager
 from Products.CMFCore.WorkflowCore import WorkflowException
 from Products.CMFCore.permissions import ManagePortal, ChangePermissions, \
      AddPortalContent, ModifyPortalContent, DeleteObjects, View, \
      ManageUsers
+from Products.CPSCore.CPSMembershipTool import CPSUnrestrictedUser
 from Products.CPSCore.permissions import ChangeSubobjectsOrder
 from Products.CPSCore.permissions import ViewArchivedRevisions
 from Products.CMFCore.utils import UniqueObject, getToolByName, _checkPermission
@@ -108,8 +110,25 @@ class RemoteControllerTool(UniqueObject, Folder):
     def getRoles(self, username):
         """Return the roles of the given user.
         """
+        mtool = getToolByName(self, 'portal_membership')
+        portal = self._getPortalObject()
         members_directory = self.portal_directories.members
+
+        user = mtool.getAuthenticatedMember()
+        if user.getId() != username:
+            raise Unauthorized('No access to roles of %s' % username)
+
+        # Become manager to access getEntry
+        manager = CPSUnrestrictedUser('manager', '', ['Manager', 'Member'], '')
+        manager = manager.__of__(portal.acl_users)
+        newSecurityManager(None, manager)
+
+        # Get the roles local associated with groups this user is member of
         entry = members_directory.getEntry(username)
+
+        # Put old user
+        newSecurityManager(None, user)
+
         roles = entry['roles']
         return roles
 
@@ -121,6 +140,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         Attention: this method doesn't know how to deal with blocked roles.
         """
         members_directory = self.portal_directories.members
+        mtool = getToolByName(self, 'portal_membership')
         portal = self._getPortalObject()
         proxy = portal.restrictedTraverse(rpath)
         roles_dict, local_roles_blocked = proxy.getCPSLocalRoles()
@@ -130,8 +150,21 @@ class RemoteControllerTool(UniqueObject, Folder):
         local_roles = self._computeLocalRoles(username, roles_dict)
         #LOG(glog_key, TRACE, "local_roles = %s" % local_roles)
 
+        user = mtool.getAuthenticatedMember()
+        if user.getId() != username:
+            raise Unauthorized('No access to local roles of %s' % username)
+
+        # Become manager to access getEntry
+        manager = CPSUnrestrictedUser('manager', '', ['Manager', 'Member'], '')
+        manager = manager.__of__(portal.acl_users)
+        newSecurityManager(None, manager)
+
         # Get the roles local associated with groups this user is member of
         entry = members_directory.getEntry(username)
+
+        # Put old user
+        newSecurityManager(None, user)
+
         groups = entry['groups']
         #LOG(glog_key, TRACE, "groups = %s" % str(groups))
         for group in groups:

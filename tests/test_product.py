@@ -29,6 +29,7 @@ from Testing import ZopeTestCase
 import CPSRemoteControllerTestCase
 from Products.CPSDefault.tests.CPSTestCase import MANAGER_ID
 from Products.CMFCore.utils import getToolByName
+from AccessControl import Unauthorized
 
 
 class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
@@ -55,12 +56,24 @@ class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
     def testGetRoles(self):
         roles = self.tool.getRoles(MANAGER_ID)
         self.assert_(isinstance(roles, list))
+        # check anonymous access
+        self.logout()
+        self.assertRaises(Unauthorized, self.tool.getRoles, MANAGER_ID)
 
 
     def testGetLocalRoles(self):
         for folder_rpath in ('workspaces', 'sections'):
             roles = self.tool.getLocalRoles(MANAGER_ID, folder_rpath)
             self.assert_(isinstance(roles, list))
+
+        # try to get local roles for different member then ourselves
+        self.assertRaises(Unauthorized,
+                          self.tool.getLocalRoles, 'dummy', 'sections')
+
+        # check anonymous access
+        self.logout()
+        self.assertRaises(Unauthorized,
+                          self.tool.getLocalRoles, MANAGER_ID, 'sections')
 
 
     def testListContent(self):

@@ -9,4 +9,9 @@ Bug fixes:
 -
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
--
+- getRoles and getLocalRoles raise Unauthorized exception if `username`
+  parameter is different from username of authenticated member. Inner call
+  to getEntry is made with Manager role to bypass security checks.
+  Above changes may be gone in future after making corresponding changes
+  in CPSDirectory.
+
