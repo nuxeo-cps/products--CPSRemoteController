@@ -6,7 +6,7 @@ New features:
 -
 Bug fixes:
 ~~~~~~~~~~
--
+- Fixed the listContent method and added a more significant unit test for it.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -

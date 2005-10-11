@@ -82,7 +82,8 @@ class RemoteControllerTool(UniqueObject, Folder):
     dav_lock_timeout = '1200';
 
     def _getPortalObject(self):
-        return self.portal_url.getPortalObject()
+        url_tool = getToolByName(self, 'portal_url')
+        return url_tool.getPortalObject()
 
     def _getDateStr(self, dt, fmt='medium'):
         """Implements medium format as seen in getDateStr skin script."""
@@ -206,8 +207,8 @@ class RemoteControllerTool(UniqueObject, Folder):
 
     security.declareProtected(View, 'listContent')
     def listContent(self, rpath):
-        """Return the list of document contained in the document specified by
-        the given relative path.
+        """Return the list of rpaths of the documents contained in the folder
+        specified by the given relative path.
 
         rpath is of the form "workspaces" or "workspaces/folder1".
 
@@ -218,12 +219,18 @@ class RemoteControllerTool(UniqueObject, Folder):
         p.listContent('workspaces/folder1')
         """
         portal = self._getPortalObject()
-        base_url = portal.portal_url.getPortalPath() + '/'
-
-        brains = portal.search(query={'cps_filter_sets': 'searchable'},
-                               folder_prefix=rpath)
-        objects_paths = [x.getPath()[len(base_url):] for x in brains]
-        return objects_paths
+        url_tool = getToolByName(self, 'portal_url')
+        container = portal.restrictedTraverse(rpath)
+        container_ppath = container.getPhysicalPath()
+        query = {'path': '/'.join(container_ppath),
+                 }
+        brains = portal.search(query=query)
+        object_rpaths = []
+        for brain in brains:
+            path = brain.getPath()
+            rpath = url_tool.getRpathFromPath(path)
+            object_rpaths.append(rpath)
+        return object_rpaths
 
 
     security.declareProtected(View, 'getDocumentState')
@@ -753,8 +760,8 @@ class RemoteControllerTool(UniqueObject, Folder):
                 raise Unauthorized("You need the ModifyPortalContent permission.")
             self._editDocument(proxy, doc_def)
             id = proxy.getId()
-            utool = getToolByName(self, 'portal_url')
-            doc_rpath = utool.getRelativeUrl(proxy)
+            url_tool = getToolByName(self, 'portal_url')
+            doc_rpath = url_tool.getRelativeUrl(proxy)
         else:
             folder_rpath = '/'.join(rpath.split('/')[:-1])
             LOG(glog_key, DEBUG,

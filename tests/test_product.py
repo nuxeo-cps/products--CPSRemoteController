@@ -19,20 +19,27 @@
 #
 # $Id$
 
-import os, sys
-import os.path
+import os
 
-if __name__ == '__main__':
-    execfile(os.path.join(sys.path[0], 'framework.py'))
+from zLOG import LOG, TRACE, DEBUG, INFO, PROBLEM, ERROR
+
 import unittest
-from Testing import ZopeTestCase
-import CPSRemoteControllerTestCase
+
+from CPSRemoteControllerTestCase import CPSRemoteControllerTestCase
 from Products.CPSDefault.tests.CPSTestCase import MANAGER_ID
 from Products.CMFCore.utils import getToolByName
 from AccessControl import Unauthorized
 
 
-class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
+class ProductTestCase(CPSRemoteControllerTestCase):
+
+    def setUp(self):
+        CPSRemoteControllerTestCase.setUp(self)
+
+        #self.printLogErrors(TRACE)
+        #self.printLogErrors(INFO)
+        #self.printLogErrors(ERROR)
+
 
     def afterSetUp(self):
         self.login_id = MANAGER_ID
@@ -77,8 +84,22 @@ class ProductTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
 
 
     def testListContent(self):
-        for folder_rpath in ('workspaces',):
-            self.assert_(self.tool.listContent(folder_rpath))
+        workspaces = self.portal.workspaces
+        sections = self.portal.sections
+        workspaces.invokeFactory('Workspace', 'ws1')
+        workspaces.invokeFactory('Workspace', 'ws2')
+        rpaths = self.tool.listContent('workspaces')
+        self.assertEquals(rpaths,
+                          ['workspaces/members/test_user_1_',
+                           'workspaces/ws1',
+                           'workspaces/ws2',
+                           'workspaces/viewLanguage/fr',
+                           'workspaces/viewLanguage/en',
+                           'workspaces/viewLanguage/de',
+                           'workspaces/members/viewLanguage/fr',
+                           'workspaces/members/viewLanguage/en',
+                           'workspaces/members/viewLanguage/de',
+                           ])
 
 
     def testCreateAndDeleteDocument(self):
