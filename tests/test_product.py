@@ -90,15 +90,9 @@ class ProductTestCase(CPSRemoteControllerTestCase):
         workspaces.invokeFactory('Workspace', 'ws2')
         rpaths = self.tool.listContent('workspaces')
         self.assertEquals(rpaths,
-                          ['workspaces/members/test_user_1_',
+                          ['workspaces/members',
                            'workspaces/ws1',
                            'workspaces/ws2',
-                           'workspaces/viewLanguage/fr',
-                           'workspaces/viewLanguage/en',
-                           'workspaces/viewLanguage/de',
-                           'workspaces/members/viewLanguage/fr',
-                           'workspaces/members/viewLanguage/en',
-                           'workspaces/members/viewLanguage/de',
                            ])
 
 

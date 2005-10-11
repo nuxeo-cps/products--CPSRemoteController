@@ -218,18 +218,14 @@ class RemoteControllerTool(UniqueObject, Folder):
         p.listContent('workspaces')
         p.listContent('workspaces/folder1')
         """
-        portal = self._getPortalObject()
         url_tool = getToolByName(self, 'portal_url')
+        portal = self._getPortalObject()
         container = portal.restrictedTraverse(rpath)
-        container_ppath = container.getPhysicalPath()
-        query = {'path': '/'.join(container_ppath),
-                 }
-        brains = portal.search(query=query)
         object_rpaths = []
-        for brain in brains:
-            path = brain.getPath()
-            rpath = url_tool.getRpathFromPath(path)
-            object_rpaths.append(rpath)
+        for id, obj in container.objectItems():
+            if not id.startswith('.'):
+                rpath = url_tool.getRpath(obj)
+                object_rpaths.append(rpath)
         return object_rpaths
 
 
