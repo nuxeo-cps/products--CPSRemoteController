@@ -1,4 +1,25 @@
 *******************************************
+** CPSRemoteController V1.5.1 [R1 build 2005/10/11-11:00 by alienoid]
+** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 28124
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+-
+Bug fixes:
+~~~~~~~~~~
+-
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+- getRoles and getLocalRoles raise Unauthorized exception if `username`
+  parameter is different from username of authenticated member. Inner call
+  to getEntry is made with Manager role to bypass security checks.
+  Above changes may be gone in future after making corresponding changes
+  in CPSDirectory.
+
+
+*******************************************
 ** CPSRemoteController V1.5.0 [R1 build 2005/09/30-14:23 by alienoid]
 ** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 27775
 Requires:
