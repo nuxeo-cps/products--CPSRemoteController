@@ -1,4 +1,20 @@
 *******************************************
+** CPSRemoteController V1.5.3 [R1 build 2005/10/12-10:38 by alienoid]
+** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 28176
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+-
+Bug fixes:
+~~~~~~~~~~
+- Fixed security declarations for some methods.
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+
+*******************************************
 ** CPSRemoteController V1.5.2 [R1 build 2005/10/12-08:33 by alienoid]
 ** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 28166
 Requires:
