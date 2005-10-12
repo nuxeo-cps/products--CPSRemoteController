@@ -115,21 +115,12 @@ class RemoteControllerTool(UniqueObject, Folder):
         portal = self._getPortalObject()
         members_directory = self.portal_directories.members
 
-        user = mtool.getAuthenticatedMember()
-        if user.getId() != username:
+        if username != mtool.getAuthenticatedMember().getId():
             raise Unauthorized('No access to roles of %s' % username)
 
-        # Become manager to access getEntry
-        manager = CPSUnrestrictedUser('manager', '', ['Manager', 'Member'], '')
-        manager = manager.__of__(portal.acl_users)
-        newSecurityManager(None, manager)
-
-        # Get the roles local associated with groups this user is member of
-        entry = members_directory.getEntry(username)
-
-        # Put old user
-        newSecurityManager(None, user)
-
+        # Get the roles associated with this user bypassing ACL checks
+        # with _getEntry
+        entry = members_directory._getEntry(username)
         roles = entry['roles']
         return roles
 
@@ -151,20 +142,12 @@ class RemoteControllerTool(UniqueObject, Folder):
         local_roles = self._computeLocalRoles(username, roles_dict)
         #LOG(glog_key, TRACE, "local_roles = %s" % local_roles)
 
-        user = mtool.getAuthenticatedMember()
-        if user.getId() != username:
+        if username != mtool.getAuthenticatedMember().getId():
             raise Unauthorized('No access to local roles of %s' % username)
 
-        # Become manager to access getEntry
-        manager = CPSUnrestrictedUser('manager', '', ['Manager', 'Member'], '')
-        manager = manager.__of__(portal.acl_users)
-        newSecurityManager(None, manager)
-
         # Get the roles local associated with groups this user is member of
-        entry = members_directory.getEntry(username)
-
-        # Put old user
-        newSecurityManager(None, user)
+        # bypassing ACL checks with _getEntry
+        entry = members_directory._getEntry(username)
 
         groups = entry['groups']
         #LOG(glog_key, TRACE, "groups = %s" % str(groups))

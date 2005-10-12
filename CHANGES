@@ -9,4 +9,5 @@ Bug fixes:
 - Fixed the listContent method and added a more significant unit test for it.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
--
+- Usage of _getEntry call in getRoles and getLocalRoles to bypass ACL checks,
+  instead of using newSecurityManager mechanism.
