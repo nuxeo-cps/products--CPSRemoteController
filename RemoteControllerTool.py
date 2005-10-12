@@ -1,6 +1,8 @@
 # (C) Copyright 2005 Nuxeo SARL <http://nuxeo.com>
-# Author:
+# Authors:
 # M.-A. Darche <madarche@nuxeo.com>
+# Ruslan Spivak <rspivak@nuxeo.com>
+# Dave Kuhlman <dkuhlman@cutter.rexx.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as published
@@ -17,7 +19,7 @@
 # 02111-1307, USA.
 #
 # $Id$
-"""
+"""The module for the RemoteControllerTool.
 """
 
 import os.path
