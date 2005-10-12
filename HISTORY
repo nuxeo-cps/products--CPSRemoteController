@@ -1,4 +1,21 @@
 *******************************************
+** CPSRemoteController V1.5.2 [R1 build 2005/10/12-08:33 by alienoid]
+** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 28166
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+-
+Bug fixes:
+~~~~~~~~~~
+- Fixed the listContent method and added a more significant unit test for it.
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+- Usage of _getEntry call in getRoles and getLocalRoles to bypass ACL checks,
+  instead of using newSecurityManager mechanism.
+
+*******************************************
 ** CPSRemoteController V1.5.1 [R1 build 2005/10/11-11:00 by alienoid]
 ** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 28124
 Requires:
