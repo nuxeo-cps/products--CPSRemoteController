@@ -107,7 +107,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         return ret
 
 
-    security.declareProtected(View, 'checkRoles')
+    security.declareProtected(View, 'getRoles')
     def getRoles(self, username):
         """Return the roles of the given user.
         """
@@ -296,7 +296,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         return history
 
 
-    security.declareProtected(View, 'getDocumentArchivedRevisionsUrls')
+    security.declareProtected(View, 'getDocumentArchivedRevisionsInfo')
     def getDocumentArchivedRevisionsInfo(self, rpath):
         """Return archived revisions info."""
 
@@ -846,7 +846,6 @@ class RemoteControllerTool(UniqueObject, Folder):
         return self._getOriginalOrPublishedDocuments(rpath)
 
 
-
     security.declareProtected(ManageUsers, 'addMember')
     def addMember(self, userId, userPassword, userRoles=None, email='',
             firstName='', lastName=''):
@@ -895,6 +894,7 @@ class RemoteControllerTool(UniqueObject, Folder):
             }
         member.setMemberProperties(memberProperties)
 
+
     security.declareProtected(ManageUsers, 'deleteMembers')
     def deleteMembers(self, member_ids, delete_memberareas=1,
             delete_localroles=1):
@@ -925,7 +925,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         mtool.deleteMembers(member_ids, delete_memberareas=delete_memberareas,
             delete_localroles=delete_localroles)
 
-    security.declarePrivate('_editDocument')
+    security.declarePrivate('_getOriginalOrPublishedDocuments')
     def _getOriginalOrPublishedDocuments(self, rpath, published_docs=True):
         """Return rpaths of the documents, published or not, through the history
         of the document specified by the given path.
