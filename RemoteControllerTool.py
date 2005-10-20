@@ -747,9 +747,8 @@ class RemoteControllerTool(UniqueObject, Folder):
             folder_rpath = '/'.join(rpath.split('/')[:-1])
             LOG(glog_key, DEBUG,
                 "editOrCreateDocument folder_rpath = %s"% folder_rpath)
-            id = self.createDocument(portal_type, doc_def, folder_rpath,
-                                     position)
-            doc_rpath = os.path.join(folder_rpath, id)
+            doc_rpath = self.createDocument(portal_type, doc_def, folder_rpath,
+                                            position)
         return doc_rpath
 
 

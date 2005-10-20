@@ -197,7 +197,7 @@ class ProductTestCase(CPSRemoteControllerTestCase):
         self.failIf(self.tool.isDocumentLocked(doc_rpath))
 
 
-    def testEditOrcreateDocument(self):
+    def testEditOrCreateDocument(self):
         folder_rpath = 'workspaces'
         proxy_list1 = self.tool.listContent(folder_rpath)
         data_dict = {'Title': "The report from Monday meeting",
@@ -215,6 +215,7 @@ class ProductTestCase(CPSRemoteControllerTestCase):
                                   'dummy-id-that-we-cannot-guess-before-doc-is-created')
         doc3_returned_rpath = self.tool.editOrCreateDocument(doc3_rpath, 'File', data_dict, 0)
         proxy_list4 = self.tool.listContent(folder_rpath)
+        self.assert_(doc3_returned_rpath in proxy_list4, doc3_returned_rpath)
         self.assertEquals(len(proxy_list3) + 1, len(proxy_list4))
 
 

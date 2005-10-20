@@ -7,6 +7,8 @@ New features:
 Bug fixes:
 ~~~~~~~~~~
 - Fix to send 'workflow_modify' event when editing of document is done.
+- Fix for 'editOrCreateDocument' returned rpath. It returned incorrect
+  rpath in case of document creation.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -
