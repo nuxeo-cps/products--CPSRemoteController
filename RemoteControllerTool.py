@@ -785,6 +785,11 @@ class RemoteControllerTool(UniqueObject, Folder):
 
         doc.edit(doc_def, doc_proxy)
 
+        # Notification has to be done manually
+        evtool = getToolByName(self, 'portal_eventservice')
+        evtool.notifyEvent('workflow_modify', doc_proxy,
+                           {'comments': comments})
+
         workflow_tool = getToolByName(self, 'portal_workflow')
         # XXX: This hack has to be used until the CPS document modification
         # really takes advantage of the "modify" workflow transition. So an hack
