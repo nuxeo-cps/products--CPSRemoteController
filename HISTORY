@@ -1,4 +1,22 @@
 *******************************************
+** CPSRemoteController V1.5.4 [R1 build 2005/10/21-12:52 by alienoid]
+** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 28480
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+-
+Bug fixes:
+~~~~~~~~~~
+- Fix to send 'workflow_modify' event when editing of document is done.
+- Fix for 'editOrCreateDocument' returned rpath. It returned incorrect
+  rpath in case of document creation.
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+
+*******************************************
 ** CPSRemoteController V1.5.3 [R1 build 2005/10/12-10:38 by alienoid]
 ** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 28176
 Requires:
