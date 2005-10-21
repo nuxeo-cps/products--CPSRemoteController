@@ -26,7 +26,7 @@ import os.path
 from xmlrpclib import Binary
 from webdav.LockItem import LockItem
 from Products.CPSCore.EventServiceTool import getEventService
-from Products.CPSUtil.id import generateId
+from Products.CPSUtil.id import cleanFileName
 from Products.CPSUtil.integration import getProductVersion
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo, Unauthorized
@@ -779,7 +779,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
         if file is not None:
             if isinstance(file, Binary):
-                file_id = generateId(file_name, lower=True)
+                file_id = cleanFileName(file_name)
                 doc_def[file_key] = File(file_id, file_name, file.data)
 
         doc.edit(doc_def, doc_proxy)
