@@ -263,6 +263,46 @@ class ProductTestCase(CPSRemoteControllerTestCase):
         self.assertEquals(len(proxy_list4) - 1, len(proxy_list5))
 
 
+    def testUnpublishDocumentsInSection(self):
+        wftool = self.portal.portal_workflow
+        rctool = self.tool
+        folder_rpath = 'workspaces'
+        sections_rpath = 'sections'
+        data_dict = {'Title': "The report from Monday meeting",
+                     'Description': "Another boring report",
+                     }
+        doc1_rpath = rctool.createDocument('File', data_dict, folder_rpath, 0)
+        doc1 = self.portal.restrictedTraverse(doc1_rpath)
+
+        data_dict = {'Title': "Climate warning!",
+                     'Description': "Consumers should make the difference",
+                     }
+        doc2_rpath = rctool.createDocument('File', data_dict, folder_rpath, 0)
+        doc2 = self.portal.restrictedTraverse(doc2_rpath)
+
+        rctool.publishDocument(doc1_rpath, {'sections': ''})
+        rctool.publishDocument(doc2_rpath, {'sections': ''})
+
+        # check that method unpublishes documents only in Sections
+        self.assertRaises(TypeError,
+                          rctool.unpublishDocumentsInSection, 'workspaces')
+
+        # check that documents in workspaces get 'unpublish' action recorded
+        # into their workflow history after we made call to unpublish all
+        # documents from section
+        for obj in doc1, doc2:
+            wfevents = wftool.getFullHistoryOf(obj)
+            unpublished = [event for event in wfevents
+                           if event.get('action') == 'unpublish']
+            self.failIf(unpublished)
+        rctool.unpublishDocumentsInSection('sections')
+        for obj in doc1, doc2:
+            wfevents = wftool.getFullHistoryOf(obj)
+            unpublished = [event for event in wfevents
+                           if event.get('action') == 'unpublish']
+            self.assert_(unpublished)
+
+
     def testGetDocumentArchivedRevisionsInfo(self):
         wftool = self.portal.portal_workflow
         folder_rpath = 'workspaces'

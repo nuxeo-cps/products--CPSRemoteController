@@ -588,6 +588,28 @@ class RemoteControllerTool(UniqueObject, Folder):
         LOG(glog_key, DEBUG, "allowed_transitions = %s" % str(allowed_transitions))
         wftool.doActionFor(context, workflow_action, comment=comments)
 
+    security.declareProtected(View, 'unpublishDocumentsInSection')
+    def unpublishDocumentsInSection(self, rpath):
+        """Unpublish the documents located in section corresponding to the
+        given rpath.
+        """
+        wftool = self.portal_workflow
+        utool = self.portal_url
+        portal = self._getPortalObject()
+
+        proxy = portal.restrictedTraverse(rpath)
+        if proxy.portal_type != 'Section':
+            LOG(glog_key, DEBUG, '%s is not Section' % rpath)
+            raise TypeError(rpath + ' is not Section')
+        section = proxy
+        workflow_action = 'unpublish'
+
+        for obj in section.contentValues():
+            allowed_transitions = wftool.getAllowedPublishingTransitions(obj)
+            log_msg = 'Unpublishing %s,  allowed_transitions = %s' \
+                      % (utool.getRelativeUrl(obj), str(allowed_transitions))
+            LOG(glog_key, DEBUG, log_msg)
+            wftool.doActionFor(obj, workflow_action)
 
     security.declareProtected(View, 'changeDocumentPosition')
     def changeDocumentPosition(self, rpath, step):

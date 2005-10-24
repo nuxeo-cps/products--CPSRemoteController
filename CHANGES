@@ -3,7 +3,8 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
--
+- Added method `unpublishDocumentsInSection(rpath)` to make bulk unpublishing
+  of documents located in section corresponding to the given `rpath`.
 Bug fixes:
 ~~~~~~~~~~
 - Now using cleanFileName in the _editDocument method instead of the generateId
