@@ -679,10 +679,16 @@ class RemoteControllerTool(UniqueObject, Folder):
         hires"},
         'workspaces', 2)
 
+        This example shows how to deal with custom document type structure.
+        file_key is the name of the attribute of the attrCPSDocument that
+        holds the file. For the CPSDocument "File" type, the file_key is
+        "file" but there is the needed flexibility to modify another
+        attribute.
+
         from xmlrpclib import ServerProxy, Binary
         f = open('MyImage.png', 'r')
         binary = Binary(f.read())
-        p.createDocument('File',
+        p.createDocument('MySpecialZipFile',
         {'Title': "The report from Monday meeting",
          'Description': "Another boring report"},
          'file_name': "MyImage.png",
@@ -788,6 +794,10 @@ class RemoteControllerTool(UniqueObject, Folder):
         # Getting and processing a potential file
         file = doc_def.get(BINARY_FILE_KEY, None)
         file_name = doc_def.get(BINARY_FILENAME_KEY, BINARY_DEFAULT_FILE_NAME)
+        # file_key is the name of the attribute of the attrCPSDocument that
+        # holds the file. For the CPSDocument "File" type, the file_key is
+        # "file" but there is the needed flexibility to modify another
+        # attribute.
         file_key = doc_def.get(DOCUMENT_FILE_KEY, DOCUMENT_DEFAULT_FILE_KEY)
 
         # We don't need those keys anymore and we don't want the document to be
