@@ -5,6 +5,8 @@ New features:
 ~~~~~~~~~~~~~
 - Added method `unpublishDocumentsInSection(rpath)` to make bulk unpublishing
   of documents located in section corresponding to the given `rpath`.
+- Added client code, that allows you to remote controll another instance of CPS
+  from the current instance  
 Bug fixes:
 ~~~~~~~~~~
 - Now using cleanFileName in the _editDocument method instead of the generateId
