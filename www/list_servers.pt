@@ -1,0 +1,53 @@
+<h1 tal:replace="structure here/manage_page_header">Header</h1>
+<tal:block tal:replace="structure here/manage_tabs">Header</tal:block>
+<h2 tal:define="form_title string:Distant servers"
+    tal:replace="structure here/manage_form_title">Form Title</h2>
+<br/>
+<div style="background-color: yellow;border: 2px solid black;padding:5px;margin:4px"
+     tal:condition="request/psm|nothing"
+     tal:content="request/psm">xxx</div>
+
+<table width="100%" cellspacing="0" cellpadding="2" border="0"
+       tal:define="servers here/listServers">
+  <tr class="location-bar">
+    <td width="20%"><strong>Name</strong></td>
+    <td width="100%"><strong>Location</strong></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr tal:repeat="server servers">
+    <td width="20%"><tal:block tal:replace="python:server[0]"/></td>
+    <td width="60%"><tal:block tal:replace="python:server[1]"/></td>
+    <td width="10%">
+      <form action="manage_delServer">
+        <input type="hidden" name="name" tal:attributes="value python:server[0]"/>
+        <input type="submit" value="Remove"/>
+      </form>
+    </td>
+    <td width="10%">
+      <form action="manage_pingServer">
+        <input type="hidden" name="name" tal:attributes="value python:server[0]"/>
+        <input type="submit" value="Ping"/>
+      </form>
+    </td>
+  </tr>
+</table>
+<hr/>
+<div class="location-bar"><strong>Add a server</strong></div>
+<form action="manage_addServer">
+  <table cellspacing="0" cellpadding="2" border="0">
+    <tr>
+      <td align="right">Name</td>
+      <td><input type="text" name="name"/></td>
+    </tr>
+    <tr>
+      <td align="right">URL</td>
+      <td><input type="text" name="value" value="http://here.goes/url/cps"/></td>
+    </tr>
+    <tr>
+      <td><input type="submit" name="submit" value="OK"/></td>
+    </tr>
+  <table>
+</form>
+
+<h1 tal:replace="structure here/manage_page_footer">Footer</h1>

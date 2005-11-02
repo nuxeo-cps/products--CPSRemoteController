@@ -44,6 +44,7 @@ from Acquisition import aq_parent, aq_inner, aq_base
 from OFS.Image import File
 from zLOG import LOG, TRACE, DEBUG, ERROR, PROBLEM
 from DateTime.DateTime import DateTimeError
+from Products.CPSRemoteController import __file__ as landmark
 
 glog_key = 'RemoteControllerTool'
 
@@ -108,6 +109,24 @@ class RemoteControllerTool(UniqueObject, Folder):
 
         return ret
 
+    security.declareProtected(View, 'getVersion')
+    def getVersion(self):
+        """ returns the version number """
+        version_filename = os.path.join(os.path.dirname(landmark), 'VERSION')
+        if os.path.exists(version_filename):
+            version_file = open(version_filename, 'r')
+            try:
+                for line in version_file.readlines():
+                    if line.startswith('PKG_VERSION='):
+                        line = line.split('=')
+                        if len(line) > 1:
+                            return line[1].strip()
+                        break
+            finally:
+                version_file.close()
+            return 'Unknown'
+        else:
+            return 'Unknown'
 
     security.declareProtected(View, 'getRoles')
     def getRoles(self, username):
@@ -466,6 +485,8 @@ class RemoteControllerTool(UniqueObject, Folder):
         another document, be it folder or document. The targeted document is
         deleted and the document to published is inserted at the position of the
         now deleted targeted document.
+
+        Returns a list of published doc full rpaths to keep a trace
         """
         portal = self._getPortalObject()
         portal_ppath = portal.getPhysicalPath()
@@ -487,6 +508,8 @@ class RemoteControllerTool(UniqueObject, Folder):
         published_docs_rpaths = self.getPublishedDocuments(doc_rpath)
         LOG(glog_key, TRACE, "published_docs_rpaths = %s"
             % str(published_docs_rpaths))
+
+        published_doc_ids = []
 
         for target_rpath, placement in rpaths_to_publish.items():
             LOG(glog_key, DEBUG, "target_rpath / placement = %s / %s"
@@ -523,6 +546,9 @@ class RemoteControllerTool(UniqueObject, Folder):
                     continue
             LOG(glog_key, DEBUG, "section_rpath = %s" % section_rpath)
             published_doc_id = wftool.findNewId(section, doc_id)
+            published_doc_ids.append('%s/%s' % (target_rpath,
+                                                published_doc_id))
+
             wftool.doActionFor(context, workflow_action,
                                dest_container=section_rpath,
                                initial_transition=transition,
@@ -572,6 +598,7 @@ class RemoteControllerTool(UniqueObject, Folder):
             event_tool = getEventService(self)
             event_tool.notify(EVENT_PUBLISH_DOCUMENT, proxy, info)
 
+        return published_doc_ids
 
     security.declareProtected(View, 'unpublishDocument')
     def unpublishDocument(self, rpath, comments=""):
@@ -997,9 +1024,13 @@ class RemoteControllerTool(UniqueObject, Folder):
         """
         return getProductVersion(product_name)
 
+    security.declareProtected(View, 'getSectionsTree')
+    def getSectionsTree(self):
+        """ returns current Section trees, used for distant publication """
+        portal = self._getPortalObject()
+        return portal.sections.getSectionsTree()
 
 InitializeClass(RemoteControllerTool)
-
 
 def toLatin9(obj):
     if isinstance(obj, dict):

@@ -30,22 +30,15 @@ class Installer(CPSInstaller):
 def install(self):
 
     installer = Installer(self, 'CPSRemoteController')
+
+
     installer.log("Starting CPSRemoteController install")
 
-##     skins = {
-##         'cps_schemas': 'Products/CPSRemoteController/skins/cps_schemas',
-##         'cps_jscalendar': 'Products/CPSRemoteController/skins/cps_jscalendar',
-##     }
-##     installer.verifySkins(skins)
-
-    # Tools
     installer.verifyTool('portal_remote_controller', 'CPSRemoteController',
                          'CPS Remote Controller Tool')
-
-    # importing .po files
-    # Non CPS installation may not have Localizer.
-##     if installer.portalHas('Localizer'):
-##         installer.setupTranslations()
+    installer.verifyTool('portal_remote_controller_client',
+                         'CPSRemoteController',
+                         'CPS Remote Controller Client Tool')
 
     installer.finalize()
     installer.log("End of specific CPSRemoteController install")

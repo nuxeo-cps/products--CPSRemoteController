@@ -22,17 +22,24 @@ from zLOG import LOG, INFO
 
 import Products.CMFCore
 import RemoteControllerTool
-
-
-tools = (
-    RemoteControllerTool.RemoteControllerTool,
-    )
-
+import RemoteControllerClient
 
 def initialize(registrar):
     Products.CMFCore.utils.ToolInit(
         # XXX: Use 'CPS Tools' when and if possible
         'CPS  Remote Controller Tool',
-        tools=tools,
+        tools=(RemoteControllerTool.RemoteControllerTool,
+               RemoteControllerClient.CPSRemoteControllerClient),
         icon='tool.png',
         ).initialize(registrar)
+
+
+    Products.CMFCore.utils.ToolInit(
+        # XXX: Use 'CPS Tools' when and if possible
+        'CPS  Remote Controller Client Tool',
+        tools=(RemoteControllerTool.RemoteControllerTool,
+               RemoteControllerClient.CPSRemoteControllerClient),
+        product_name='CPSRemoteController',
+        icon='tool.png',
+        ).initialize(registrar)
+
