@@ -12,6 +12,6 @@ Bug fixes:
 - Now using cleanFileName in the _editDocument method instead of the generateId
   method so that file names keep their suffix and that one can have xxx.sxw,
   xxx.zip, etc. files.
+- Fixed XMLRPC over SSL
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
--

@@ -46,10 +46,19 @@ import re
 class RequestDispatcher(object):
     """ this encapsulates a xmlrpc call """
     def __init__(self, server, method):
-        self._user, self._password, self._server = \
+        self._user, self._password, self._server, self._ssl = \
             self._extractElements(server)
         self._method = method
-        self._transport = BasicAuthTransport(self._user, self._password)
+
+        LOG('RemoteControllerCLient.dispatching init', DEBUG,
+             'user: %s' % (self._user))
+        LOG('RemoteControllerCLient.dispatching init', DEBUG,
+             'server: %s' % (self._server))
+        LOG('RemoteControllerCLient.dispatching init', DEBUG,
+             'method: %s' % (self._method))
+
+        self._transport = BasicAuthTransport(self._user, self._password,
+                                             self._ssl)
         self._connector = ServerProxy(self._server, allow_none=True,
                                       transport=self._transport)
 
@@ -58,16 +67,16 @@ class RequestDispatcher(object):
 
         >>> dp = RequestDispatcher('http://XX', 'XX')
         >>> dp._extractElements('http://manager:xxxxx@myserver.net:808/cps')
-        ('manager', 'xxxxx', 'http://myserver.net:808/cps')
+        ('manager', 'xxxxx', 'http://myserver.net:808/cps', False)
         >>> dp._extractElements('http://myserver.net:808/cps')
-        (None, None, 'http://myserver.net:808/cps')
+        (None, None, 'http://myserver.net:808/cps', False)
         >>> dp._extractElements('myserver.net:808/cps')
-        (None, None, 'myserver.net:808/cps')
+        (None, None, 'myserver.net:808/cps', False)
         >>> dp._extractElements('manager:xxxxx@myserver.net:808/cps')
-        ('manager', 'xxxxx', 'myserver.net:808/cps')
+        ('manager', 'xxxxx', 'myserver.net:808/cps', False)
         >>> dp = RequestDispatcher('https://XX', 'XX')
         >>> dp._extractElements('https://manager:xxxxx@myserver.net:808/cps')
-        ('manager', 'xxxxx', 'https://myserver.net:808/cps')
+        ('manager', 'xxxxx', 'https://myserver.net:808/cps', True)
         """
         pattern = r'(http://|https://)?(.*:.*@)?(.*)'
         groups = re.findall(pattern, url)
@@ -79,8 +88,9 @@ class RequestDispatcher(object):
         else:
             user, password = groups[1][:-1].split(':')
         url = groups[2]
+        is_ssl = groups[0] == 'https://'
 
-        return user, password, '%s%s' % (header, url)
+        return user, password, '%s%s' % (header, url), is_ssl
 
     def __call__(self, *args):
         """ makes the call """
@@ -192,12 +202,14 @@ class RemoteControllerClient(object):
             if self._current_server is None:
                 self._current_server = self._server_proxies.keys()[0]
             url = self._server_proxies[self._current_server]
+            LOG('RemoteControllerCLient.dispatching', DEBUG,
+                'calling %s/%s' % (url, name))
             return RequestDispatcher(url, name)
 
         if name in self.__dict__:
             return self.__dict__[name]
         else:
-            raise AttributeError()
+            raise AttributeError(name)
 
 # XXX starts zope specific code (might want to create another module)
 import thread
@@ -258,6 +270,8 @@ class CPSRemoteControllerClient(UniqueObject, Folder):
     security.declareProtected(ManagePortal, 'manage_pingServer')
     def manage_pingServer(self, name, REQUEST=None):
         """ tests a server """
+        LOG('RemoteControllerCLient.manage_pingServer', DEBUG,
+            'pinging %s' % name)
         self.setActiveServer(name)
         try:
             psm = '%s says: CPSRemoteController v.%s | STATUS OK' % \
@@ -270,6 +284,9 @@ class CPSRemoteControllerClient(UniqueObject, Folder):
             psm = '%s says: Zope error on my side' % name
         except ProtocolError:
             psm = '%s says: Protocol error' % name
+
+        LOG('RemoteControllerCLient.manage_pingServer', DEBUG,
+            'pinging result: %s' % psm)
 
         if REQUEST is not None:
             REQUEST.response.redirect('manage_listServers?psm=%s' % psm)

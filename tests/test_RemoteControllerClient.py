@@ -87,6 +87,40 @@ class RemoteControllerClientTC(CPSRemoteControllerTestCase.CPSRemoteControllerTe
         else:
             self.assert_(False)
 
+    def test_SSL(self):
+        rc = CPSRemoteControllerClient()
+        rc.addServer('1', 'https://1')
+
+        try:
+            rc.server_method('arg1', 'arg2')
+        except AttributeError:
+            pass
+        except:
+            raise
+        else:
+            self.assert_(False)
+
+        from socket import error
+        try:
+            rc.deleteDocument('arg1', 'arg2')
+        except error:
+            pass
+        except:
+            raise
+        else:
+            self.assert_(False)
+
+    def test_RequestDispatcherSSL(self):
+        rd = RequestDispatcher('https://server', 'method')
+
+        # make sure RequestDispatcher calls the server
+        from socket import gaierror
+        self.assertRaises(gaierror, rd, 'arg1', 'arg2')
+
+        # make sure the connector is doing ssl
+        from httplib import HTTPS
+        self.assert_(isinstance(rd._transport._getConnector('host'), HTTPS))
+
 def test_suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(RemoteControllerClientTC))

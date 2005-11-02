@@ -21,23 +21,34 @@
 """ Add Basic Auth to XML-RPC transport
 
     Typical usage :
+
+    >>> from xmlrpclib import ServerProxy
     >>> BAtransport = BasicAuthTransport('user', 'password')
-    >>> Proxy = ServerProxy('url', transport=BAtransport)
+    >>> Proxy = ServerProxy('http://url', transport=BAtransport)
+
 """
 import string, xmlrpclib, httplib
 from base64 import encodestring
 
 class BasicAuthTransport(xmlrpclib.Transport):
-    def __init__(self, username=None, password=None):
+
+    def __init__(self, username=None, password=None, is_ssl=False):
         self.username=username
         self.password=password
         self.verbose = 0
+        self.is_ssl = is_ssl
+
+    def _getConnector(self, host):
+        if self.is_ssl:
+            return httplib.HTTPS(host)
+        else:
+            return httplib.HTTP(host)
 
     def request(self, host, handler, request_body, verbose=0):
         """ issue XML-RPC request """
         self.verbose = verbose
 
-        h = httplib.HTTP(host)
+        h = self._getConnector(host)
         h.putrequest("POST", handler)
 
         # required by HTTP/1.1
