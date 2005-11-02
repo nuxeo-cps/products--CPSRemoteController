@@ -65,8 +65,11 @@ class RequestDispatcher(object):
         (None, None, 'myserver.net:808/cps')
         >>> dp._extractElements('manager:xxxxx@myserver.net:808/cps')
         ('manager', 'xxxxx', 'myserver.net:808/cps')
+        >>> dp = RequestDispatcher('https://XX', 'XX')
+        >>> dp._extractElements('https://manager:xxxxx@myserver.net:808/cps')
+        ('manager', 'xxxxx', 'https://myserver.net:808/cps')
         """
-        pattern = r'(http://)?(.*:.*@)?(.*)'
+        pattern = r'(http://|https://)?(.*:.*@)?(.*)'
         groups = re.findall(pattern, url)
         groups = list(groups[0])
         header = groups[0]
