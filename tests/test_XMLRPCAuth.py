@@ -22,7 +22,9 @@ import os
 import unittest
 from httplib import HTTP, HTTPS
 
-from Products.CPSRemoteController.XMLRPCAuth import BasicAuthTransport
+from Products.CPSRemoteController.XMLRPCAuth import BasicAuthTransport, \
+                                                    EncodedParser, \
+                                                    EncodedUnmarshaller
 
 if __name__ == '__main__':
     execfile(os.path.join(sys.path[0], 'framework.py'))
@@ -36,6 +38,30 @@ class XMLRPCAuthTestCase(unittest.TestCase):
 
         auth = BasicAuthTransport('john', 'doe', True)
         self.assert_(isinstance(auth._getConnector('host'), HTTPS))
+
+
+    def test_encoding_issues(self):
+        # simulating a xml-rpc session
+        unmarshaller = EncodedUnmarshaller()
+        parser = EncodedParser(unmarshaller)
+
+        feed = ("<?xml version='1.0'?>"
+                "<methodResponse>"
+                "<params>"
+                "<param>"
+                "<value><array><data>"
+                "<value><string>ייייייייייי</string></value>"
+                "<value><string>טטטטטטאחחחחח</string></value>"
+                "</data></array></value>"
+                "</param>"
+                "</params>"
+                "</methodResponse>")
+
+        parser.feed(feed)
+        import pdb;pdb.set_trace()
+        result = unmarshaller.close()
+        self.assertEquals(result, (['ייייייייייי', 'טטטטטטאחחחחח'],))
+
 
 def test_suite():
     suite = unittest.TestSuite()

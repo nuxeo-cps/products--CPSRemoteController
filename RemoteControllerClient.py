@@ -60,7 +60,8 @@ class RequestDispatcher(object):
         self._transport = BasicAuthTransport(self._user, self._password,
                                              self._ssl)
         self._connector = ServerProxy(self._server, allow_none=True,
-                                      transport=self._transport)
+                                      transport=self._transport,
+                                      encoding='iso-8859-15')
 
     def _extractElements(self, url):
         """ extracts from url user and password,

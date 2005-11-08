@@ -27,10 +27,70 @@
     >>> Proxy = ServerProxy('http://url', transport=BAtransport)
 
 """
-import string, xmlrpclib, httplib
+from xmlrpclib import SlowParser, Transport, ProtocolError, Unmarshaller
+import string
+from httplib import HTTP, HTTPS
 from base64 import encodestring
 
-class BasicAuthTransport(xmlrpclib.Transport):
+# XXX need to use lxml here instead of old expat and marshall things
+try:
+    from xml.parsers import expat
+    if not hasattr(expat, "ParserCreate"):
+        raise ImportError
+
+    class EncodedParser:
+        def __init__(self, target, encoding="iso-8859-15"):
+            self._parser = parser = expat.ParserCreate(encoding=encoding)
+            self._target = target
+            parser.StartElementHandler = target.start
+            parser.EndElementHandler = target.end
+            parser.CharacterDataHandler = target.data
+            target.xml(encoding, None)
+            self.encoding = encoding
+
+        def feed(self, data):
+            self._parser.Parse(data, 0)
+
+        def close(self):
+            self._parser.Parse('', 1)
+            del self._target, self._parser
+
+except ImportError:
+    EncodedParser = SlowParser
+
+
+class EncodedUnmarshaller(Unmarshaller):
+    def __init__(self, encoding="iso-8859-15"):
+        Unmarshaller.__init__(self)
+        self._encoding = encoding
+
+    def end_string(self, data):
+        """ string mode """
+        self.append(data)
+        self._value = 0
+
+    def close(self):
+        def _encode(element):
+            if isinstance(element, list):
+                return map(_encode, element)
+            if isinstance(element, unicode):
+                return element.encode(self._encoding)
+            else:
+                return element
+
+        if self._type is None or self._marks:
+            raise ResponseError()
+
+        if self._type == "fault":
+            raise Fault(**self._stack[0])
+
+        elements = map(_encode, self._stack)
+        return tuple(elements)
+
+    Unmarshaller.dispatch["string"] = end_string
+    Unmarshaller.dispatch["name"] = end_string
+
+class BasicAuthTransport(Transport):
 
     def __init__(self, username=None, password=None, is_ssl=False):
         self.username=username
@@ -40,9 +100,9 @@ class BasicAuthTransport(xmlrpclib.Transport):
 
     def _getConnector(self, host):
         if self.is_ssl:
-            return httplib.HTTPS(host)
+            return HTTPS(host)
         else:
-            return httplib.HTTP(host)
+            return HTTP(host)
 
     def request(self, host, handler, request_body, verbose=0):
         """ issue XML-RPC request """
@@ -56,7 +116,7 @@ class BasicAuthTransport(xmlrpclib.Transport):
 
         # required by XML-RPC
         h.putheader("User-Agent", self.user_agent)
-        h.putheader("Content-Type", "text/xml")
+        h.putheader("Content-Type", "text/xml; charset=iso-8859-15")
         h.putheader("Content-Length", str(len(request_body)))
 
         # basic auth
@@ -72,10 +132,14 @@ class BasicAuthTransport(xmlrpclib.Transport):
         errcode, errmsg, headers = h.getreply()
 
         if errcode != 200:
-            raise xmlrpclib.ProtocolError(
+            raise ProtocolError(
                 host + handler,
                 errcode, errmsg,
                 headers
                 )
 
         return self.parse_response(h.getfile())
+
+    def getparser(self):
+        unmarshaller = EncodedUnmarshaller()
+        return EncodedParser(target=unmarshaller), unmarshaller
