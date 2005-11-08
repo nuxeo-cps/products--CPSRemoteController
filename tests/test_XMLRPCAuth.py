@@ -58,7 +58,6 @@ class XMLRPCAuthTestCase(unittest.TestCase):
                 "</methodResponse>")
 
         parser.feed(feed)
-        import pdb;pdb.set_trace()
         result = unmarshaller.close()
         self.assertEquals(result, (['ייייייייייי', 'טטטטטטאחחחחח'],))
 
