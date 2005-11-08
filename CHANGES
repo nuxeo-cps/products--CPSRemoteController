@@ -6,8 +6,7 @@ New features:
 -
 Bug fixes:
 ~~~~~~~~~~
-- Fixed ISO encoding bug in xml transport in the client
-
+-
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -

@@ -1,4 +1,21 @@
 *******************************************
+** CPSRemoteController V1.6.1 [R1 build 2005/11/08-16:56 by fguillaume]
+** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 29274
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+-
+Bug fixes:
+~~~~~~~~~~
+- Fixed ISO encoding bug in xml transport in the client
+
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+
+*******************************************
 ** CPSRemoteController V1.6.0 [R1 build 2005/11/07-15:34 by fguillaume]
 ** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 29059
 Requires:
