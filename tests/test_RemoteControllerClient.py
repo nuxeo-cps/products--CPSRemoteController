@@ -140,6 +140,20 @@ class RemoteControllerClientTC(CPSRemoteControllerTestCase.CPSRemoteControllerTe
 
         self.assertEquals(content, wanted)
 
+        # use case #2: booleans
+        from xmlrpclib import dumps
+        rd = RequestDispatcher('http://1', 'xx')
+        content = ('Document', {'do': True}, 'workspaces')
+        content = map(rd._controlArg, content)
+        content = dumps(tuple(content))
+        wanted = ('<params>\n<param>\n<value><string>Document</string>'
+                  '</value>\n</param>\n<param>\n<value><struct>\n<membe'
+                  'r>\n<name>do</name>\n<value><boolean>1</boolean></val'
+                  'ue>\n</member>\n</struct></value>\n</param>\n<param>\n'
+                  '<value><string>workspaces</string></value>\n</param>\n'
+                  '</params>\n')
+
+        self.assertEquals(content, wanted)
 
 def test_suite():
     suite = unittest.TestSuite()
