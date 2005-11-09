@@ -729,7 +729,10 @@ class RemoteControllerTool(UniqueObject, Folder):
         'workspaces', 2)
         """
         portal = self._getPortalObject()
+
+        folder_rpath = toLatin9(folder_rpath)
         folder_proxy = portal.restrictedTraverse(folder_rpath)
+
         if not _checkPermission(AddPortalContent, folder_proxy):
             raise Unauthorized("You need the AddPortalContent permission.")
 
