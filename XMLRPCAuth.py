@@ -27,7 +27,7 @@
     >>> Proxy = ServerProxy('http://url', transport=BAtransport)
 
 """
-from xmlrpclib import SlowParser, Transport, ProtocolError, Unmarshaller
+from xmlrpclib import SlowParser, Transport, ProtocolError, Unmarshaller, Fault
 import string
 from httplib import HTTP, HTTPS
 from base64 import encodestring
@@ -125,7 +125,6 @@ class BasicAuthTransport(Transport):
                     encodestring("%s:%s" % (self.username, self.password)),
                     "\012", ""))
         h.endheaders()
-
         if request_body:
             h.send(request_body)
 
