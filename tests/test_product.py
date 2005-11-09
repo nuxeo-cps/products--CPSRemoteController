@@ -408,6 +408,27 @@ class ProductTestCase(CPSRemoteControllerTestCase):
         self.assert_(self.tool.getProductVersion('CPSUtil'))
         self.assert_(self.tool.getProductVersion('CPSRemoteController'))
 
+    def testCreateAndDeleteDocumentUnicodeFeed(self):
+        folder_rpath = u'workspaces'
+        proxy_list1 = self.tool.listContent(folder_rpath)
+        data_dict = {'Title': u"The report from Monday meeting",
+                     'Description': u"Another boring report",
+                     }
+        doc_rpath = self.tool.createDocument('File', data_dict, folder_rpath, 0)
+        proxy_list2 = self.tool.listContent(folder_rpath)
+        self.assertEquals(len(proxy_list1) + 1, len(proxy_list2))
+        self.assert_(doc_rpath in proxy_list2)
+
+        self.tool.deleteDocument(doc_rpath)
+        proxy_list3 = self.tool.listContent(folder_rpath)
+        self.assertEquals(len(proxy_list1), len(proxy_list3))
+        self.failIf(doc_rpath in proxy_list3)
+
+    def testgetSectionsTree(self):
+        tree = self.tool.getSectionsTree()
+        self.assert_(len(tree), 1)
+        self.assertEquals(tree[0]['title_or_id'], 'Sections')
+
 def test_suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(ProductTestCase))
