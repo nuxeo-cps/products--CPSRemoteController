@@ -735,6 +735,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         # time.
         doc_language = doc_def.get('Language', 'en')
         id = folder_proxy.computeId(compute_from=doc_title)
+        portal_type = toLatin9(portal_type)
         folder_proxy.invokeFactory(portal_type, id, language=doc_language)
         doc_proxy = getattr(folder_proxy, id)
         doc_rpath = os.path.join(folder_rpath, id)
