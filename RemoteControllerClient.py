@@ -40,12 +40,14 @@ __author__ =  "Tarek Ziadé <tz@nuxeo.com>"
 from RemoteControllerTool import RemoteControllerTool
 from XMLRPCAuth import BasicAuthTransport
 from xmlrpclib import ServerProxy, Fault, ProtocolError
+from xmlrpclib import DateTime as rpcDateTime
+from DateTime import DateTime
 import socket
 import re
 
 class RequestDispatcher(object):
     """ this encapsulates a xmlrpc call """
-    def __init__(self, server, method):
+    def __init__(self, server, method, encoding='iso-8859-15'):
         self._user, self._password, self._server, self._ssl = \
             self._extractElements(server)
         self._method = method
@@ -57,11 +59,12 @@ class RequestDispatcher(object):
         LOG('RemoteControllerCLient.dispatching init', DEBUG,
              'method: %s' % (self._method))
 
+        self.encoding = encoding
         self._transport = BasicAuthTransport(self._user, self._password,
                                              self._ssl)
         self._connector = ServerProxy(self._server, allow_none=True,
                                       transport=self._transport,
-                                      encoding='iso-8859-15')
+                                      encoding=encoding)
 
     def _extractElements(self, url):
         """ extracts from url user and password,
@@ -93,8 +96,23 @@ class RequestDispatcher(object):
 
         return user, password, '%s%s' % (header, url), is_ssl
 
+    def _controlArg(self, arg):
+        """ maps arguments to serialize dates
+        """
+        if isinstance(arg, DateTime):
+            arg = rpcDateTime(arg)
+        elif isinstance(arg, dict):
+            for key in arg.keys():
+                arg[key] = self._controlArg(arg[key])
+        elif isinstance(arg, list):
+            arg = map(_controlArg, arg)
+        elif isinstance(arg, unicode):
+            arg = arg.encode(encoding)
+        return arg
+
     def __call__(self, *args):
         """ makes the call """
+        args = map(self._controlArg, args)
         return getattr(self._connector, self._method)(*args)
 
 class RemoteControllerClient(object):
