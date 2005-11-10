@@ -105,7 +105,7 @@ class RequestDispatcher(object):
             for key in arg.keys():
                 arg[key] = self._controlArg(arg[key])
         elif isinstance(arg, list):
-            arg = map(_controlArg, arg)
+            arg = map(self._controlArg, arg)
         elif isinstance(arg, unicode):
             arg = arg.encode(encoding)
         return arg

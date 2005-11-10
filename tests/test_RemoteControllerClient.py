@@ -155,6 +155,15 @@ class RemoteControllerClientTC(CPSRemoteControllerTestCase.CPSRemoteControllerTe
 
         self.assertEquals(content, wanted)
 
+        content = [DateTime('01/01/1971')]
+        content = map(rd._controlArg, content)
+        content = dumps(tuple(content))
+        wanted = ('<params>\n<param>\n<value><dateTime.iso8601>19710101T00:00:00'
+                  '</dateTime.iso8601></value>\n</param>\n</params>\n')
+
+        self.assertEquals(content, wanted)
+
+
 def test_suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(RemoteControllerClientTC))
