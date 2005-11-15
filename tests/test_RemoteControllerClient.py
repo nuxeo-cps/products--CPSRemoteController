@@ -121,52 +121,6 @@ class RemoteControllerClientTC(CPSRemoteControllerTestCase.CPSRemoteControllerTe
         from httplib import HTTPS
         self.assert_(isinstance(rd._transport._getConnector('host'), HTTPS))
 
-    def test_RequestDispatcherDateEncoding(self):
-        # make sure the args we use are dumpable by xmlrpc
-
-        # use case #1: dates
-        from DateTime import DateTime
-        from xmlrpclib import dumps
-        rd = RequestDispatcher('http://1', 'xx')
-        content = ('Document', {'date': DateTime('01/01/1971')}, 'workspaces')
-        content = map(rd._controlArg, content)
-        content = dumps(tuple(content))
-        wanted = ('<params>\n<param>\n<value><string>Document</string>'
-                 '</value>\n</param>\n<param>\n<value><struct>\n<member>\n'
-                 '<name>date</name>\n<value><dateTime.iso8601>19710101T00:00:0'
-                 '0</dateTime.iso8601></value>\n</member>\n</struct></value>\n'
-                 '</param>\n<param>\n<value><string>workspaces</string></value'
-                 '>\n</param>\n</params>\n')
-
-        self.assertEquals(content, wanted)
-
-        # use case #2: booleans
-        from xmlrpclib import dumps
-        rd = RequestDispatcher('http://1', 'xx')
-        content = ('Document', {'do': True}, 'workspaces')
-        content = map(rd._controlArg, content)
-        content = dumps(tuple(content))
-        wanted = ('<params>\n<param>\n<value><string>Document</string>'
-                  '</value>\n</param>\n<param>\n<value><struct>\n<membe'
-                  'r>\n<name>do</name>\n<value><boolean>1</boolean></val'
-                  'ue>\n</member>\n</struct></value>\n</param>\n<param>\n'
-                  '<value><string>workspaces</string></value>\n</param>\n'
-                  '</params>\n')
-
-        self.assertEquals(content, wanted)
-
-        content = [[DateTime('01/01/1971')]]
-        content = map(rd._controlArg, content)
-        content = dumps(tuple(content))
-
-        wanted = ('<params>\n<param>\n<value><array><data>\n<value>'
-                  '<dateTime.iso8601>19710101T00:00:00</dateTime.is'
-                  'o8601></value>\n</data></array></value>\n'
-                  '</param>\n</params>\n')
-
-        self.assertEquals(content, wanted)
-
-
 def test_suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(RemoteControllerClientTC))

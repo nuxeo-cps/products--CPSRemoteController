@@ -45,6 +45,7 @@ from OFS.Image import File
 from zLOG import LOG, TRACE, DEBUG, ERROR, PROBLEM
 from DateTime.DateTime import DateTimeError
 from Products.CPSRemoteController import __file__ as landmark
+from Products.CPSRemoteController.utils import unMarshallDocument
 
 glog_key = 'RemoteControllerTool'
 
@@ -724,7 +725,10 @@ class RemoteControllerTool(UniqueObject, Folder):
             raise Unauthorized("You need the AddPortalContent permission.")
 
         LOG(glog_key, DEBUG, "editOrCreateDocument doc_def = %s" % str(doc_def))
+
         doc_def = toLatin9(doc_def)
+        doc_def = unMarshallDocument(doc_def)
+
 
         # If no Title is given, the portal_type is used as a fallback title
         doc_title = doc_def.get('Title', portal_type)
@@ -736,10 +740,12 @@ class RemoteControllerTool(UniqueObject, Folder):
         doc_language = doc_def.get('Language', 'en')
         id = folder_proxy.computeId(compute_from=doc_title)
         portal_type = toLatin9(portal_type)
+
         folder_proxy.invokeFactory(portal_type, id, language=doc_language)
         doc_proxy = getattr(folder_proxy, id)
         doc_rpath = os.path.join(folder_rpath, id)
 
+        self._createFlexibleWidgets(doc_proxy, doc_def)
         self._editDocument(doc_proxy, doc_def, comments)
 
         if position >= 0:
@@ -748,6 +754,36 @@ class RemoteControllerTool(UniqueObject, Folder):
 
         return doc_rpath
 
+    security.declarePrivate('_createFlexibleWidgets')
+    def _createFlexibleWidgets(self, proxy, mapping):
+        """ tries to recreate flexibles """
+        layout_num = -1
+        for field_name in mapping:
+            if field_name.startswith('content_'):
+                splitted_name = field_name.split('_')
+                if len(splitted_name) < 2:
+                    continue
+
+                if splitted_name[1] not in ('right', 'left'):
+                    splitted_name = splitted_name[1]
+                else:
+                    if len(splitted_name) < 3:
+                        continue
+                    splitted_name = splitted_name[2]
+
+                try:
+                    current_layout_num = int(splitted_name)
+                except ValueError:
+                    current_layout_num = 0
+                if current_layout_num > layout_num:
+                    layout_num = current_layout_num
+
+        if layout_num > -1:
+            widget_type = 'textimage'
+            layout_id = 'flexible_content'
+            for i in range(layout_num+1):
+                proxy.getEditableContent().flexibleAddWidget(layout_id,
+                                                             widget_type)
 
     security.declareProtected(View, 'editDocument')
     def editDocument(self, rpath, doc_def={}, comments=""):
