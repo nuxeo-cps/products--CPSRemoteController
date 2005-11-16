@@ -94,10 +94,10 @@ class RequestDispatcher(object):
 
         return user, password, '%s%s' % (header, url), is_ssl
 
-    def __call__(self, *args):
+    def __call__(self, *args, **kw):
         """ makes the call """
         args = tuple(marshallDocument(args))
-        return getattr(self._connector, self._method)(*args)
+        return getattr(self._connector, self._method)(*args, **kw)
 
 class RemoteControllerClient(object):
 
