@@ -30,8 +30,16 @@ from Products.CPSDefault.tests.CPSTestCase import MANAGER_ID
 
 from Products.CPSRemoteController.RemoteControllerClient import \
     RequestDispatcher, RemoteControllerClient, CPSRemoteControllerClient
+from Products.CPSRemoteController.RemoteControllerTool import toLatin9
 
-class RemoteControllerClientTC(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
+def randomText(max_len=10):
+    import random
+    return ''.join(
+        [chr(random.randint(32, 128)) for i in range(0, max_len)])
+
+BaseClass = CPSRemoteControllerTestCase.CPSRemoteControllerTestCase
+
+class RemoteControllerClientTC(BaseClass):
 
     def afterSetUp(self):
         self.login_id = MANAGER_ID
@@ -46,6 +54,14 @@ class RemoteControllerClientTC(CPSRemoteControllerTestCase.CPSRemoteControllerTe
         self.assert_('installRemoteController' in self.portal.objectIds())
         self.portal.installRemoteController()
         self.tool = self.portal.portal_remote_controller
+
+        try:
+            self.ws = self.portal.workspaces
+        except AttributeError:
+            self.ws = self.portal
+        self.document_schemas = self.portal.getDocumentSchemas()
+        self.document_types = self.portal.getDocumentTypes()
+
 
     def beforeTearDown(self):
         self.logout()
@@ -120,6 +136,55 @@ class RemoteControllerClientTC(CPSRemoteControllerTestCase.CPSRemoteControllerTe
         # make sure the connector is doing ssl
         from httplib import HTTPS
         self.assert_(isinstance(rd._transport._getConnector('host'), HTTPS))
+
+    def _restrictedTraverse(self, path):
+        path = toLatin9(path)
+        portal = self.portal
+        return portal.restrictedTraverse(path)
+
+    def _document_send(self, doc_def, portal_type):
+        from Products.CPSRemoteController.utils import marshallDocument
+        doc_def = marshallDocument(doc_def)
+        # now calling RemoteController with the given def
+        folder_rpath = '/portal/workspaces'
+        path = self.tool.createDocument(portal_type, doc_def, folder_rpath,
+                                        clean_files=False)
+        # checking how the rpc-ed file looks
+        return self._restrictedTraverse(path)
+
+    def test_file_sending(self):
+        from StringIO import StringIO
+        from ZPublisher.HTTPRequest import FileUpload
+
+        # creating doc
+        self.ws.invokeFactory('File', 'file1')
+        proxy = self.ws.file1
+
+        # adding a file
+        try:
+            doc = proxy.getEditableContent()
+        except AttributeError:
+            doc = proxy
+
+        class FieldStorage:
+            def __init__(self, **kw):
+                for k, v in kw.items():
+                    setattr(self, k, v)
+
+        text = randomText()
+        file = StringIO(text)
+        fs = FieldStorage(file=file, headers={"Content-Type": "text/html"},
+            filename="filename")
+        fileupload = FileUpload(fs)
+        doc = proxy.getContent()
+        doc_def = proxy.getTypeInfo().getDataModel(ob=doc)
+        doc_def = doc_def.data
+        doc_def['file'] = fileupload
+
+        # sending and checking how the rpc-ed file looks
+        rpced_doc = self._document_send(doc_def, proxy.portal_type)
+        file = rpced_doc['file']
+        self.assertEquals(file.read(), text)
 
 def test_suite():
     suite = unittest.TestSuite()

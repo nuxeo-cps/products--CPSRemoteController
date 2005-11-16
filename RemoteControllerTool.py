@@ -654,7 +654,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
     security.declareProtected(View, 'createDocument')
     def createDocument(self, portal_type, doc_def, folder_rpath, position=-1,
-                       comments=""):
+                       comments="", clean_files=True):
         """Create document with the given portal_type with data from the given
         data dictionary.
 
@@ -746,7 +746,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         doc_rpath = os.path.join(folder_rpath, id)
 
         self._createFlexibleWidgets(doc_proxy, doc_def)
-        self._editDocument(doc_proxy, doc_def, comments)
+        self._editDocument(doc_proxy, doc_def, comments, clean_files)
 
         if position >= 0:
             context = aq_parent(aq_inner(doc_proxy))
@@ -833,7 +833,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
 
     security.declarePrivate('_editDocument')
-    def _editDocument(self, doc_proxy, doc_def, comments=""):
+    def _editDocument(self, doc_proxy, doc_def, comments="", clean_files=True):
         """Modify the document given its proxy.
 
         This method holds the special logic used to retrieve a potential file
@@ -854,17 +854,18 @@ class RemoteControllerTool(UniqueObject, Folder):
 
         # We don't need those keys anymore and we don't want the document to be
         # modified by them.
-        if doc_def.has_key(BINARY_FILE_KEY):
-            del doc_def[BINARY_FILE_KEY]
-        if doc_def.has_key(BINARY_FILENAME_KEY):
-            del doc_def[BINARY_FILENAME_KEY]
-        if doc_def.has_key(DOCUMENT_FILE_KEY):
-            del doc_def[DOCUMENT_FILE_KEY]
+        if clean_files:
+            if doc_def.has_key(BINARY_FILE_KEY):
+                del doc_def[BINARY_FILE_KEY]
+            if doc_def.has_key(BINARY_FILENAME_KEY):
+                del doc_def[BINARY_FILENAME_KEY]
+            if doc_def.has_key(DOCUMENT_FILE_KEY):
+                del doc_def[DOCUMENT_FILE_KEY]
 
-        if file is not None:
-            if isinstance(file, Binary):
-                file_id = generateFileName(file_name)
-                doc_def[file_key] = File(file_id, file_name, file.data)
+            if file is not None:
+                if isinstance(file, Binary):
+                    file_id = generateFileName(file_name)
+                    doc_def[file_key] = File(file_id, file_name, file.data)
 
         doc.edit(doc_def, doc_proxy)
 
