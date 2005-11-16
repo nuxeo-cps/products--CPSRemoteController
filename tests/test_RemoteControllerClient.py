@@ -62,7 +62,6 @@ class RemoteControllerClientTC(BaseClass):
         self.document_schemas = self.portal.getDocumentSchemas()
         self.document_types = self.portal.getDocumentTypes()
 
-
     def beforeTearDown(self):
         self.logout()
 
@@ -185,6 +184,17 @@ class RemoteControllerClientTC(BaseClass):
         rpced_doc = self._document_send(doc_def, proxy.portal_type)
         file = rpced_doc['file']
         self.assertEquals(file.read(), text)
+
+    def test_link(self):
+        self.ws.invokeFactory('Link', 'link1')
+        proxy = self.ws.link1
+        doc = proxy.getContent()
+        doc_def = proxy.getTypeInfo().getDataModel(ob=doc)
+        doc_def = doc_def.data
+        doc_def['link'] = 'http://gooogooole.com'
+        rpced_doc = self._document_send(doc_def, proxy.portal_type)
+        doc_def = rpced_doc.getTypeInfo().getDataModel(ob=doc)
+        self.assertEquals(doc_def['link'], 'http://gooogooole.com')
 
 def test_suite():
     suite = unittest.TestSuite()
