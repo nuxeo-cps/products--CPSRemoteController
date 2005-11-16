@@ -66,6 +66,12 @@ class UtilsTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
         self.assertEquals(unmarshalled[0], 'Document')
         self.assert_(isinstance(unmarshalled[1]['date'], DateTime))
 
+    def test_preview(self):
+        content = ('Flash Animation', {'file_text': '\n\n\n'}, 'workspaces')
+        unmarshalled = self._test_marshalling(content)
+        self.assertEquals(unmarshalled[0], 'Flash Animation')
+        self.assertEquals(unmarshalled[1]['file_text'], '')
+
 def test_suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(UtilsTestCase))

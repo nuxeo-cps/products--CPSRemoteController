@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
-# $Id:$
+# $Id$
 """
     utilities for XML-RPC, used to send
     complex documents over.
@@ -39,7 +39,11 @@ def marshallDocument(structure):
         return map(marshallElement, structure)
     if isinstance(structure, dict):
         for item in structure:
-            structure[item] = marshallElement(structure[item])
+            if item == 'file_text':
+                # generated automatically by PortalTransforms
+                structure[item] = ''
+            else:
+                structure[item] = marshallElement(structure[item])
         return structure
     raise NotImplementedError('Type not implemented: %s' % str(type(structure)))
 
@@ -100,7 +104,10 @@ def marshallElement(element):
         element = rpcDateTime(element)
     elif isinstance(element, dict):
         for key in element.keys():
-            element[key] = marshallElement(element[key])
+            if key == 'file_text':
+                element[key] = ''
+            else:
+                element[key] = marshallElement(element[key])
     elif isinstance(element, list):
         element = map(marshallElement, element)
     elif isinstance(element, unicode):

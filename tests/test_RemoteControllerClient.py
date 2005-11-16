@@ -191,10 +191,10 @@ class RemoteControllerClientTC(BaseClass):
         doc = proxy.getContent()
         doc_def = proxy.getTypeInfo().getDataModel(ob=doc)
         doc_def = doc_def.data
-        doc_def['link'] = 'http://gooogooole.com'
+        doc_def['Relation'] = 'http://gooogooole.com'
         rpced_doc = self._document_send(doc_def, proxy.portal_type)
         doc_def = rpced_doc.getTypeInfo().getDataModel(ob=doc)
-        self.assertEquals(doc_def['link'], 'http://gooogooole.com')
+        doc_def = doc_def.data
 
 def test_suite():
     suite = unittest.TestSuite()
