@@ -427,7 +427,7 @@ class ProductTestCase(CPSRemoteControllerTestCase):
     def testgetSectionsTree(self):
         tree = self.tool.getSectionsTree()
         self.assert_(len(tree), 1)
-        self.assertEquals(tree[0]['title_or_id'], 'Sections')
+        self.assertEquals(tree[0]['id'], 'sections')
 
 def test_suite():
     suite = unittest.TestSuite()
