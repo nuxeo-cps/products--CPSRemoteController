@@ -20,12 +20,12 @@
 
 from zLOG import LOG, INFO
 
-import Products.CMFCore
 import RemoteControllerTool
 import RemoteControllerClient
 
 def initialize(registrar):
-    Products.CMFCore.utils.ToolInit(
+    from Products.CMFCore import utils
+    utils.ToolInit(
         # XXX: Use 'CPS Tools' when and if possible
         'CPS  Remote Controller Tool',
         tools=(RemoteControllerTool.RemoteControllerTool,
@@ -34,12 +34,21 @@ def initialize(registrar):
         ).initialize(registrar)
 
 
-    Products.CMFCore.utils.ToolInit(
-        # XXX: Use 'CPS Tools' when and if possible
-        'CPS  Remote Controller Client Tool',
-        tools=(RemoteControllerTool.RemoteControllerTool,
-               RemoteControllerClient.CPSRemoteControllerClient),
-        product_name='CPSRemoteController',
-        icon='tool.png',
-        ).initialize(registrar)
-
+    try:
+        utils.ToolInit(
+            # XXX: Use 'CPS Tools' when and if possible
+            'CPS  Remote Controller Client Tool',
+            tools=(RemoteControllerTool.RemoteControllerTool,
+                   RemoteControllerClient.CPSRemoteControllerClient),
+            icon='tool.png',
+            ).initialize(registrar)
+    except 'TypeError':
+        # BBB for CMF 1.4, remove this in CPS 3.4.0
+        utils.ToolInit(
+            # XXX: Use 'CPS Tools' when and if possible
+            'CPS  Remote Controller Client Tool',
+            tools=(RemoteControllerTool.RemoteControllerTool,
+                   RemoteControllerClient.CPSRemoteControllerClient),
+            product_name='CPSRemoteController', # BBB
+            icon='tool.png',
+            ).initialize(registrar)

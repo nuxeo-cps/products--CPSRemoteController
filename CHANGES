@@ -6,7 +6,7 @@ New features:
 -
 Bug fixes:
 ~~~~~~~~~~
--
+- Removed deprecation warnings.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -
