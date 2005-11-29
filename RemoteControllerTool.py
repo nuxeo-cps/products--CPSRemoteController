@@ -757,6 +757,9 @@ class RemoteControllerTool(UniqueObject, Folder):
     security.declarePrivate('_createFlexibleWidgets')
     def _createFlexibleWidgets(self, proxy, mapping):
         """ tries to recreate flexibles """
+        if proxy.portal_type != 'Flexible':
+            return None
+
         layout_num = -1
         for field_name in mapping:
             if field_name.startswith('content_'):
