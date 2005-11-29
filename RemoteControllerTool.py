@@ -754,22 +754,58 @@ class RemoteControllerTool(UniqueObject, Folder):
 
         return doc_rpath
 
+    security.declarePrivate('_flexibleLayout')
+    def _flexibleLayout(self, proxy):
+        ptype = proxy.portal_type
+        portal_types = getToolByName(self, 'portal_types')
+        if ptype in portal_types.objectIds():
+            flexible_layouts = portal_types[ptype].flexible_layouts
+            if flexible_layouts != ():
+                return flexible_layouts[0].split(':')[0]
+        return None
+
     security.declarePrivate('_createFlexibleWidgets')
     def _createFlexibleWidgets(self, proxy, mapping):
         """ tries to recreate flexibles """
-        if proxy.portal_type != 'Flexible':
+        def _extractNum(field_name, widget_type):
+            pos = field_name.find(widget_type)
+            if pos != -1:
+                root = field_name[pos+len(widget_type):]
+            else:
+                root = field_name
+
+            splitted_name = root.split('_')
+            if len(splitted_name) < 2:
+                try:
+                    return int(field_name.split('%s_f' % widget_type)[-1])
+                except ValueError:
+                    return 0
+            else:
+                try:
+                    splitted_name = splitted_name[-2]
+                    return int(splitted_name)
+                except ValueError:
+                    return 0
+
+        layout_id = self._flexibleLayout(proxy)
+        if layout_id is None:
             return None
 
         widgets = {}
 
-        layout_num = -1
         for field_name in mapping:
-            if field_name.startswith('attachedFile_f'):
-                num = int(field_name.split('attachedFile_f')[-1])
+            if field_name.startswith('attachedFile'):
+                num = _extractNum(field_name, 'attachedFile')
+                while num in widgets and widgets[num]=='attachedFile':
+                    num += 1
                 widgets[num] = 'attachedFile'
-            elif field_name.startswith('link_href_f'):
-                num = int(field_name.split('link_href_f')[-1])
+
+            elif field_name.startswith('link_href'):
+                num = _extractNum(field_name, 'link_href')
+                while num in widgets and widgets[num]=='link_href':
+                    num += 1
                 widgets[num] = 'link'
+
             elif field_name.startswith('content_'):
                 splitted_name = field_name.split('_')
                 if len(splitted_name) < 2:
@@ -786,11 +822,10 @@ class RemoteControllerTool(UniqueObject, Folder):
                     current_layout_num = int(splitted_name)
                     widgets[current_layout_num] = 'textimage'
                 except ValueError:
-                    pass
+                    widgets[0] = 'textimage'
 
         for layout_num in range(len(widgets)):
             widget_type = widgets[layout_num]
-            layout_id = 'flexible_content'
             proxy.getEditableContent().flexibleAddWidget(layout_id,
                                                          widget_type)
 
