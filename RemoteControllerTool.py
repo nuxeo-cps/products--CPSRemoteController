@@ -760,9 +760,17 @@ class RemoteControllerTool(UniqueObject, Folder):
         if proxy.portal_type != 'Flexible':
             return None
 
+        widgets = {}
+
         layout_num = -1
         for field_name in mapping:
-            if field_name.startswith('content_'):
+            if field_name.startswith('attachedFile_f'):
+                num = int(field_name.split('attachedFile_f')[-1])
+                widgets[num] = 'attachedFile'
+            elif field_name.startswith('link_href_f'):
+                num = int(field_name.split('link_href_f')[-1])
+                widgets[num] = 'link'
+            elif field_name.startswith('content_'):
                 splitted_name = field_name.split('_')
                 if len(splitted_name) < 2:
                     continue
@@ -776,17 +784,15 @@ class RemoteControllerTool(UniqueObject, Folder):
 
                 try:
                     current_layout_num = int(splitted_name)
+                    widgets[current_layout_num] = 'textimage'
                 except ValueError:
-                    current_layout_num = 0
-                if current_layout_num > layout_num:
-                    layout_num = current_layout_num
+                    pass
 
-        if layout_num > -1:
-            widget_type = 'textimage'
+        for layout_num in range(len(widgets)):
+            widget_type = widgets[layout_num]
             layout_id = 'flexible_content'
-            for i in range(layout_num+1):
-                proxy.getEditableContent().flexibleAddWidget(layout_id,
-                                                             widget_type)
+            proxy.getEditableContent().flexibleAddWidget(layout_id,
+                                                         widget_type)
 
     security.declareProtected(View, 'editDocument')
     def editDocument(self, rpath, doc_def={}, comments=""):
