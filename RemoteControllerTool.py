@@ -767,6 +767,7 @@ class RemoteControllerTool(UniqueObject, Folder):
     security.declarePrivate('_createFlexibleWidgets')
     def _createFlexibleWidgets(self, proxy, mapping):
         """ tries to recreate flexibles """
+        # XXX need to delete extra widgets as well
         def _extractNum(field_name, widget_type):
             pos = field_name.find(widget_type)
             if pos != -1:
@@ -863,6 +864,9 @@ class RemoteControllerTool(UniqueObject, Folder):
         if proxy is not None and proxy.portal_type == portal_type:
             if not _checkPermission(ModifyPortalContent, proxy):
                 raise Unauthorized("You need the ModifyPortalContent permission.")
+            doc_def = unMarshallDocument(doc_def)
+            # the layout might have changed
+            self._createFlexibleWidgets(proxy, doc_def)
             self._editDocument(proxy, doc_def)
             id = proxy.getId()
             url_tool = getToolByName(self, 'portal_url')
