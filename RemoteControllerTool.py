@@ -589,8 +589,8 @@ class RemoteControllerTool(UniqueObject, Folder):
                     # the same document.
                     'update': update,
                    }
-            event_tool = getEventService(self)
-            event_tool.notify(EVENT_PUBLISH_DOCUMENT, proxy, info)
+            evtool = getEventService(self)
+            evtool.notify(EVENT_PUBLISH_DOCUMENT, proxy, info)
 
         return published_doc_ids
 
@@ -648,8 +648,8 @@ class RemoteControllerTool(UniqueObject, Folder):
         info = {'position_from': position,
                 'position_to': new_position,
                 }
-        event_tool = getEventService(self)
-        event_tool.notify(EVENT_CHANGE_DOCUMENT_POSITION, proxy, info)
+        evtool = getEventService(self)
+        evtool.notify(EVENT_CHANGE_DOCUMENT_POSITION, proxy, info)
 
 
     security.declareProtected(View, 'createDocument')
@@ -918,7 +918,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         doc.edit(doc_def, doc_proxy)
 
         # Notification has to be done manually
-        evtool = getToolByName(self, 'portal_eventservice')
+        evtool = getEventService(self)
         evtool.notifyEvent('workflow_modify', doc_proxy,
                            {'comments': comments})
 
