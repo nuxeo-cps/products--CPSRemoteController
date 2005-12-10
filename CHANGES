@@ -6,9 +6,7 @@ New features:
 -
 Bug fixes:
 ~~~~~~~~~~
-- Fixed all flexible types widget creation
-- Removed deprecation warnings.
+-
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
-- Send EVENT_LOCK_DOCUMENT and EVENT_UNLOCK_DOCUMENT when locking and unlocking
-  document correspondingly.
+-

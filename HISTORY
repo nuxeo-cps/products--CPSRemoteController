@@ -1,4 +1,22 @@
 *******************************************
+** CPSRemoteController V1.6.2 [R1 build 2005/12/10-22:40 by alienoid]
+** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 30473
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+-
+Bug fixes:
+~~~~~~~~~~
+- Fixed all flexible types widget creation
+- Removed deprecation warnings.
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+- Send EVENT_LOCK_DOCUMENT and EVENT_UNLOCK_DOCUMENT when locking and unlocking
+  document correspondingly.
+
+*******************************************
 ** CPSRemoteController V1.6.1 [R1 build 2005/11/08-16:56 by fguillaume]
 ** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 29274
 Requires:
