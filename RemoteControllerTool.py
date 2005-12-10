@@ -57,6 +57,9 @@ DOCUMENT_DEFAULT_FILE_KEY = 'file'
 
 EVENT_PUBLISH_DOCUMENT = 'remote_controller_publish_documents'
 EVENT_CHANGE_DOCUMENT_POSITION = 'remote_controller_change_document_position'
+EVENT_LOCK_DOCUMENT = 'remote_controller_lock_document'
+EVENT_UNLOCK_DOCUMENT = 'remote_controller_unlock_document'
+
 
 class RemoteControllerTool(UniqueObject, Folder):
     """A tool providing an high-level API for manipulating documents.
@@ -402,6 +405,13 @@ class RemoteControllerTool(UniqueObject, Folder):
         lock = LockItem(user, user, timeout=lock_timeout)
         lock_token = lock.getLockToken()
         proxy.wl_setLock(lock_token, lock)
+
+        # Send event notification that we are locked to interested parties
+        evtool = getEventService(self)
+        utool = getToolByName(self, 'portal_url')
+        info = {'rpath': utool.getRelativeUrl(proxy)}
+        evtool.notifyEvent(EVENT_LOCK_DOCUMENT, proxy, info)
+
         return lock_token
 
 
@@ -422,6 +432,13 @@ class RemoteControllerTool(UniqueObject, Folder):
             proxy.wl_clearLocks()
         else:
             proxy.wl_delLock(lock_token)
+
+        # Send event notification that we are unlocked to interested parties
+        evtool = getEventService(self)
+        utool = getToolByName(self, 'portal_url')
+        info = {'rpath': utool.getRelativeUrl(proxy)}
+        evtool.notifyEvent(EVENT_UNLOCK_DOCUMENT, proxy, info)
+
         return True
 
 
@@ -444,6 +461,11 @@ class RemoteControllerTool(UniqueObject, Folder):
             if lock.getOwner() == user:
                 del lock_mapping[lock_token]
 
+        # Send event notification that we are unlocked to interested parties
+        evtool = getEventService(self)
+        utool = getToolByName(self, 'portal_url')
+        info = {'rpath': utool.getRelativeUrl(proxy)}
+        evtool.notifyEvent(EVENT_UNLOCK_DOCUMENT, proxy, info)
 
     security.declareProtected(View, 'acceptDocument')
     def acceptDocument(self, rpath, comments=""):
