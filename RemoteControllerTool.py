@@ -408,9 +408,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
         # Send event notification that we are locked to interested parties
         evtool = getEventService(self)
-        utool = getToolByName(self, 'portal_url')
-        info = {'rpath': utool.getRelativeUrl(proxy)}
-        evtool.notifyEvent(EVENT_LOCK_DOCUMENT, proxy, info)
+        evtool.notifyEvent(EVENT_LOCK_DOCUMENT, proxy, {})
 
         return lock_token
 
@@ -435,9 +433,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
         # Send event notification that we are unlocked to interested parties
         evtool = getEventService(self)
-        utool = getToolByName(self, 'portal_url')
-        info = {'rpath': utool.getRelativeUrl(proxy)}
-        evtool.notifyEvent(EVENT_UNLOCK_DOCUMENT, proxy, info)
+        evtool.notifyEvent(EVENT_UNLOCK_DOCUMENT, proxy, {})
 
         return True
 
@@ -463,9 +459,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
         # Send event notification that we are unlocked to interested parties
         evtool = getEventService(self)
-        utool = getToolByName(self, 'portal_url')
-        info = {'rpath': utool.getRelativeUrl(proxy)}
-        evtool.notifyEvent(EVENT_UNLOCK_DOCUMENT, proxy, info)
+        evtool.notifyEvent(EVENT_UNLOCK_DOCUMENT, proxy, {})
 
     security.declareProtected(View, 'acceptDocument')
     def acceptDocument(self, rpath, comments=""):
