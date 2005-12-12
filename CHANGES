@@ -6,8 +6,7 @@ New features:
 -
 Bug fixes:
 ~~~~~~~~~~
-- No need to pass 'rpath' in info dictionary to notifyEvent method, as event
-  service tool's 'notify' method will do that itself.
+-
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -

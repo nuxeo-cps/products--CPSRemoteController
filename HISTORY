@@ -1,4 +1,21 @@
 *******************************************
+** CPSRemoteController V1.6.3 [R1 build 2005/12/12-22:36 by ogrisel]
+** SVN URL: http://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 30507
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+-
+Bug fixes:
+~~~~~~~~~~
+- No need to pass 'rpath' in info dictionary to notifyEvent method, as event
+  service tool's 'notify' method will do that itself.
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+
+*******************************************
 ** CPSRemoteController V1.6.2 [R1 build 2005/12/10-22:40 by alienoid]
 ** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 30473
 Requires:
