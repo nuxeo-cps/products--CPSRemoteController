@@ -6,7 +6,8 @@ New features:
 -
 Bug fixes:
 ~~~~~~~~~~
--
+- unpublishDocumentsInSection was failing if section contained pending
+  documents. Now pending documents are rejected with comment.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -

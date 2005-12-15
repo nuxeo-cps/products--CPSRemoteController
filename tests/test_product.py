@@ -264,7 +264,8 @@ class ProductTestCase(CPSRemoteControllerTestCase):
 
 
     def testUnpublishDocumentsInSection(self):
-        wftool = self.portal.portal_workflow
+        portal = self.portal
+        wftool = portal.portal_workflow
         rctool = self.tool
         folder_rpath = 'workspaces'
         sections_rpath = 'sections'
@@ -272,13 +273,13 @@ class ProductTestCase(CPSRemoteControllerTestCase):
                      'Description': "Another boring report",
                      }
         doc1_rpath = rctool.createDocument('File', data_dict, folder_rpath, 0)
-        doc1 = self.portal.restrictedTraverse(doc1_rpath)
+        doc1 = portal.restrictedTraverse(doc1_rpath)
 
         data_dict = {'Title': "Climate warning!",
                      'Description': "Consumers should make the difference",
                      }
         doc2_rpath = rctool.createDocument('File', data_dict, folder_rpath, 0)
-        doc2 = self.portal.restrictedTraverse(doc2_rpath)
+        doc2 = portal.restrictedTraverse(doc2_rpath)
 
         rctool.publishDocument(doc1_rpath, {'sections': ''})
         rctool.publishDocument(doc2_rpath, {'sections': ''})
@@ -286,6 +287,8 @@ class ProductTestCase(CPSRemoteControllerTestCase):
         # check that method unpublishes documents only in Sections
         self.assertRaises(TypeError,
                           rctool.unpublishDocumentsInSection, 'workspaces')
+
+        self.assertEqual(len(portal.sections.contentValues()), 2)
 
         # check that documents in workspaces get 'unpublish' action recorded
         # into their workflow history after we made call to unpublish all
@@ -302,6 +305,46 @@ class ProductTestCase(CPSRemoteControllerTestCase):
                            if event.get('action') == 'unpublish']
             self.assert_(unpublished)
 
+        self.assertEqual(len(portal.sections.contentValues()), 0)
+
+    def testUnpublishDocumentsInSectionWithSubmittedDocument(self):
+        portal = self.portal
+        wftool = portal.portal_workflow
+        rctool = self.tool
+        folder_rpath = 'workspaces'
+        sections_rpath = 'sections'
+        data_dict = {'Title': 'doc1',
+                     'Description': 'Another boring report',
+                     }
+        doc1_rpath = rctool.createDocument('File', data_dict, folder_rpath, 0)
+
+        data_dict = {'Title': 'doc2',
+                     'Description': 'Consumers should make the difference',
+                     }
+        doc2_rpath = rctool.createDocument('File', data_dict, folder_rpath, 0)
+        doc2 = portal.restrictedTraverse(doc2_rpath)
+
+        # publish
+        rctool.publishDocument(doc1_rpath, {'sections': ''})
+        # submit
+        rctool.publishDocument(doc2_rpath, {'sections': ''},
+                               wait_for_approval=True)
+        doc1_sec = portal.restrictedTraverse('sections/doc1')
+        doc2_sec = portal.restrictedTraverse('sections/doc2')
+
+        self.assertEqual(len(portal.sections.contentValues()), 2)
+        self.assertEqual(wftool.getInfoFor(doc1_sec, 'review_state', None),
+                         'published')
+        self.assertEqual(wftool.getInfoFor(doc2_sec, 'review_state', None),
+                         'pending')
+        rctool.unpublishDocumentsInSection('sections')
+        self.assertEqual(len(portal.sections.contentValues()), 0)
+
+        wfevents = wftool.getFullHistoryOf(doc2)
+        reject_events = [event for event in wfevents
+                         if event.get('action') == 'reject']
+        comment = reject_events[0]['comments']
+        self.assertEqual(comment, 'rejected due to section emptying')
 
     def testGetDocumentArchivedRevisionsInfo(self):
         wftool = self.portal.portal_workflow

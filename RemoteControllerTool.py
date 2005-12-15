@@ -637,14 +637,19 @@ class RemoteControllerTool(UniqueObject, Folder):
             LOG(glog_key, DEBUG, '%s is not Section' % rpath)
             raise TypeError(rpath + ' is not Section')
         section = proxy
-        workflow_action = 'unpublish'
 
         for obj in section.contentValues():
             allowed_transitions = wftool.getAllowedPublishingTransitions(obj)
             log_msg = 'Unpublishing %s,  allowed_transitions = %s' \
                       % (utool.getRelativeUrl(obj), str(allowed_transitions))
             LOG(glog_key, DEBUG, log_msg)
-            wftool.doActionFor(obj, workflow_action)
+
+            if wftool.getInfoFor(obj, 'review_state', None) == 'pending':
+                # we can't unpublish pending document
+                wftool.doActionFor(obj, 'reject',
+                                   comment='rejected due to section emptying')
+            else:
+                wftool.doActionFor(obj, 'unpublish')
 
     security.declareProtected(View, 'changeDocumentPosition')
     def changeDocumentPosition(self, rpath, step):
