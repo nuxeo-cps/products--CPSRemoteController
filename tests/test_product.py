@@ -472,6 +472,41 @@ class ProductTestCase(CPSRemoteControllerTestCase):
         self.assert_(len(tree), 1)
         self.assertEquals(tree[0]['id'], 'sections')
 
+    def testGetPublishedOrPendingDocuments(self):
+        portal = self.portal
+        rctool = self.tool
+        wftool = getToolByName(portal, 'portal_workflow')
+        utool = getToolByName(portal, 'portal_url')
+
+        kw = {'Title': 'Title',
+              'Description': 'Description',
+              }
+        wftool.invokeFactoryFor(portal.sections, 'Section', 'test', **kw)
+        s1 = getattr(portal.sections, 'test')
+
+        section_rpath = utool.getRelativeUrl(portal.sections)
+        s1_rpath = utool.getRelativeUrl(s1)
+
+        wftool.invokeFactoryFor(portal.workspaces, 'Document', 'doc', **kw)
+        ws_doc = getattr(portal.workspaces, 'doc')
+
+        # publish to 'sections'
+        wftool.doActionFor(ws_doc, 'copy_submit',
+                           dest_container=section_rpath,
+                           initial_transition='publish')
+        # submit to 'sections/test'
+        wftool.doActionFor(ws_doc, 'copy_submit',
+                           dest_container=s1,
+                           initial_transition='submit')
+
+        rpaths = rctool.getPublishedOrPendingDocuments('workspaces/doc')
+        self.assertEqual(len(rpaths), 2)
+        results = (('sections/test/doc', 'pending'),
+                   ('sections/doc', 'published'),
+                   )
+        for rpath, review_state in rpaths:
+            self.assert_((rpath, review_state) in results)
+
 def test_suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(ProductTestCase))

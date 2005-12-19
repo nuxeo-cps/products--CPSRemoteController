@@ -1003,6 +1003,22 @@ class RemoteControllerTool(UniqueObject, Folder):
         """
         return self._getOriginalOrPublishedDocuments(rpath)
 
+    security.declareProtected(View, 'getPublishedOrPendingDocuments')
+    def getPublishedOrPendingDocuments(self, rpath):
+        """Return a list of tuples (new_rpath, review_state) representing
+        review state(published or pending) and relative path of documents
+        which are publications or submissions of the document specified by
+        the given relative path.
+
+        rpath is of the form 'workspaces/doc1'.
+        """
+        rpaths = []
+        wf_events = self.getDocumentHistory(rpath)
+        for wf_event in wf_events:
+            review_state = wf_event['review_state']
+            if review_state == 'published' or review_state == 'pending':
+                rpaths.append((wf_event['rpath'], review_state))
+        return rpaths
 
     security.declareProtected(ManageUsers, 'addMember')
     def addMember(self, userId, userPassword, userRoles=None, email='',
