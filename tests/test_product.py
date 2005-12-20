@@ -219,6 +219,43 @@ class ProductTestCase(CPSRemoteControllerTestCase):
         self.assertEquals(len(proxy_list3) + 1, len(proxy_list4))
 
 
+    def testEditOrCreateDocumentUnsupposedBehavior(self):
+        # Check that if we want to create Document in workspace and pass as
+        # 'rpath', for example, 'workspaces/test' path, document will be
+        # created in one level up - i.e. in 'workspaces'
+        # This may be considered as inconsistent behaviour and require changes
+        # to 'editOrCreateDocument' method.
+        portal = self.portal
+        rctool = self.tool
+        wftool = getToolByName(portal, 'portal_workflow')
+        kw = {'Title': 'Title',
+              'Description': 'Description',
+              }
+        wftool.invokeFactoryFor(portal.workspaces, 'Workspace', 'test', **kw)
+        ws1 = getattr(portal.workspaces, 'test')
+
+        # we want to create document under 'workspaces/test'.
+        # to create it really there we need append bogus document id to rpath,
+        # like 'workspaces/test/doc1', that will be never actually used, as id
+        # will be generated from Title in doc_def.
+        doc_def = {'Title': 'doctitle',
+                   'Description': 'docdescription',
+                   }
+        rpath = rctool.editOrCreateDocument('workspaces/test',
+                                            'Document', doc_def)
+
+        # document was not created under 'workspaces/test'
+        self.failIf(ws1.contentValues())
+
+        # but under 'workspaces'
+        self.assert_('doctitle' in portal.workspaces.objectIds())
+
+        proxy = getattr(portal.workspaces, 'doctitle')
+        doc = proxy.getContent()
+        self.assertEqual(doc.Title(), doc_def['Title'])
+        self.assertEqual(doc.Description(), doc_def['Description'])
+
+
     def testPublishApproveUnpublishDocument(self):
         folder_rpath = 'workspaces'
         sections_rpath = 'sections'
