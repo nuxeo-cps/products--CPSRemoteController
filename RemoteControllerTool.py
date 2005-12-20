@@ -1012,13 +1012,29 @@ class RemoteControllerTool(UniqueObject, Folder):
 
         rpath is of the form 'workspaces/doc1'.
         """
-        rpaths = []
-        wf_events = self.getDocumentHistory(rpath)
-        for wf_event in wf_events:
-            review_state = wf_event['review_state']
-            if review_state == 'published' or review_state == 'pending':
-                rpaths.append((wf_event['rpath'], review_state))
-        return rpaths
+        portal = self.portal
+        rpaths_info = []
+        proxy = self._restrictedTraverse(rpath)
+        if not _checkPermission(View, proxy):
+            raise Unauthorized("You need the View permission.")
+
+        wtool = getToolByName(portal, 'portal_workflow')
+        ptool = getToolByName(portal, 'portal_proxies')
+
+        wf_vars = ['review_state']
+        docid = proxy.getDocid()
+        if docid:
+            proxies_info = ptool.getProxyInfosFromDocid(docid,
+                                                        workflow_vars=wf_vars)
+            for proxy_info in proxies_info:
+                review_state = proxy_info['review_state']
+                if review_state == 'published' or review_state == 'pending':
+                    rpaths_info.append((proxy_info['rpath'], review_state))
+        else:
+            LOG(glog_key, DEBUG,
+                'getPublishedOrPendingDocuments - could not get docid for %s' \
+                % rpath)
+        return rpaths_info
 
     security.declareProtected(ManageUsers, 'addMember')
     def addMember(self, userId, userPassword, userRoles=None, email='',

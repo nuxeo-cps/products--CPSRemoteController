@@ -528,9 +528,12 @@ class ProductTestCase(CPSRemoteControllerTestCase):
               }
         wftool.invokeFactoryFor(portal.sections, 'Section', 'test', **kw)
         s1 = getattr(portal.sections, 'test')
+        wftool.invokeFactoryFor(portal.sections, 'Section', 'test1', **kw)
+        s2 = getattr(portal.sections, 'test1')
 
         section_rpath = utool.getRelativeUrl(portal.sections)
         s1_rpath = utool.getRelativeUrl(s1)
+        s2_rpath = utool.getRelativeUrl(s2)
 
         wftool.invokeFactoryFor(portal.workspaces, 'Document', 'doc', **kw)
         ws_doc = getattr(portal.workspaces, 'doc')
@@ -541,17 +544,25 @@ class ProductTestCase(CPSRemoteControllerTestCase):
                            initial_transition='publish')
         # submit to 'sections/test'
         wftool.doActionFor(ws_doc, 'copy_submit',
-                           dest_container=s1,
+                           dest_container=s1_rpath,
                            initial_transition='submit')
+        # publish to 'sections/test1'
+        wftool.doActionFor(ws_doc, 'copy_submit',
+                           dest_container=s2_rpath,
+                           initial_transition='publish')
+        # unpublish 'sections/test1/doc'
+        sec_doc = portal.restrictedTraverse('sections/test1/doc')
+        wftool.doActionFor(sec_doc, 'unpublish')
 
         rpaths = rctool.getPublishedOrPendingDocuments('workspaces/doc')
+        # check that we get only existing documents, and not all 'pending'
+        # or 'published' items from workflow history
         self.assertEqual(len(rpaths), 2)
         results = (('sections/test/doc', 'pending'),
                    ('sections/doc', 'published'),
                    )
         for rpath, review_state in rpaths:
             self.assert_((rpath, review_state) in results)
-
 
     def testChangeDocumentPosition(self):
         portal = self.portal
