@@ -20,15 +20,23 @@
 # $Id$
 
 import os
-
-from zLOG import LOG, TRACE, DEBUG, INFO, PROBLEM, ERROR
-
 import unittest
 
+from zLOG import LOG, TRACE, DEBUG, INFO, PROBLEM, ERROR
 from CPSRemoteControllerTestCase import CPSRemoteControllerTestCase
 from Products.CPSDefault.tests.CPSTestCase import MANAGER_ID
 from Products.CMFCore.utils import getToolByName
+from Products.CPSCore.EventServiceTool import getEventService
+from Products.CPSRemoteController.RemoteControllerTool import \
+     EVENT_CHANGE_DOCUMENT_POSITION
+from OFS.Folder import Folder
 from AccessControl import Unauthorized
+
+class DummySubscriber(Folder):
+    def notify_event(self, event_type, obj, info):
+        self.event_type = event_type
+        self.obj = obj
+        self.info = info
 
 
 class ProductTestCase(CPSRemoteControllerTestCase):
@@ -589,6 +597,57 @@ class ProductTestCase(CPSRemoteControllerTestCase):
         self.assertEqual(new_test_pos, 2)
         self.failIf(new_doc_pos == old_doc_pos)
         self.assertEqual(new_doc_pos, 1)
+
+    def testChangeDocumentPositionSendsEvent(self):
+        portal = self.portal
+        rctool = self.tool
+        wftool = getToolByName(portal, 'portal_workflow')
+        utool = getToolByName(portal, 'portal_url')
+        evtool = getEventService(portal)
+
+        kw = {'Title': 'Title',
+              'Description': 'Description',
+              }
+        wftool.invokeFactoryFor(portal.sections, 'Section', 'test', **kw)
+        s1 = getattr(portal.sections, 'test')
+
+        section_rpath = utool.getRelativeUrl(portal.sections)
+        s1_rpath = utool.getRelativeUrl(s1)
+
+        wftool.invokeFactoryFor(portal.workspaces, 'Document', 'doc', **kw)
+        ws_doc = getattr(portal.workspaces, 'doc')
+
+        # publish to 'sections'
+        wftool.doActionFor(ws_doc, 'copy_submit',
+                           dest_container=section_rpath,
+                           initial_transition='publish')
+        # we have tree:
+        # sections
+        #     test
+        #     doc
+        sections = portal.sections
+        old_test_pos = sections.getObjectPosition('test')
+        step = 1
+
+        subscriber = DummySubscriber('foo')
+        portal._setObject(subscriber.getId(), subscriber)
+
+        evtool.manage_addSubscriber(
+            subscriber=subscriber.getId(),
+            action='event',
+            meta_type='*',
+            event_type='*',
+            notification_type='synchronous',
+            activated=True,
+            )
+
+        rctool.changeDocumentPosition('sections/test', step)
+
+        new_test_pos = sections.getObjectPosition('test')
+        self.assertEqual(subscriber.event_type, EVENT_CHANGE_DOCUMENT_POSITION)
+        self.assertEqual(subscriber.info['rpath'], 'sections/test')
+        self.assertEqual(subscriber.info['position_from'], old_test_pos)
+        self.assertEqual(subscriber.info['position_to'], new_test_pos)
 
 
 def test_suite():
