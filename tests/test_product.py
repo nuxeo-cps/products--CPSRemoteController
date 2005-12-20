@@ -544,6 +544,53 @@ class ProductTestCase(CPSRemoteControllerTestCase):
         for rpath, review_state in rpaths:
             self.assert_((rpath, review_state) in results)
 
+
+    def testChangeDocumentPosition(self):
+        portal = self.portal
+        rctool = self.tool
+        wftool = getToolByName(portal, 'portal_workflow')
+        utool = getToolByName(portal, 'portal_url')
+
+        kw = {'Title': 'Title',
+              'Description': 'Description',
+              }
+        wftool.invokeFactoryFor(portal.sections, 'Section', 'test', **kw)
+        s1 = getattr(portal.sections, 'test')
+
+        section_rpath = utool.getRelativeUrl(portal.sections)
+        s1_rpath = utool.getRelativeUrl(s1)
+
+        wftool.invokeFactoryFor(portal.workspaces, 'Document', 'doc', **kw)
+        ws_doc = getattr(portal.workspaces, 'doc')
+
+        # publish to 'sections'
+        wftool.doActionFor(ws_doc, 'copy_submit',
+                           dest_container=section_rpath,
+                           initial_transition='publish')
+        # we have tree:
+        # sections
+        #     test
+        #     doc
+        sections = portal.sections
+        old_test_pos = sections.getObjectPosition('test')
+        old_doc_pos = sections.getObjectPosition('doc')
+        step = 1
+
+        # sections.objectIds()->['.cps_workflow_configuration', 'test', 'doc']
+        # check that 'test' has first position and 'doc' is second
+        self.assertEqual(old_test_pos, 1)
+        self.assertEqual(old_doc_pos, 2)
+
+        rctool.changeDocumentPosition('sections/test', step)
+
+        new_test_pos = sections.getObjectPosition('test')
+        new_doc_pos = sections.getObjectPosition('doc')
+        self.failIf(new_test_pos == old_test_pos)
+        self.assertEqual(new_test_pos, 2)
+        self.failIf(new_doc_pos == old_doc_pos)
+        self.assertEqual(new_doc_pos, 1)
+
+
 def test_suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(ProductTestCase))
