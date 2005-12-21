@@ -688,6 +688,52 @@ class ProductTestCase(CPSRemoteControllerTestCase):
         self.assertEqual(doc.Description(), doc_def['Description'])
 
 
+    def testGetPublishedDocuments(self):
+        portal = self.portal
+        rctool = self.tool
+        wftool = getToolByName(portal, 'portal_workflow')
+        utool = getToolByName(portal, 'portal_url')
+
+        kw = {'Title': 'Title',
+              'Description': 'Description',
+              }
+        wftool.invokeFactoryFor(portal.sections, 'Section', 'test', **kw)
+        s1 = getattr(portal.sections, 'test')
+        wftool.invokeFactoryFor(portal.sections, 'Section', 'test1', **kw)
+        s2 = getattr(portal.sections, 'test1')
+
+        section_rpath = utool.getRelativeUrl(portal.sections)
+        s1_rpath = utool.getRelativeUrl(s1)
+        s2_rpath = utool.getRelativeUrl(s2)
+
+        wftool.invokeFactoryFor(portal.workspaces, 'Document', 'doc', **kw)
+        ws_doc = getattr(portal.workspaces, 'doc')
+        # publish to 'sections'
+        wftool.doActionFor(ws_doc, 'copy_submit',
+                           dest_container=section_rpath,
+                           initial_transition='publish')
+        # submit to 'sections/test'
+        wftool.doActionFor(ws_doc, 'copy_submit',
+                           dest_container=s1_rpath,
+                           initial_transition='submit')
+        # publish to 'sections/test1'
+        wftool.doActionFor(ws_doc, 'copy_submit',
+                           dest_container=s2_rpath,
+                           initial_transition='publish')
+        # unpublish 'sections/test1/doc'
+        sec_doc = portal.restrictedTraverse('sections/test1/doc')
+        wftool.doActionFor(sec_doc, 'unpublish')
+
+        rpaths = rctool.getPublishedDocuments('workspaces/doc')
+
+        # check that we get only existing documents, and not all 'published'
+        # items from workflow history
+        self.assertEqual(len(rpaths), 1)
+        results = ['sections/doc']
+        for rpath in rpaths:
+            self.assert_(rpath in results)
+
+
 def test_suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(ProductTestCase))
