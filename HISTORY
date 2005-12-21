@@ -1,4 +1,20 @@
 *******************************************
+** CPSRemoteController V1.7.0 [R1 build 2005/12/21-15:34 by alienoid]
+** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 30870
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+- Added new method 'getPublishedOrPendingDocuments'.
+Bug fixes:
+~~~~~~~~~~
+-
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+
+*******************************************
 ** CPSRemoteController V1.6.4 [R1 build 2005/12/15-02:48 by alienoid]
 ** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 30666
 Requires:
