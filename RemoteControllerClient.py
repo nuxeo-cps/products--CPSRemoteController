@@ -279,7 +279,7 @@ class CPSRemoteControllerClient(UniqueObject, Folder):
         self.setActiveServer(name)
         try:
             psm = '%s says: CPSRemoteController v.%s | STATUS OK' % \
-                (name, self._rclient.getVersion())
+                (name, self._rclient.getProductVersion('CPSRemoteController'))
         except (socket.gaierror, socket.error), e:
             psm = '%s says: %s' % (name, str(e))
         except IOError, e:

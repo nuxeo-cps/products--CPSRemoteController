@@ -44,7 +44,6 @@ from Acquisition import aq_parent, aq_inner, aq_base
 from OFS.Image import File
 from zLOG import LOG, TRACE, DEBUG, ERROR, PROBLEM
 from DateTime.DateTime import DateTimeError
-from Products.CPSRemoteController import __file__ as landmark
 from Products.CPSRemoteController.utils import unMarshallDocument
 
 glog_key = 'RemoteControllerTool'
@@ -117,25 +116,6 @@ class RemoteControllerTool(UniqueObject, Folder):
             ret = 'Invalid'
 
         return ret
-
-    security.declareProtected(View, 'getVersion')
-    def getVersion(self):
-        """ returns the version number """
-        version_filename = os.path.join(os.path.dirname(landmark), 'VERSION')
-        if os.path.exists(version_filename):
-            version_file = open(version_filename, 'r')
-            try:
-                for line in version_file.readlines():
-                    if line.startswith('PKG_VERSION='):
-                        line = line.split('=')
-                        if len(line) > 1:
-                            return line[1].strip()
-                        break
-            finally:
-                version_file.close()
-            return 'Unknown'
-        else:
-            return 'Unknown'
 
     security.declareProtected(View, 'getRoles')
     def getRoles(self, username):
