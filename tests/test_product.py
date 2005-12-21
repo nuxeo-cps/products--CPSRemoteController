@@ -661,6 +661,33 @@ class ProductTestCase(CPSRemoteControllerTestCase):
         self.assertEqual(subscriber.info['position_to'], new_test_pos)
 
 
+    def testEditDocument(self):
+        portal = self.portal
+        workspaces = portal.workspaces
+        wftool = getToolByName(portal, 'portal_workflow')
+        utool = getToolByName(portal, 'portal_url')
+        rctool = self.tool
+
+        folder_rpath = 'workspaces'
+        data_kw = {'Title': 'title',
+                   'Description': 'description',
+                   }
+        wftool.invokeFactoryFor(workspaces, 'File', 'testfile', **data_kw)
+        proxy = getattr(workspaces, 'testfile')
+        doc = proxy.getContent()
+        rpath = utool.getRelativeUrl(proxy)
+        self.assertEqual(doc.Title(), data_kw['Title'])
+        self.assertEqual(doc.Description(), data_kw['Description'])
+
+        doc_def = {'Title': 'newtitle',
+                   'Description': 'newdescription',
+                   }
+        rctool.editDocument(rpath, doc_def)
+
+        self.assertEqual(doc.Title(), doc_def['Title'])
+        self.assertEqual(doc.Description(), doc_def['Description'])
+
+
 def test_suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(ProductTestCase))
