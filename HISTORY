@@ -1,4 +1,21 @@
 *******************************************
+** CPSRemoteController V1.7.1 [R1 build 2005/12/21-18:07 by alienoid]
+** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 30885
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+-
+Bug fixes:
+~~~~~~~~~~
+- Bug fix, use _getPortalObject to get portal object in
+  getPublishedOrPendingDocuments method.
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+
+*******************************************
 ** CPSRemoteController V1.7.0 [R1 build 2005/12/21-15:34 by alienoid]
 ** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 30870
 Requires:
