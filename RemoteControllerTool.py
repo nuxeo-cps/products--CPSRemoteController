@@ -992,12 +992,12 @@ class RemoteControllerTool(UniqueObject, Folder):
 
         rpath is of the form 'workspaces/doc1'.
         """
-        portal = self.portal
-        rpaths_info = []
         proxy = self._restrictedTraverse(rpath)
         if not _checkPermission(View, proxy):
             raise Unauthorized("You need the View permission.")
 
+        portal = self._getPortalObject()
+        rpaths_info = []
         wtool = getToolByName(portal, 'portal_workflow')
         ptool = getToolByName(portal, 'portal_proxies')
 

@@ -6,7 +6,8 @@ New features:
 -
 Bug fixes:
 ~~~~~~~~~~
--
+- Bug fix, use _getPortalObject to get portal object in
+  getPublishedOrPendingDocuments method.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -
