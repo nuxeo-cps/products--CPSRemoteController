@@ -3,7 +3,8 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
--
+- Added getDocumentLocksInfo method to return some information about
+  document's locks(if any) like lock owner and lock token.
 Bug fixes:
 ~~~~~~~~~~
 -

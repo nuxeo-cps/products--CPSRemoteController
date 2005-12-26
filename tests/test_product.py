@@ -31,6 +31,7 @@ from Products.CPSRemoteController.RemoteControllerTool import \
      EVENT_CHANGE_DOCUMENT_POSITION
 from OFS.Folder import Folder
 from AccessControl import Unauthorized
+from webdav.LockItem import LockItem
 
 class DummySubscriber(Folder):
     def notify_event(self, event_type, obj, info):
@@ -732,6 +733,43 @@ class ProductTestCase(CPSRemoteControllerTestCase):
         results = ['sections/doc']
         for rpath in rpaths:
             self.assert_(rpath in results)
+
+
+    def testGetDocumentLocksInfo(self):
+        portal = self.portal
+        rctool = self.tool
+        wftool = getToolByName(portal, 'portal_workflow')
+        utool = getToolByName(portal, 'portal_url')
+        mtool = getToolByName(portal, 'portal_membership')
+
+        kw = {'Title': 'Title',
+              'Description': 'Description',
+              }
+        wftool.invokeFactoryFor(portal.workspaces, 'Document', 'doc', **kw)
+        ws_doc = getattr(portal.workspaces, 'doc')
+        ws_doc_rpath = utool.getRelativeUrl(ws_doc)
+
+        member = portal.portal_membership.getAuthenticatedMember()
+        user = member.getUser()
+
+        lock_timeout = 'Seconds-120'
+
+        lock1 = LockItem(user, user, timeout=lock_timeout)
+        lock_token1 = lock1.getLockToken()
+        ws_doc.wl_setLock(lock_token1, lock1)
+
+        lock2 = LockItem(user, user, timeout=lock_timeout)
+        lock_token2 = lock2.getLockToken()
+        ws_doc.wl_setLock(lock_token2, lock2)
+
+        locks_info = rctool.getDocumentLocksInfo(ws_doc_rpath)
+        self.assertEqual(len(locks_info), 2)
+
+        results = [(lock1.getOwner(), lock_token1),
+                   (lock2.getOwner(), lock_token2),
+                   ]
+        for lock_owner, lock_token in locks_info:
+            self.assert_((lock_owner, lock_token) in results)
 
 
 def test_suite():

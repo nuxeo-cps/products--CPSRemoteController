@@ -346,6 +346,22 @@ class RemoteControllerTool(UniqueObject, Folder):
         proxy = self._restrictedTraverse(rpath)
         return proxy.wl_isLocked()
 
+    security.declareProtected(View, 'getDocumentLocksInfo')
+    def getDocumentLocksInfo(self, rpath):
+        """Return information about locks on document at passed 'rpath'.
+
+        Returns list of tuples (lock_owner, lock_token) or empty list if there
+        are no locks available on the document.
+        """
+        proxy = self._restrictedTraverse(rpath)
+        if not _checkPermission(View, proxy):
+            raise Unauthorized(
+                'You need View permission for proxy at %s.' % rpath)
+        locks_info = []
+        for lock_token, lock in proxy.wl_lockItems():
+            locks_info.append((lock.getOwner(), lock_token))
+        return locks_info
+
     security.declareProtected(View, 'lockDocument')
     def lockDocument(self, rpath, timeout=None):
         """Lock the document and return the associated lock token or False if
