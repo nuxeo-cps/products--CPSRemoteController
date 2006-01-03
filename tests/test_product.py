@@ -492,8 +492,7 @@ class ProductTestCase(CPSRemoteControllerTestCase):
         user = mtool.getMemberById(userid)
         self.failUnless((user is None))
 
-    def test_getProductVersion(self):
-        from CPSUtil.integration import ProductError
+    def testGetProductVersion(self):
         self.assert_(self.tool.getProductVersion('CPSUtil'))
         self.assert_(self.tool.getProductVersion('CPSRemoteController'))
 
