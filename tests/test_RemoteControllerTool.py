@@ -516,6 +516,7 @@ class ProductTestCase(CPSRemoteControllerTestCase):
         tree = self.tool.getSectionsTree()
         self.assert_(len(tree), 1)
         self.assertEquals(tree[0]['id'], 'sections')
+        self.assertEquals(tree[0]['roles'], [])
 
     def testGetPublishedOrPendingDocuments(self):
         portal = self.portal

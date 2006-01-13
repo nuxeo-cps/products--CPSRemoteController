@@ -1149,7 +1149,18 @@ class RemoteControllerTool(UniqueObject, Folder):
     def getSectionsTree(self):
         """ returns current Section trees, used for distant publication """
         portal = self._getPortalObject()
-        return portal.sections.getSectionsTree()
+
+        pm = getToolByName(self, 'portal_membership')
+        current_user = pm.getAuthenticatedMember()
+        sections = portal.sections.getSectionsTree()
+
+        # adding user's roles on each section,
+        # to retrieve all infos in *one* rpc cal
+        for section in sections:
+            roles = self.getLocalRoles(current_user.getId(), section['rpath'])
+            section['roles'] = roles
+
+        return sections
 
 InitializeClass(RemoteControllerTool)
 
