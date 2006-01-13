@@ -1163,8 +1163,7 @@ class RemoteControllerTool(UniqueObject, Folder):
                 continue
             sections.extend(ptree[root_uid].getList(
                 locale_keys=('title', 'short_title'),
-                locale_lang=locale,
-                filter=False))
+                locale_lang=locale))
 
         res = []
         for section in sections:
