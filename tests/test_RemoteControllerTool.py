@@ -513,10 +513,10 @@ class ProductTestCase(CPSRemoteControllerTestCase):
         self.failIf(doc_rpath in proxy_list3)
 
     def testgetSectionsTree(self):
-        tree = self.tool.getSectionsTree('workspaces', 'link')
+        tree = self.tool.getSectionsTree()
         self.assert_(len(tree), 1)
         self.assertEquals(tree[0]['id'], 'sections')
-        self.assertEquals(tree[0]['publishing_transitions'], [])
+        self.assertEquals(tree[0]['can_publish'], True)
 
     def testGetPublishedOrPendingDocuments(self):
         portal = self.portal
