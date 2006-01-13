@@ -34,7 +34,7 @@ from AccessControl.SecurityManagement import newSecurityManager
 from Products.CMFCore.WorkflowCore import WorkflowException
 from Products.CMFCore.permissions import ManagePortal, ChangePermissions, \
      AddPortalContent, ModifyPortalContent, DeleteObjects, View, \
-     ManageUsers
+     ManageUsers, ReviewPortalContent
 from Products.CPSCore.CPSMembershipTool import CPSUnrestrictedUser
 from Products.CPSCore.permissions import ChangeSubobjectsOrder
 from Products.CPSCore.permissions import ViewArchivedRevisions
@@ -1147,20 +1147,33 @@ class RemoteControllerTool(UniqueObject, Folder):
 
     security.declareProtected(View, 'getSectionsTree')
     def getSectionsTree(self):
-        """ returns current Section trees, used for distant publication """
+        """ simulates getSectionsTree for a distant document. wich means how
+        it would look on the current server if the document was asking
+        for a publication from the 'rpath' folderish object """
+
         portal = self._getPortalObject()
+        sections_roots = portal.getSectionsRoots()
+        locale = getToolByName(self, 'translation_service').getSelectedLanguage()
+        ptree = getToolByName(self, 'portal_trees')
+        available_roots = ptree.objectIds()
+        sections = []
 
-        pm = getToolByName(self, 'portal_membership')
-        current_user = pm.getAuthenticatedMember()
-        sections = portal.sections.getSectionsTree()
+        for root_uid in sections_roots:
+            if not root_uid in available_roots:
+                continue
+            sections.extend(ptree[root_uid].getList(
+                locale_keys=('title', 'short_title'),
+                locale_lang=locale,
+                filter=False))
 
-        # adding user's roles on each section,
-        # to retrieve all infos in *one* rpc cal
+        res = []
         for section in sections:
-            roles = self.getLocalRoles(current_user.getId(), section['rpath'])
-            section['roles'] = roles
+            section['can_publish'] = self.checkPermission(section['rpath'],
+                                                          ReviewPortalContent)
+            section['can_submit'] = True
+            res.append(section)
 
-        return sections
+        return res
 
 InitializeClass(RemoteControllerTool)
 
