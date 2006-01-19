@@ -71,7 +71,7 @@ class ProductTestCase(CPSRemoteControllerTestCase):
 
     def testGetRoles(self):
         roles = self.tool.getRoles(MANAGER_ID)
-        self.assert_(isinstance(roles, list) or sinstance(roles, tuple))
+        self.assert_(isinstance(roles, list) or isinstance(roles, tuple))
         # check anonymous access
         self.logout()
         self.assertRaises(Unauthorized, self.tool.getRoles, MANAGER_ID)
