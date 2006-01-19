@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<import-steps>
+ <import-step id="remote_controller" version="20060119-01"
+              handler="Products.CPSRemoteController.exportimport.importRemoteControllerTool"
+              title="RemoteController Tool">
+  <dependency step="toolset"/>
+  Import remote controller tool.
+ </import-step>
+</import-steps>

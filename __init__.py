@@ -1,5 +1,5 @@
-# (C) Copyright 2005 Nuxeo SARL <http://nuxeo.com>
-# Author:
+# (C) Copyright 2005-2006 Nuxeo SAS <http://nuxeo.com>
+# Authors:
 # M.-A. Darche <madarche@nuxeo.com>
 #
 # This program is free software; you can redistribute it and/or modify
@@ -19,6 +19,11 @@
 # $Id$
 
 from zLOG import LOG, INFO
+
+from Products.GenericSetup import profile_registry
+from Products.GenericSetup import EXTENSION
+
+from Products.CPSCore.interfaces import ICPSSite
 
 import RemoteControllerTool
 import RemoteControllerClient
@@ -52,3 +57,15 @@ def initialize(registrar):
             product_name='CPSRemoteController', # BBB
             icon='tool.png',
             ).initialize(registrar)
+
+    # Registering the default profile
+    profile_registry.registerProfile(
+        'default',
+        'CPS RemoteController',
+        "Remote control product for CPS.",
+        'profiles/default',
+        'CPSRemoteController',
+        EXTENSION,
+        for_=ICPSSite)
+
+

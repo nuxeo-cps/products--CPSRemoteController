@@ -1,4 +1,4 @@
-# (C) Copyright 2005 Nuxeo SARL <http://nuxeo.com>
+# (C) Copyright 2005-2006 Nuxeo SAS <http://nuxeo.com>
 # Authors:
 # M.-A. Darche <madarche@nuxeo.com>
 # Ruslan Spivak <rspivak@nuxeo.com>
@@ -24,27 +24,34 @@
 
 import os.path
 from xmlrpclib import Binary
-from webdav.LockItem import LockItem
-from Products.CPSCore.EventServiceTool import getEventService
-from Products.CPSUtil.id import generateFileName
-from Products.CPSUtil.integration import getProductVersion
+
+from zope.interface import implements
+from zLOG import LOG, TRACE, DEBUG, ERROR, PROBLEM
 from Globals import InitializeClass
-from AccessControl import ClassSecurityInfo, Unauthorized
+from OFS.Folder import Folder
+from Acquisition import aq_parent, aq_inner, aq_base
+from OFS.Image import File
+from DateTime.DateTime import DateTimeError
 from AccessControl.SecurityManagement import newSecurityManager
+from AccessControl import ClassSecurityInfo, Unauthorized
+from webdav.LockItem import LockItem
+
 from Products.CMFCore.WorkflowCore import WorkflowException
 from Products.CMFCore.permissions import ManagePortal, ChangePermissions, \
      AddPortalContent, ModifyPortalContent, DeleteObjects, View, \
      ManageUsers, ReviewPortalContent
+from Products.CMFCore.utils import UniqueObject, getToolByName, _checkPermission
+
 from Products.CPSCore.CPSMembershipTool import CPSUnrestrictedUser
 from Products.CPSCore.permissions import ChangeSubobjectsOrder
 from Products.CPSCore.permissions import ViewArchivedRevisions
-from Products.CMFCore.utils import UniqueObject, getToolByName, _checkPermission
-from OFS.Folder import Folder
-from Acquisition import aq_parent, aq_inner, aq_base
-from OFS.Image import File
-from zLOG import LOG, TRACE, DEBUG, ERROR, PROBLEM
-from DateTime.DateTime import DateTimeError
+
+from Products.CPSCore.EventServiceTool import getEventService
+from Products.CPSUtil.id import generateFileName
+from Products.CPSUtil.integration import getProductVersion
+
 from Products.CPSRemoteController.utils import unMarshallDocument
+from Products.CPSRemoteController.interfaces import IRemoteControllerTool
 
 glog_key = 'RemoteControllerTool'
 
@@ -74,6 +81,7 @@ class RemoteControllerTool(UniqueObject, Folder):
     ['cps/workspaces/folder1', 'cps/workspaces/folder1/folder11', 'cps/workspaces/folder1/other_file']
     >>>
     """
+    implements(IRemoteControllerTool)
 
     id = 'portal_remote_controller'
     meta_type = 'CPS Remote Controller Tool'
