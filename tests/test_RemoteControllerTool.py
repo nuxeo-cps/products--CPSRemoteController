@@ -98,11 +98,7 @@ class ProductTestCase(CPSRemoteControllerTestCase):
         workspaces.invokeFactory('Workspace', 'ws1')
         workspaces.invokeFactory('Workspace', 'ws2')
         rpaths = self.tool.listContent('workspaces')
-        self.assertEquals(rpaths,
-                          ['workspaces/members',
-                           'workspaces/ws1',
-                           'workspaces/ws2',
-                           ])
+        self.assertEquals(rpaths, ['workspaces/ws1', 'workspaces/ws2',])
 
 
     def testCreateAndDeleteDocument(self):
