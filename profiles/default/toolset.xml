@@ -2,4 +2,6 @@
 <tool-setup>
  <required tool_id="portal_remote_controller"
            class="Products.CPSRemoteController.RemoteControllerTool.RemoteControllerTool"/>
+ <required tool_id="portal_remote_controller_client"
+           class="Products.CPSRemoteController.RemoteControllerClient.CPSRemoteControllerClient"/>
 </tool-setup>
