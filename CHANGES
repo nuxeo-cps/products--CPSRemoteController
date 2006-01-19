@@ -6,6 +6,7 @@ New features:
 - Added getDocumentLocksInfo method to return some information about
   document's locks(if any) like lock owner and lock token.
 - Added default profile for GenericSetup.
+- Added a Java example for using the RemoteControllerTool.
 Bug fixes:
 ~~~~~~~~~~
 - remote getSectionsTree() is a specific, simpler version to interpret

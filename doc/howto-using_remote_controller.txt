@@ -6,7 +6,7 @@ Understanding and using the CPS Remote Controller
 :address: dkuhlman@rexx.com
     http://www.rexx.com/~dkuhlman
 
-:revision: 1.1a
+:Revision: $Id$
 :date: Sept. 26, 2005
 
 :copyright: (C) Copyright 2005 Nuxeo SARL (http://nuxeo.com).
@@ -26,10 +26,7 @@ Understanding and using the CPS Remote Controller
     includes python scripts, Java programs, etc.) to remotely
     control a CPS site and its content.
 
-.. $Id$
-
 .. sectnum::    :depth: 4
-
 .. contents::   :depth: 4
 
 
@@ -328,6 +325,16 @@ Servers and Clients with Twisted`_.
 
 .. _`Creating XML-RPC Servers and Clients with Twisted`:
     http://twisted.sourceforge.net/TwistedDocs-1.2.0/howto/xmlrpc.html
+
+
+An example built with Java
+--------------------------
+
+A file RemoteControl.java_ using `Apache XML-RPC`_ is
+provided in the doc directory.
+
+.. _RemoteControl.java: RemoteControl.java
+.. _`Apache XML-RPC`: http://ws.apache.org/xmlrpc/
 
 
 Preliminary hints and suggestions
@@ -1452,3 +1459,9 @@ addMember_ and deleteMembers_.
 .. _Twisted: http://twistedmatrix.com/
 
 .. _TwistedWeb: http://twistedmatrix.com/projects/web/
+
+
+.. Local Variables:
+.. mode: rst
+.. End:
+.. vim: set filetype=rst:
