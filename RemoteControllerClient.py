@@ -101,7 +101,7 @@ class RequestDispatcher(object):
 
 class RemoteControllerClient(object):
 
-    def __init__(self, server_proxies={}):
+    def __init__(self, server_proxies=None):
         """ RemoteControllerClient can handle several servers
             _server_proxies is a dictionnary that contains
             n servers that can be called
@@ -112,7 +112,7 @@ class RemoteControllerClient(object):
         ... }
         >>> client = RemoteControllerClient(servers)
         """
-        self._server_proxies = server_proxies
+        self._server_proxies = server_proxies or {}
         self._current_server = None
 
     def setActiveServer(self, name):
@@ -361,7 +361,7 @@ class CPSRemoteControllerClient(UniqueObject, Folder):
         else:
             raise AttributeError()
 
-    def callMethod(self, server_name, method_name, *args,**kw):
+    def callMethod(self, server_name, method_name, *args, **kw):
         """ sets the current server to server_name and call
         the method method_name, with the given args.
         This is made thread-safe to prevent a thread to change
