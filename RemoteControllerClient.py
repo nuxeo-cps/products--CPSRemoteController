@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- encoding: iso-8859-15 -*-
-# Copyright (c) 2005 Nuxeo SARL <http://nuxeo.com>
+# Copyright (c) 2005-2006 Nuxeo SAS <http://nuxeo.com>
 # Author : Tarek Ziadé <tz@nuxeo.com>
 #
 # This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
+#
 # $Id$
 """  Stateless Zope client for CPSRemoteController
 
