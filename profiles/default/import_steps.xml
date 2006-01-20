@@ -4,8 +4,6 @@
               handler="Products.CPSRemoteController.exportimport.importRemoteControllerTool"
               title="RemoteController Tool">
   <dependency step="toolset"/>
-  <dependency step="workflow"/>
-  <dependency step="trees"/>
   Import remote controller tool.
  </import-step>
 </import-steps>
