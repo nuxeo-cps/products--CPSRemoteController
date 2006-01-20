@@ -4,13 +4,8 @@
               handler="Products.CPSRemoteController.exportimport.importRemoteControllerTool"
               title="RemoteController Tool">
   <dependency step="toolset"/>
-  <dependency step="portal_url"/>
-  <dependency step="portal_membership"/>
-  <dependency step="portal_proxies"/>
-  <dependency step="portal_workflow"/>
-  <dependency step="portal_types"/>
-  <dependency step="portal_trees"/>
-  <dependency step="translation_service"/>
+  <dependency step="workflow"/>
+  <dependency step="trees"/>
   Import remote controller tool.
  </import-step>
 </import-steps>
