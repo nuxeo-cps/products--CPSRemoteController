@@ -29,7 +29,7 @@
 """
 from xmlrpclib import SlowParser, Transport, ProtocolError, Unmarshaller, Fault
 import string
-from httplib import HTTP, HTTPS
+from httplib import HTTP
 from base64 import encodestring
 
 # XXX need to use lxml here instead of old expat and marshall things
@@ -100,6 +100,7 @@ class BasicAuthTransport(Transport):
 
     def _getConnector(self, host):
         if self.is_ssl:
+            from httplib import HTTPS
             return HTTPS(host)
         else:
             return HTTP(host)
