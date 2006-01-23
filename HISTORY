@@ -1,4 +1,20 @@
 *******************************************
+** CPSRemoteController V1.8.1 [R1 build 2006/01/23-17:41 by fermigier]
+** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 32078
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+-
+Bug fixes:
+~~~~~~~~~~
+- (Not recorded)
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+
+*******************************************
 ** CPSRemoteController V1.8.0 [R1 build 2006/01/23-17:30 by fermigier]
 ** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 31976
 Requires:
