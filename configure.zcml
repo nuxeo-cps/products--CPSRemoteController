@@ -1,0 +1,11 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope">
+
+  <adapter
+      factory=".exportimport.RemoteControllerToolXMLAdapter"
+      provides="Products.GenericSetup.interfaces.IBody"
+      for=".interfaces.IRemoteControllerTool
+           Products.GenericSetup.interfaces.ISetupEnviron"
+      />
+
+</configure>
