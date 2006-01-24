@@ -19,10 +19,8 @@
 # $Id$
 
 from Testing import ZopeTestCase
-from Products.CPSDefault.tests import CPSTestCase
-
-CPSTestCase.setupPortal(CPSTestCase.CPSInstaller)
+from Products.CPSDefault.tests.CPSTestCase import CPSTestCase
 
 ZopeTestCase.installProduct('CPSRemoteController')
 
-CPSRemoteControllerTestCase = CPSTestCase.CPSTestCase
+CPSRemoteControllerTestCase = CPSTestCase
