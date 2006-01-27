@@ -204,9 +204,10 @@ class RemoteControllerClientTC(BaseClass):
         doc = proxy.getContent()
         doc_def = proxy.getTypeInfo().getDataModel(ob=doc)
         doc_def = doc_def.data
-        doc_def['content'] = 'the content'
+        value = "This is a new description"
+        doc_def['Description'] = value
         rpced_doc = self._document_send(doc_def, proxy.portal_type)
-        self.assertEquals(rpced_doc.getContent().content, 'the content')
+        self.assertEquals(rpced_doc.getContent().Description(), value)
 
     def test_flexibleLayout(self):
         self.ws.invokeFactory('Link', 'link1')
