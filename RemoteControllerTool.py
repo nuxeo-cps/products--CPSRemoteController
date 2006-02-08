@@ -505,6 +505,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         portal = self._getPortalObject()
         portal_ppath = portal.getPhysicalPath()
         wftool = self.portal_workflow
+
         proxy = self._restrictedTraverse(doc_rpath)
         # Why this permission check is not working?
         # Is this permission check neeeded anyway?
@@ -531,7 +532,7 @@ class RemoteControllerTool(UniqueObject, Folder):
             target_doc = None
             try:
                 object = self._restrictedTraverse(target_rpath)
-            except KeyError:
+            except (KeyError, AttributeError):
                 LOG(glog_key, DEBUG, 'publishDocument no object with rpath = %s'
                     % target_rpath)
                 continue
@@ -547,7 +548,7 @@ class RemoteControllerTool(UniqueObject, Folder):
                     target_doc_ppath = target_doc.getPhysicalPath()
                     rppath = target_doc_ppath[len(portal_ppath):]
                     object = self._restrictedTraverse(rppath[:-1])
-                except KeyError:
+                except (KeyError, AttributeError):
                     LOG(glog_key, DEBUG, 'publishDocument no object with rpath = %s'
                         % target_rpath)
                     continue
@@ -883,7 +884,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         try:
             proxy = self._restrictedTraverse(rpath)
             LOG(glog_key, DEBUG, "editOrCreateDocument document DOES exist")
-        except KeyError:
+        except (KeyError, AttributeError):
             proxy = None
             LOG(glog_key, DEBUG, "editOrCreateDocument document does NOT exist")
         if proxy is not None and proxy.portal_type == portal_type:
