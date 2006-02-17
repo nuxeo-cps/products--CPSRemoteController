@@ -6,10 +6,7 @@ New features:
 -
 Bug fixes:
 ~~~~~~~~~~
-- traversals exception can be KeyError and AttributeError (#1382)
-- Fixed unit test that was failing since the "Document" document type has been
-  modified with the side effect of a break in compatibility. Not good.
-- updated tests
+-
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -
