@@ -2,14 +2,12 @@
 Understanding and using the CPS Remote Controller
 =================================================
 
-:author: Dave Kuhlman
-:address: dkuhlman@rexx.com
-    http://www.rexx.com/~dkuhlman
+:Authors: Dave Kuhlman
+    Marc-Aurèle Darche
 
 :Revision: $Id$
-:date: Sept. 26, 2005
 
-:copyright: (C) Copyright 2005 Nuxeo SARL (http://nuxeo.com).
+:Copyright: (C) Copyright 2005-2006 Nuxeo SAS (http://nuxeo.com).
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
     version 2 as published by the Free Software Foundation. This
@@ -21,7 +19,7 @@ Understanding and using the CPS Remote Controller
     this program; if not, write to the Free Software Foundation,
     Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-:abstract: This document describes the CPSRemoteController
+:Abstract: This document describes the CPSRemoteController
     product.  This product enables any XML-RPC clients (which
     includes python scripts, Java programs, etc.) to remotely
     control a CPS site and its content.
@@ -37,13 +35,10 @@ Introducing CPSRemoteController
 Credits
 -------
 
-Thanks to Nuxeo and the developers there for CPSRemoteController_.
-This document would not be possible without that implementation.
-Significant portions of the documentation on individual methods
-was copied from the CPSRemoteController_ module.  Thanks for those
-very helpful comments.  Also, it is likely that any errors in this
-document have been introduced by me and should not be attributed
-to the implementors of CPSRemoteController_.
+.. _Dave Kuhlman: http://www.rexx.com/~dkuhlman
+
+This document has been mainly contributed by `Dave Kuhlman`_:
+`dkuhlman@rexx.com`.
 
 
 What is CPSRemoteController?
@@ -330,11 +325,107 @@ Servers and Clients with Twisted`_.
 An example built with Java
 --------------------------
 
-A file RemoteControl.java_ using `Apache XML-RPC`_ is
-provided in the doc directory.
-
 .. _RemoteControl.java: RemoteControl.java
 .. _`Apache XML-RPC`: http://ws.apache.org/xmlrpc/
+
+For accessing CPS through XML-RPC in Java one can use `Apache XML-RPC`_ Java
+library::
+
+  import java.io.IOException;
+  import java.net.MalformedURLException;
+  import java.net.URL;
+
+  import java.util.List;
+  import java.util.HashMap;
+  import java.util.Vector;
+
+  import org.apache.xmlrpc.XmlRpc;
+  import org.apache.xmlrpc.XmlRpcClient;
+  import org.apache.xmlrpc.XmlRpcException;
+
+  public class RemoteControl {
+
+      private XmlRpcClient client;
+
+      static {
+          XmlRpc.setEncoding("UTF-8");
+      }
+
+      public RemoteControl(String url) throws MalformedURLException {
+          this(new URL(url));
+      }
+
+      public RemoteControl(URL url) {
+          client = new XmlRpcClient(url);
+          client.setBasicAuthentication("manager", "xxx");
+      }
+
+      // ------------------- XMLRPC API -------------------
+
+      public List listContent(String docRelativePath)
+          throws XmlRpcException, IOException {
+              Vector params = new Vector();
+              params.addElement(docRelativePath);
+              System.out.println("Executing RPC method listContent() " + params);
+              return (List) client.execute("listContent", params);
+          }
+
+      public Object getDocumentState(String docRelativePath)
+          throws XmlRpcException, IOException {
+              Vector params = new Vector();
+              params.addElement(docRelativePath);
+              System.out.println("getDocumentState() " + params);
+              return client.execute("getDocumentState", params);
+          }
+
+      public String createDocument(String type, String folderRelPath,
+              Object docMap, int position)
+          throws XmlRpcException, IOException {
+              Vector params = new Vector();
+              params.addElement(type);
+              params.addElement(docMap);
+              params.addElement(folderRelPath);
+              params.addElement(new Integer(position));
+              System.out.println("createDocument() " + params);
+              return (String) client.execute("createDocument", params);
+          }
+
+      // --------------------------------------------------
+
+      /**
+       * The method in charge of analyzing the parameters given to the program and
+       * executing the corresponding actions.
+       */
+      public static void main(String[] args) {
+          try {
+              String remoteControllerAddr =
+                  "http://myserver.net:8080/cps/portal_remote_controller";
+              RemoteControl ctrl = new RemoteControl(remoteControllerAddr);
+
+              List list = ctrl.listContent("workspaces");
+              System.out.println("\nWorkspaces content: " + list);
+
+              Object res;
+              HashMap metadata = new HashMap();
+              metadata.put("Title", "Test Document");
+              metadata.put("Description", "Test Document Description");
+              metadata.put("file", "Bla bla ...".getBytes());
+              metadata.put("file_name", "test.txt");
+              res = ctrl.createDocument("File", "workspaces", metadata, 0);
+              System.out.println("\nDocument created: " + res);
+
+              res = ctrl.getDocumentState("workspaces/test-document");
+              System.out.println("\nDocument state: " + res);
+
+          } catch (Exception ex) {
+              System.out.println("main() " + ex);
+              ex.printStackTrace();
+          }
+      }
+
+  }
+
+A file RemoteControl.java_ is provided in the doc directory.
 
 
 Preliminary hints and suggestions
@@ -1313,10 +1404,9 @@ mark them off clearly with comments.
 Licensing
 ---------
 
-IANALB (I am not a lawyer but ...) -- Since you are extending
-CPSRemoteController_ and since that code is covered by the GNU
-General Public License, you will need to preserve and honor that
-license in your extensions.
+Since you are extending CPSRemoteController_ and since that code is covered by
+the GNU General Public License, you will need to preserve and honor that license
+in your extensions.
 
 
 getComplexDocumentHistory
