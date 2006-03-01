@@ -32,82 +32,82 @@ import org.apache.xmlrpc.XmlRpcException;
 
 public class RemoteControl {
 
-	private XmlRpcClient client;
+    private XmlRpcClient client;
 
-	static {
-		XmlRpc.setEncoding("UTF-8");
-	}
+    static {
+	XmlRpc.setEncoding("UTF-8");
+    }
 
-	public RemoteControl(String url) throws MalformedURLException {
-		this(new URL(url));
-	}
+    public RemoteControl(String url) throws MalformedURLException {
+	this(new URL(url));
+    }
 
-	public RemoteControl(URL url) {
-		client = new XmlRpcClient(url);
-		client.setBasicAuthentication("manager", "xxx");
-	}
+    public RemoteControl(URL url) {
+	client = new XmlRpcClient(url);
+	client.setBasicAuthentication("manager", "xxx");
+    }
 
-	// ------------------- XMLRPC API -------------------
+    // ------------------- XMLRPC API -------------------
 
-	public List listContent(String docRelativePath)
-        throws XmlRpcException, IOException {
+    public List listContent(String docRelativePath)
+	throws XmlRpcException, IOException {
 	    Vector params = new Vector();
 	    params.addElement(docRelativePath);
-        System.out.println("Executing RPC method listContent() " + params);
-        return (List) client.execute("listContent", params);
+	    System.out.println("Executing RPC method listContent() " + params);
+	    return (List) client.execute("listContent", params);
 	}
 
     public Object getDocumentState(String docRelativePath)
-        throws XmlRpcException, IOException {
-        Vector params = new Vector();
-        params.addElement(docRelativePath);
-        System.out.println("getDocumentState() " + params);
-        return client.execute("getDocumentState", params);
-    }
+	throws XmlRpcException, IOException {
+	    Vector params = new Vector();
+	    params.addElement(docRelativePath);
+	    System.out.println("getDocumentState() " + params);
+	    return client.execute("getDocumentState", params);
+	}
 
     public String createDocument(String type, String folderRelPath,
-                                 Object docMap, int position)
-        throws XmlRpcException, IOException {
-        Vector params = new Vector();
-        params.addElement(type);
-        params.addElement(docMap);
-        params.addElement(folderRelPath);
-        params.addElement(new Integer(position));
-        System.out.println("createDocument() " + params);
-        return (String) client.execute("createDocument", params);
-    }
+	    Object docMap, int position)
+	throws XmlRpcException, IOException {
+	    Vector params = new Vector();
+	    params.addElement(type);
+	    params.addElement(docMap);
+	    params.addElement(folderRelPath);
+	    params.addElement(new Integer(position));
+	    System.out.println("createDocument() " + params);
+	    return (String) client.execute("createDocument", params);
+	}
 
-	// --------------------------------------------------
+    // --------------------------------------------------
 
     /**
      * The method in charge of analyzing the parameters given to the program and
      * executing the corresponding actions.
      */
     public static void main(String[] args) {
-        try {
-            String remoteControllerAddr =
-                "http://myserver.net:8080/cps/portal_remote_controller";
-            RemoteControl ctrl = new RemoteControl(remoteControllerAddr);
+	try {
+	    String remoteControllerAddr =
+		"http://myserver.net:8080/cps/portal_remote_controller";
+	    RemoteControl ctrl = new RemoteControl(remoteControllerAddr);
 
-            List list = ctrl.listContent("workspaces");
-            System.out.println("\nWorkspaces content: " + list);
+	    List list = ctrl.listContent("workspaces");
+	    System.out.println("\nWorkspaces content: " + list);
 
-            Object res;
-            HashMap metadata = new HashMap();
-            metadata.put("Title", "Test Document");
-            metadata.put("Description", "Test Document Description");
-            metadata.put("file", "Bla bla ...".getBytes());
-            metadata.put("file_name", "test.txt");
-            res = ctrl.createDocument("File", "workspaces", metadata, 0);
-            System.out.println("\nDocument created: " + res);
+	    Object res;
+	    HashMap metadata = new HashMap();
+	    metadata.put("Title", "Test Document");
+	    metadata.put("Description", "Test Document Description");
+	    metadata.put("file", "Bla bla ...".getBytes());
+	    metadata.put("file_name", "test.txt");
+	    res = ctrl.createDocument("File", "workspaces", metadata, 0);
+	    System.out.println("\nDocument created: " + res);
 
-            res = ctrl.getDocumentState("workspaces/test-document");
-            System.out.println("\nDocument state: " + res);
+	    res = ctrl.getDocumentState("workspaces/test-document");
+	    System.out.println("\nDocument state: " + res);
 
-        } catch (Exception ex) {
-            System.out.println("main() " + ex);
-            ex.printStackTrace();
-        }
+	} catch (Exception ex) {
+	    System.out.println("main() " + ex);
+	    ex.printStackTrace();
+	}
     }
 
 }
