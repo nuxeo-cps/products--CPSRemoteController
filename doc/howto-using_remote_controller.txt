@@ -698,7 +698,7 @@ Explanation:
   + The property values -- To learn this, first determine the
     widget type of the ``content`` property by looking in
     ``my_cps_site/portal_layouts/document/w__content`` in the ZMI.
-    Once found that the type of the widget used to display
+    Once it has been determined that the type of the widget used to display
     ``content`` is ``CPSTextWidget``, then look at the
     ``render`` method in class ``CPSTextWidget`` in
     ``my_zope_instance/Products/CPSSchemas/ExtendedWidgets.py``.
