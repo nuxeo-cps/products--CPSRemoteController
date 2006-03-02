@@ -1,5 +1,5 @@
 # -*- coding: ISO-8859-15 -*-
-# (C) Copyright 2005 Nuxeo SARL <http://nuxeo.com>
+# (C) Copyright 2005-2006 Nuxeo SAS <http://nuxeo.com>
 # Authors:
 # M.-A. Darche <madarche@nuxeo.com>
 #
@@ -471,11 +471,11 @@ class ProductTestCase(CPSRemoteControllerTestCase):
         mtool = getToolByName(tool, 'portal_membership')
         userid = 'randomuser001'
         passwd = '%s%s' % (userid, userid, )
-        firstName = 'Random'
-        lastName = 'User'
+        first_name = 'Random'
+        last_name = 'User'
         email = '%s@somewhere.com' % userid
         tool.addMember(userid, passwd, email=email,
-            firstName= firstName, lastName=lastName)
+            first_name=first_name, last_name=last_name)
         user = mtool.getMemberById(userid)
         self.failIf((user is None))
         tool.deleteMembers(userid)
