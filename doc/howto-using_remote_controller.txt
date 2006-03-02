@@ -7,7 +7,7 @@ Understanding and using the CPS Remote Controller
 
 :Revision: $Id$
 
-:Copyright: (C) Copyright 2005-2006 Nuxeo SAS (http://nuxeo.com).
+:Copyright: (C) Copyright 2005-2006 Nuxeo_ SAS.
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
     version 2 as published by the Free Software Foundation. This
@@ -20,8 +20,8 @@ Understanding and using the CPS Remote Controller
     Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 :Abstract: This document describes the CPSRemoteController
-    product.  This product enables any XML-RPC clients (which
-    includes python scripts, Java programs, etc.) to remotely
+    product.  This product enables any XML-RPC_ clients (which
+    includes Python_ scripts, Java_ programs, etc.) to remotely
     control a CPS site and its content.
 
 .. sectnum::    :depth: 4
@@ -44,50 +44,59 @@ This document has been mainly contributed by `Dave Kuhlman`_:
 What is CPSRemoteController?
 ----------------------------
 
-CPSRemoteController_ provides a way to run Python scripts, outside
-of the CPS_ environment that manipulate a CPS portal, including the
-users, groups, documents, and other objects at that site.
+CPSRemoteController_ provides a way to remotely control a CPS_ portal in a
+platform-independent manner through XML-RPC_.
 
-Why you might want to use CPSRemoteController_ -- Some possible of
+Why you might want to use CPSRemoteController -- Some possible of
 benefits:
 
-- Since the protocol used by CPSRemoteController is XML-RPC_ and
+- For remotely controlling a CPS_ portal.
+  Since the protocol used by CPSRemoteController is XML-RPC_ and
   is usable across the Web, you can control your CPS site from
-  anywhere that you have access to the site through the Web.
+  anywhere that you have access to the web site through the Web.
+  CPSRemoteController also features a `RemoteControllerClient` that makes it
+  possible for a CPS portal to remotely control other CPS portals.
 
-- Because there is XML-RPC_ client support for a variety of
-  languages, for example Java, C/C++, PHP, etc in addition to
-  Python. For more information on XML-RPC implementations see
-  XML-RPC_ Thus, You are likely to be able to write your client in
+- For controlling a CPS_ portal in a platform-independent manner, that is for
+  example controlling CPS without using Python_, the main programming language
+  used in CPS.
+  Because there is XML-RPC_ client support for a variety of
+  languages, for example Java_, C/C++, PHP, etc. in addition to
+  Python_. For more information on XML-RPC implementations see
+  XML-RPC. Thus, You are likely to be able to write your client in
   the language of your choice and on the platform that fits your
   needs.
 
-- If an application provides an XML-RPC_ interface, you might be
-  able to control a CPS site from within that foreign application.
-
-- Task automation -- You may be able to write scripts that
+- For task automation.
+  You may be able to write scripts that
   automate tasks which would be tedious if done manually at your
   CPS site from within the Web browser.  For example, you might be
   able to write a script that adds a batch of documents to your
-  site or that adds a set of users to the site.  Some of these
-  tasks, however, may require extensions to CPSRemoteController_.
+  site or that adds a set of users to the site. Some of these
+  tasks, however, may require extensions to CPSRemoteController.
 
-Extensions to CPSRemoteController_ -- In addition, you may be able
-to implement additional methods not currently supported by
-CPSRemoteController_.  We'll see how to do that in section `Adding
-New Methods to CPSRemoteController`_.
+- If an application provides an XML-RPC_ interface, you might be
+  able to control a CPS site from within that foreign application.
 
 
 Where to find CPSRemoteController
 ---------------------------------
 
-CPSRemoteController_ is included in the latest version of the CPS_
-distribution.  The latest version is also available through SVN at
-http://svn.nuxeo.org/trac/pub.
+CPSRemoteController_ is included in CPS_ since CPS 3.3.6.
+The latest version is also available through the Nuxeo_ SVN
+public repository http://svn.nuxeo.org/.
 
 
 Installing CPSRemoteController
 ------------------------------
+
+For CPS 3.4 and subsequent versions
++++++++++++++++++++++++++++++++++++
+
+Select the ``CPS RemoteController`` extension when you install a new CPS portal.
+
+For CPS prior to CPS 3.4
+++++++++++++++++++++++++
 
 Use ``portal_quickinstaller`` in the ZMI:
 
@@ -102,29 +111,30 @@ Use ``portal_quickinstaller`` in the ZMI:
 Using CPSRemoteController
 =========================
 
-There is already some documentation on CPSRemoteController_:
+There is already documentation directly in the code of CPSRemoteController_.
+Each method is well documented in its purpose and use.
 
-- Brief comments on how to make calls into CPSRemoteController are
-  in  ``Products/CPSRemoteController/RemoteControllerTool.py``.
+It is important to note that the present documentation lacks some new methods
+that have been added in CPSRemoteController, so checking the source code for
+existing methods is highly recommended.
 
-- Comments on each method that is exposed are the method's
-  implementation.  Although you can read the in-line documentation
-  in the source code, it may make for more convenient reading if
-  you generate HTML documentation for the methods.  I used
-  happydoc_.  Generate the documentation for CPSRemoteController
-  using something like the following::
+Although you can read the in-line documentation
+in the source code, it may make for more convenient reading if
+you generate HTML documentation for the methods. We recommend using
+happydoc_.  Generate the documentation for CPSRemoteController
+using something like the following::
 
-      cd my_cps_site/Products/CPSRemoteController
-      happydoc RemoteControllerTool.py
+    $ cd my_cps_site/Products/CPSRemoteController
+    $ happydoc RemoteControllerTool.py
 
-  By default, happydoc_ places the generated files in a directory
-  named ``doc``.  happydoc_ may already be installed on your
-  machine.  If not and if you are on a Debian GNU/Linux machine,
-  you can install happydoc_ with something like the following:
+By default, happydoc_ places the generated files in a directory
+named ``doc``.  happydoc_ may already be installed on your
+machine.  If not and if you are on a Debian GNU/Linux machine,
+you can install happydoc_ with something like the following:
 
-      apt-get install python-happydoc
+    apt-get install python-happydoc
 
-  For help on other platforms, check the happydoc_ Web site.
+For help on other platforms, check the happydoc_ Web site.
 
 .. _happydoc: http://happydoc.sourceforge.net/
 
@@ -133,7 +143,7 @@ An example built with xmlrpclib
 -------------------------------
 
 Calling a method on CPSRemoteController is fairly easy.  Here is
-an example based on the use of the standard python module
+an example based on the use of the standard Python_ module
 xmlrpclib_ that you can use as a template::
 
     from xmlrpclib import ServerProxy
@@ -165,9 +175,9 @@ Explanation:
    comments.
 
 *Note:* Use of the ServerProxy class as described here is
-dependant on the specific implementation library used here, in
-particular xmlrpclib_. There are other python XML-RPC
-implementations for Python that might be better suited than
+dependent on the specific implementation library used here, in
+particular xmlrpclib_. There are other Python_ XML-RPC
+implementations for Python_ that might be better suited than
 xmlrpclib_, for example see
 `Creating XML-RPC Servers and Clients with Twisted`_.
 One deficiency with the xmlrpclib_ implementation is not be able to
@@ -328,7 +338,7 @@ An example built with Java
 .. _RemoteControl.java: RemoteControl.java
 .. _`Apache XML-RPC`: http://ws.apache.org/xmlrpc/
 
-For accessing CPS through XML-RPC in Java one can use `Apache XML-RPC`_ Java
+For accessing CPS through XML-RPC in Java_, one can use `Apache XML-RPC`_ Java
 library::
 
   import java.io.IOException;
@@ -460,8 +470,8 @@ itself for that function if you have questions about this
 conversion process.
 
 Although the behavior of ``generateId`` can be modified by
-parameters, here are a few rules that my version of CPS seems to
-be following:
+parameters, here are the rules that ``generateId`` follows at the time of
+writing:
 
 - The allowable characters are letters, digits, underscores, and
   dashes.
@@ -665,7 +675,7 @@ specifies the content format::
         doc_def = {'Title': title,
             'Description': description,
             'content': content,
-            'content_format': 'stx',
+            'content_format': 'rst',
             }
         doc_rpath = 'workspaces/members/%s' % user
         result = proxy.createDocument('Document', doc_def, doc_rpath)
@@ -685,16 +695,15 @@ Explanation:
     "Schema" tab.  What we see is a list of the IDs of the objects
     in any object of type ``Document``.
 
-  + The property values -- To learn this I first determined the
+  + The property values -- To learn this, first determine the
     widget type of the ``content`` property by looking in
     ``my_cps_site/portal_layouts/document/w__content`` in the ZMI.
-    I found that the type of the widget used to display
-    ``content`` is ``CPSTextWidget``. Then, I looked at the
+    Once found that the type of the widget used to display
+    ``content`` is ``CPSTextWidget``, then look at the
     ``render`` method in class ``CPSTextWidget`` in
     ``my_zope_instance/Products/CPSSchemas/ExtendedWidgets.py``.
     If you read that code, you will find that the format keys are
-    "pre", "stx", "text", and "html" (where "stx" means "Zope
-    Structured Text").
+    "text", "rst", and "html".
 
   Hopefully, you will be able to do similar investigative work to
   learn about the properties of other object types.
@@ -842,7 +851,7 @@ Example::
         doc_def = {'Title': title,
             'Description': description,
             'content': content,
-            'content_format': 'stx',
+            'content_format': 'rst',
             }
         doc_rpath = 'workspaces/members/%s/%s' % (user, title, )
         position = 1
@@ -1283,29 +1292,29 @@ addMember
 
 Prototype::
 
-    def addMember(self, userId,
-            userPassword,
-            userRoles=None,
+    def addMember(self, user_id,
+            user_password,
+            user_roles=None,
             email='',
-            firstName='',
-            lastName='')
+            first_name='',
+            last_name='')
 
 Add a new member to the portal.
 
 Parameters:
 
-- *userId* (a string) is the user ID for the new member.
+- *user_id* (a string) is the user ID for the new member.
 
-- *userPassword* (a string) is the password for the new member.
+- *user_password* (a string) is the password for the new member.
 
-- *userRoles* (a tuple or list of strings) are the initial roles
+- *user_roles* (a tuple or list of strings) are the initial roles
   for the new member.  The default is ('Member', ).
 
 - *email* (a string) is the email address for the new member.
 
-- *firstName* (a string) is the new member's first name.
+- *first_name* (a string) is the new member's first name.
 
-- *lastName* (a string) is the new member's last name.
+- *last_name* (a string) is the new member's last name.
 
 Notes:
 
@@ -1321,15 +1330,15 @@ Notes:
 
 Example::
 
-    def test_addMember(userId, userPassword, firstName, lastName):
+    def test_addMember(user_id, user_password, first_name, last_name):
         user = 'manager'
         constr = 'http://%s:%s%s@thrush:8085/cps1/portal_remote_controller' % \
             (user, user, user, )
         proxy = ServerProxy(constr)
-        userRoles = ('Member',)
-        email = '%s@somehost.com' % userId
-        proxy.addMember(userId, userPassword, userRoles, email,
-            firstName, lastName)
+        user_roles = ('Member',)
+        email = '%s@somehost.com' % user_id
+        proxy.addMember(user_id, user_password, user_roles, email,
+            first_name, last_name)
 
 
 deleteMembers
@@ -1365,19 +1374,23 @@ Notes:
 
 Example::
 
-    def test_deleteMembers(userIds):
+    def test_deleteMembers(user_ids):
         user = 'manager'
         constr = Constr % (user, user, user, )
         proxy = ServerProxy(constr)
         # Convert the user IDs into a list of strings.
-        userIds = userIds.split()
+        user_ids = user_ids.split()
         # Delete the members, but do not delete their private spaces.
-        proxy.deleteMembers(userIds, False)
+        proxy.deleteMembers(user_ids, False)
 
 
 
 Adding New Methods to CPSRemoteController
 =========================================
+
+Extensions to CPSRemoteController_ -- You may be able
+to implement additional methods not currently supported by
+CPSRemoteController_.
 
 For our example, we will implement a method that will create a new
 user.
@@ -1388,25 +1401,22 @@ Advance planning
 Preparing for upgrades to CPSRemoteController -- We will want to
 preserve our added methods when CPSRemoteController is upgraded.
 Therefore, we'd like to put our additional methods in a separate
-class and in a separate module.  Unfortunately, I have not figured
-out how to do that.  I've tried both (1) placing additional
-methods in a sub-class of ``RemoteControllerTool`` and (2) adding
-methods in a new class registered as a tool with
-CPSRemoteController_.  Neither of these approaches worked.  If you
-know how to do something like this, please send me an email,
-explaining your solution.
+class and in a separate module.
 
-And so, in the examples below, where we add a new method, we will
-simply add it at the end of class ``RemoteControllerTool`` and
-mark them off clearly with comments.
+There are 2 ways to achieve this:
 
+1. By extending the RemoteControllerTool class and installing this new tool
+   instead of the original RemoteControllerTool tool.
+
+2. By `monkey-patching` the RemoteControllerTool. This is easier and faster, but
+   less clean.
 
 Licensing
 ---------
 
 Since you are extending CPSRemoteController_ and since that code is covered by
-the GNU General Public License, you will need to preserve and honor that license
-in your extensions.
+the GNU General Public License, you will need to use a GNU GPL compatible
+license for distributing your extensions.
 
 
 getComplexDocumentHistory
@@ -1528,19 +1538,10 @@ is our new method::
 
 
 
-addUser
--------
 
-This capability has now been added to CPSRemoteController_.  See
-addMember_ and deleteMembers_.
+.. _Python: http://www.python.org/
 
-
-
-
-
-.. _CPSRemoteController: http://svn.nuxeo.org/trac/pub
-
-.. _CPS: http://www.cps-project.org
+.. _Java: http://java.sun.com/
 
 .. _XML-RPC: http://www.xmlrpc.com/
 
@@ -1549,6 +1550,12 @@ addMember_ and deleteMembers_.
 .. _Twisted: http://twistedmatrix.com/
 
 .. _TwistedWeb: http://twistedmatrix.com/projects/web/
+
+.. _CPS: http://www.cps-project.org
+
+.. _CPSRemoteController: http://svn.nuxeo.org/trac/pub/browser/CPSRemoteController/
+
+.. _Nuxeo: http://www.nuxeo.com/
 
 
 .. Local Variables:

@@ -1042,52 +1042,52 @@ class RemoteControllerTool(UniqueObject, Folder):
         return rpaths_info
 
     security.declareProtected(ManageUsers, 'addMember')
-    def addMember(self, userId, userPassword, userRoles=None, email='',
-            firstName='', lastName=''):
+    def addMember(self, user_id, user_password, user_roles=None, email='',
+            first_name='', last_name=''):
         """Add a new member to the portal.
         By default, the new member will have a Member role.
 
         Parameters:
 
-        userId -- The ID of the new user.
+        user_id -- The ID of the new user.
 
-        userPassword -- The initial password of the new user.
+        user_password -- The initial password of the new user.
 
-        userRoles -- A tuple of roles (tuple of strings).
+        user_roles -- A tuple of roles (tuple of strings).
 
         email -- The email address the new member (a string).
 
-        firstName -- The first name of the new member (a string).
+        first_name -- The first name of the new member (a string).
 
-        lastName -- The last name of the new member (a string).
+        last_name -- The last name of the new member (a string).
 
         Example::
 
-            def test_addMember(userId, userPassword, firstName, lastName):
+            def test_addMember(user_id, user_password, first_name, last_name):
                 user = 'manager'
                 constr = 'http://%s:%s%s@thrush:8085/cps1/portal_remote_controller' % \
                     (user, user, user, )
                 proxy = ServerProxy(constr)
-                userRoles = ('Member',)
-                email = '%s@somehost.com' % userId
-                proxy.addMember(userId, userPassword, userRoles, email,
-                    firstName, lastName)
+                user_roles = ('Member',)
+                email = '%s@somehost.com' % user_id
+                proxy.addMember(user_id, user_password, user_roles, email,
+                    first_name, last_name)
         """
-        #LOG(glog_key, DEBUG, "addMember userId: %s" % userId)
+        #LOG(glog_key, DEBUG, "addMember user_id: %s" % user_id)
         mtool = getToolByName(self, 'portal_membership')
-        if not userRoles:
-            userRoles = ('Member', )
-        userDomains = []
-        mtool.addMember(userId, userPassword, userRoles, userDomains)
-        member = mtool.getMemberById(userId)
+        if not user_roles:
+            user_roles = ('Member', )
+        user_domains = []
+        mtool.addMember(user_id, user_password, user_roles, user_domains)
+        member = mtool.getMemberById(user_id)
         if member is None or not hasattr(aq_base(member), 'getMemberId'):
-            raise ValueError("Cannot add member '%s'" % userId)
-        memberProperties = {
+            raise ValueError("Cannot add member '%s'" % user_id)
+        member_properties = {
             'email': email,
-            'givenName': firstName,
-            'sn': lastName,
+            'givenName': first_name,
+            'sn': last_name,
             }
-        member.setMemberProperties(memberProperties)
+        member.setMemberProperties(member_properties)
 
 
     security.declareProtected(ManageUsers, 'deleteMembers')
@@ -1107,14 +1107,14 @@ class RemoteControllerTool(UniqueObject, Folder):
 
         Example::
 
-            def test_deleteMembers(userIds):
+            def test_deleteMembers(user_ids):
                 user = 'manager'
                 constr = Constr % (user, user, user, )
                 proxy = ServerProxy(constr)
                 # Convert the user IDs into a list of strings.
-                userIds = userIds.split()
+                user_ids = user_ids.split()
                 # Delete the members, but do not delete their private spaces.
-                proxy.deleteMembers(userIds, False)
+                proxy.deleteMembers(user_ids, False)
         """
         mtool = getToolByName(self, 'portal_membership')
         mtool.deleteMembers(member_ids, delete_memberareas=delete_memberareas,
