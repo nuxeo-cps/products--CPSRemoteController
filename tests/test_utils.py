@@ -43,12 +43,6 @@ class UtilsTestCase(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
         self.portal.REQUEST.SESSION = {}
         self.portal.REQUEST['AUTHENTICATED_USER'] = self.login_id
 
-        from Products.ExternalMethod.ExternalMethod import ExternalMethod
-        installer = ExternalMethod('installRemoteController', '',
-                                   'CPSRemoteController.install', 'install')
-        self.portal._setObject('installRemoteController', installer)
-        self.assert_('installRemoteController' in self.portal.objectIds())
-        self.portal.installRemoteController()
         self.tool = self.portal.portal_remote_controller
 
     def beforeTearDown(self):

@@ -1,6 +1,5 @@
-# (C) Copyright 2005 Nuxeo SARL <http://nuxeo.com>
-# Authors:
-# M.-A. Darche <madarche@nuxeo.com>
+# (C) Copyright 2006 Nuxeo SAS <http://nuxeo.com>
+# Author: Dragos Ivan <div@nuxeo.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as published
@@ -18,9 +17,15 @@
 #
 # $Id$
 
-from Testing import ZopeTestCase
 from Products.CPSDefault.tests.CPSTestCase import CPSTestCase
+from Products.CPSDefault.tests.CPSTestCase import ExtensionProfileLayerClass
 
-ZopeTestCase.installProduct('CPSRemoteController')
 
-CPSRemoteControllerTestCase = CPSTestCase
+class LayerClass(ExtensionProfileLayerClass):
+    extension_ids = ('CPSRemoteController:default',)
+
+CPSRemoteControllerLayer = LayerClass(__name__, 'CPSRemoteControllerLayer')
+
+
+class CPSRemoteControllerTestCase(CPSTestCase):
+    layer = CPSRemoteControllerLayer

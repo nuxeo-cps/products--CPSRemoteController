@@ -41,7 +41,7 @@ def randomText(max_len=10):
 
 BaseClass = CPSRemoteControllerTestCase.CPSRemoteControllerTestCase
 
-class RemoteControllerClientTC(BaseClass):
+class RemoteControllerClientTC(CPSRemoteControllerTestCase.CPSRemoteControllerTestCase):
 
     def afterSetUp(self):
         self.login_id = MANAGER_ID
@@ -49,20 +49,13 @@ class RemoteControllerClientTC(BaseClass):
         self.portal.REQUEST.SESSION = {}
         self.portal.REQUEST['AUTHENTICATED_USER'] = self.login_id
 
-        from Products.ExternalMethod.ExternalMethod import ExternalMethod
-        installer = ExternalMethod('installRemoteController', '',
-                                   'CPSRemoteController.install', 'install')
-        self.portal._setObject('installRemoteController', installer)
-        self.assert_('installRemoteController' in self.portal.objectIds())
-        self.portal.installRemoteController()
-        self.tool = self.portal.portal_remote_controller
-
         try:
             self.ws = self.portal.workspaces
         except AttributeError:
             self.ws = self.portal
         self.document_schemas = self.portal.getDocumentSchemas()
         self.document_types = self.portal.getDocumentTypes()
+        self.tool = self.portal.portal_remote_controller
 
     def beforeTearDown(self):
         self.logout()
