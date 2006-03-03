@@ -1,4 +1,20 @@
 *******************************************
+** CPSRemoteController V1.9.0 [R1 build 2006/03/03-17:29 by ben]
+** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 33855
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+-
+Bug fixes:
+~~~~~~~~~~
+-
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+- Updated the doc, especially through adding an inline Java example.
+
+*******************************************
 ** CPSRemoteController V1.8.2 [R1 build 2006/02/17-20:32 by fermigier]
 ** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 33068
 Requires:
