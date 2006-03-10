@@ -2,8 +2,8 @@
 Understanding and using the CPS Remote Controller
 =================================================
 
-:Authors: Dave Kuhlman
-    Marc-Aurèle Darche
+:Authors: - Dave Kuhlman <dkuhlman@rexx.com> <http://www.rexx.com/~dkuhlman>
+          - Marc-Aurèle Darche
 
 :Revision: $Id$
 
@@ -31,15 +31,6 @@ Understanding and using the CPS Remote Controller
 
 Introducing CPSRemoteController
 ===============================
-
-Credits
--------
-
-.. _Dave Kuhlman: http://www.rexx.com/~dkuhlman
-
-This document has been mainly contributed by `Dave Kuhlman`_:
-`dkuhlman@rexx.com`.
-
 
 What is CPSRemoteController?
 ----------------------------
