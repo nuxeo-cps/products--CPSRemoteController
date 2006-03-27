@@ -761,6 +761,9 @@ class ProductTestCase(CPSRemoteControllerTestCase):
         for lock_owner, lock_token in locks_info:
             self.assert_((lock_owner, lock_token) in results)
 
+    def testGetVocabularyEntries(self):
+        entries = self.tool.getVocabularyEntries('subject_voc')
+        self.assert_(('Arts', 'Arts') in entries)
 
 def test_suite():
     suite = unittest.TestSuite()

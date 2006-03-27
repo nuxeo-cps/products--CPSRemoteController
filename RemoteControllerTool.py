@@ -1183,6 +1183,12 @@ class RemoteControllerTool(UniqueObject, Folder):
 
         return res
 
+    security.declareProtected(View, 'getVocabularyEntries')
+    def getVocabularyEntries(self, vocabulary_name):
+        portal = self._getPortalObject()
+        portal_vocabularies = getToolByName(portal, 'portal_vocabularies')
+        return portal_vocabularies[vocabulary_name].items()
+
 InitializeClass(RemoteControllerTool)
 
 def toLatin9(obj):
