@@ -1185,6 +1185,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
     security.declareProtected(View, 'getVocabularyEntries')
     def getVocabularyEntries(self, vocabulary_name):
+        """ retrieves a given vocabulary entries """
         portal = self._getPortalObject()
         portal_vocabularies = getToolByName(portal, 'portal_vocabularies')
         return portal_vocabularies[vocabulary_name].items()
