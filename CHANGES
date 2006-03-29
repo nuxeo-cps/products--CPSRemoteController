@@ -8,6 +8,7 @@ New features:
 Bug fixes:
 ~~~~~~~~~~
 - Better reST formatting for the documentation.
+- Support File attachement that comes from CPSDistantPublisher
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -

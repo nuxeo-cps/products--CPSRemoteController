@@ -940,6 +940,10 @@ class RemoteControllerTool(UniqueObject, Folder):
                 if isinstance(file, Binary):
                     file_id = generateFileName(file_name)
                     doc_def[file_key] = File(file_id, file_name, file.data)
+                elif isinstance(file, File):
+                    # CPSDistantPublisher is able to directly send File
+                    # instances
+                    doc_def[file_key] = file
 
         doc.edit(doc_def, doc_proxy)
 
