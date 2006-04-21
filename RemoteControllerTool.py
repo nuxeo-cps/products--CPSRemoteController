@@ -367,7 +367,7 @@ class RemoteControllerTool(UniqueObject, Folder):
                 'You need View permission for proxy at %s.' % rpath)
         locks_info = []
         for lock_token, lock in proxy.wl_lockItems():
-            locks_info.append((lock.getOwner(), lock_token))
+            locks_info.append((lock.getOwner().getUserName(), lock_token))
         return locks_info
 
     security.declareProtected(View, 'lockDocument')

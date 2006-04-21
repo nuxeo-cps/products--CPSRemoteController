@@ -755,8 +755,8 @@ class ProductTestCase(CPSRemoteControllerTestCase):
         locks_info = rctool.getDocumentLocksInfo(ws_doc_rpath)
         self.assertEqual(len(locks_info), 2)
 
-        results = [(lock1.getOwner(), lock_token1),
-                   (lock2.getOwner(), lock_token2),
+        results = [(lock1.getOwner().getUserName(), lock_token1),
+                   (lock2.getOwner().getUserName(), lock_token2),
                    ]
         for lock_owner, lock_token in locks_info:
             self.assert_((lock_owner, lock_token) in results)
