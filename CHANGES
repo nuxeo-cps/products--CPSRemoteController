@@ -3,14 +3,10 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
-- Added getVocabularyEntries, to retrieve vocabulary entries
-
+-
 Bug fixes:
 ~~~~~~~~~~
-- Better reST formatting for the documentation.
-- Support File attachement that comes from CPSDistantPublisher
-- Fix getDocumentLocksInfo method, it was returning object instead
-  of user name.
+-
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -

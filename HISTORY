@@ -1,4 +1,24 @@
 *******************************************
+** CPSRemoteController V1.10.0 [R1 build 2006/05/19-12:44 by fermigier]
+** SVN URL: https://svn.nuxeo.org/pub/CPS3/products/CPSRemoteController/trunk Revision: 45740
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+- Added getVocabularyEntries, to retrieve vocabulary entries
+
+Bug fixes:
+~~~~~~~~~~
+- Better reST formatting for the documentation.
+- Support File attachement that comes from CPSDistantPublisher
+- Fix getDocumentLocksInfo method, it was returning object instead
+  of user name.
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+
+*******************************************
 ** CPSRemoteController V1.9.0 [R1 build 2006/03/03-17:29 by ben]
 ** SVN URL: https://svn.nuxeo.org/pub/CPSRemoteController/trunk Revision: 33855
 Requires:
