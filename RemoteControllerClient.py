@@ -225,7 +225,7 @@ from OFS.Folder import Folder
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from ZODB.PersistentMapping import PersistentMapping
 from zLOG import LOG, DEBUG
-from utils import marshallDocument
+from Products.CPSUtil.xmlrpc import marshallDocument
 
 _lock = thread.allocate_lock()
 

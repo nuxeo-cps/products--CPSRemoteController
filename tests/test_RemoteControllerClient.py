@@ -137,7 +137,7 @@ class RemoteControllerClientTC(CPSRemoteControllerTestCase.CPSRemoteControllerTe
         return portal.restrictedTraverse(path)
 
     def _document_send(self, doc_def, portal_type):
-        from Products.CPSRemoteController.utils import marshallDocument
+        from Products.CPSUtil.xmlrpc import marshallDocument
         doc_def = marshallDocument(doc_def)
         # now calling RemoteController with the given def
         folder_rpath = '/portal/workspaces'

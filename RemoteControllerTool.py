@@ -50,8 +50,8 @@ from Products.CPSCore.EventServiceTool import getEventService
 from Products.CPSUtil.id import generateFileName
 from Products.CPSUtil.integration import getProductVersion
 from Products.CPSUtil.xmlrpc import toLatin9
+from Products.CPSUtil.xmlrpc import unMarshallDocument
 
-from Products.CPSRemoteController.utils import unMarshallDocument
 from Products.CPSRemoteController.interfaces import IRemoteControllerTool
 
 glog_key = 'RemoteControllerTool'
