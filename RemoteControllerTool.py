@@ -49,6 +49,7 @@ from Products.CPSCore.permissions import ViewArchivedRevisions
 from Products.CPSCore.EventServiceTool import getEventService
 from Products.CPSUtil.id import generateFileName
 from Products.CPSUtil.integration import getProductVersion
+from Products.CPSUtils.xmlrpc import toLatin9
 
 from Products.CPSRemoteController.utils import unMarshallDocument
 from Products.CPSRemoteController.interfaces import IRemoteControllerTool
@@ -1195,25 +1196,3 @@ class RemoteControllerTool(UniqueObject, Folder):
         return portal_vocabularies[vocabulary_name].items()
 
 InitializeClass(RemoteControllerTool)
-
-def toLatin9(obj):
-    if isinstance(obj, dict):
-        for k, v in obj.items():
-            if isinstance(v, unicode):
-                v = _stringToLatin9(v)
-                obj[k] = v
-    elif isinstance(obj, unicode):
-        obj = _stringToLatin9(obj)
-    return obj
-
-
-def _stringToLatin9(s):
-    if s is None:
-        return None
-    else:
-        # Replace RIGHT SINGLE QUOTATION MARK (unicode only)
-        # by the APOSTROPHE (ascii and latin1).
-        # cf. http://www.cl.cam.ac.uk/~mgk25/ucs/quotes.html
-        s = s.replace(u'\u2019', u'\u0027')
-        #&#8217;
-        return s.encode('iso-8859-15', 'ignore')
