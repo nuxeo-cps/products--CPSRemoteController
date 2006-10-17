@@ -1,12 +1,12 @@
-Requires:
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+-
+Bug fixes
 ~~~~~~~~~
--
-New features:
-~~~~~~~~~~~~~
--
-Bug fixes:
-~~~~~~~~~~
--
-New internal features:
-~~~~~~~~~~~~~~~~~~~~~~
--
+- [packaging] bundleman svn property
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
