@@ -1,3 +1,23 @@
+===========================================================
+Package: CPSRemoteController 1.10.1
+===========================================================
+First release built by: madarche at: 2006-12-04T15:34:29
+SVN Tag: https://svn.nuxeo.org/pub/CPS3/products/CPSRemoteController/tags/1.10.1
+Build from: https://svn.nuxeo.org/pub/CPS3/products/CPSRemoteController/trunk@50420
+
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+-
+Bug fixes
+~~~~~~~~~
+- [packaging] bundleman svn property
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
 *******************************************
 ** CPSRemoteController V1.10.0 [R1 build 2006/05/19-12:44 by fermigier]
 ** SVN URL: https://svn.nuxeo.org/pub/CPS3/products/CPSRemoteController/trunk Revision: 45740
