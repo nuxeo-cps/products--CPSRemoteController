@@ -134,7 +134,7 @@ class ProductTestCase(CPSRemoteControllerTestCase):
         self.assertEquals(len(proxy_list1) + 1, len(proxy_list2))
         self.assert_(doc_rpath in proxy_list2)
 
-        title = "Le rapport de la runion de lundi matin"
+        title = "Le rapport de la réunion de lundi matin"
         description = "Encore un rapport ennuyeux"
         language = 'fr'
         data_dict = {'Title': title,
