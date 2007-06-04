@@ -3,7 +3,8 @@ Requires
 -
 New features
 ~~~~~~~~~~~~
--
+- Added new method to retrieve metadata of a document.
+
 Bug fixes
 ~~~~~~~~~
 -

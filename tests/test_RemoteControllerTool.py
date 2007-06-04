@@ -134,7 +134,7 @@ class ProductTestCase(CPSRemoteControllerTestCase):
         self.assertEquals(len(proxy_list1) + 1, len(proxy_list2))
         self.assert_(doc_rpath in proxy_list2)
 
-        title = "Le rapport de la réunion de lundi matin"
+        title = "Le rapport de la runion de lundi matin"
         description = "Encore un rapport ennuyeux"
         language = 'fr'
         data_dict = {'Title': title,
@@ -428,7 +428,42 @@ class ProductTestCase(CPSRemoteControllerTestCase):
         self.assertEquals(proxy.getContent().Description(),
                           data_dict['Description'])
 
+    def testGetDocumentMetadata(self):
+        data_dict = {'Title': "The report from Monday meeting",
+                     'Description': "Another boring report",
+                     }
+        tool = self.tool
+       
+        folder_rpath = "workspaces" 
+        doc_rpath = tool.createDocument('Workspace', data_dict, folder_rpath, 0)
+        proxy = self.portal.restrictedTraverse(doc_rpath)
+        
+        metadata = tool.getDocumentMetadata(doc_rpath)
+        tmp = {'contentInfo':None, 'dublinCore':None}
+        self.assertEquals(metadata.keys(), tmp.keys())
 
+        # Validate the content info values
+        self.assertEquals(metadata['contentInfo']['title'], data_dict['Title'])
+        self.assertEquals(metadata['contentInfo']['description'], data_dict['Description'])
+        
+        # Validate the Dublin Core values
+        self.assertEquals(metadata['dublinCore']['Title'], data_dict['Title'])
+        
+        ## Test for File type of content
+        doc_rpath = tool.createDocument('File', data_dict, folder_rpath, 0)
+        proxy = self.portal.restrictedTraverse(doc_rpath)
+        
+        metadata1 = tool.getDocumentMetadata(doc_rpath)
+
+        self.assertEquals(metadata.keys(), tmp.keys())
+
+        # Validate the content info values
+        self.assertEquals(metadata['contentInfo']['title'], data_dict['Title'])
+        self.assertEquals(metadata['contentInfo']['description'], data_dict['Description'])
+        
+        # Validate the Dublin Core values
+        self.assertEquals(metadata['dublinCore']['Title'], data_dict['Title'])
+        
     def testGetDocumentHistory(self):
         wftool = self.portal.portal_workflow
         folder_rpath = 'workspaces'
@@ -439,7 +474,7 @@ class ProductTestCase(CPSRemoteControllerTestCase):
         tool = self.tool
         doc_rpath = tool.createDocument('File', data_dict, folder_rpath, 0)
         proxy = self.portal.restrictedTraverse(doc_rpath)
-
+        
         folder = proxy.aq_inner.aq_parent
 
         for i in range(4):

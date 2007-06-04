@@ -227,6 +227,61 @@ class RemoteControllerTool(UniqueObject, Folder):
                 object_rpaths.append(rpath)
         return object_rpaths
 
+    security.declareProtected(View, 'getDocumentMetadata')
+    def getDocumentMetadata(self, rpath):
+        """Return the metadata (Dublin Core) and some more information
+          about the document specified by the given relative path.
+
+        rpath is of the form "workspaces/doc1" or "sections/doc2".
+
+        It returns a dictionary with two entries, one with the values of
+        Dublin Core and the other one with additional information which is
+        the result of retrieving the content info in level 1.
+
+        Examples:
+        
+        from xmlrpclib import ServerProxy
+        p = ServerProxy('http://manager:xxxxx@myserver.net:8080/cps/portal_remote_controller')
+        metadata = p.getDocumentMetadata('workspaces/folder1')
+        print metadata['contentInfo']
+        print metadata['dublinCore']
+        
+        XXX TODO: If any of the data returned has a written accent the client
+        raises an exception due to malformed xml.
+        """
+        proxy = self._restrictedTraverse(rpath)
+        if not _checkPermission(View, proxy):
+            raise Unauthorized("You need the View permission.")
+
+        utool = getToolByName(self, 'portal_url')
+        contentInfo = proxy.getContentInfo(level=1)
+        
+        ## Complete information for File content type.
+        if contentInfo['type'] == 'File':
+            if contentInfo.has_key('download_url') and contentInfo.has_key('download_mimetype'):
+               contentInfo['download_url'] = ''.join([utool(), '/', contentInfo['download_url']])
+               contentInfo['download_mimetype'] = str(contentInfo['download_mimetype'])
+            
+        ## Avoid to send the proxy as it is unuseful for the client.
+        del contentInfo['doc']
+
+        ## getContentInfo does not gets all metadata information so Dublin Core
+        ## values are picked up too. 
+        tmpDublinCore = proxy.getMetadataHeaders()
+        dublinCore = {}
+        for key, value in tmpDublinCore:
+            stripForMap = (lambda x: x.strip())
+            if key == 'Subject':
+               value = value.split(',')
+               value = map(stripForMap, value)
+            elif key == 'Contributors':
+               value = value.split(';')
+               value = map(stripForMap, value)
+            dublinCore[key] = value
+
+        metadata = {'contentInfo': contentInfo, 'dublinCore': dublinCore}
+
+        return metadata
 
     security.declareProtected(View, 'getDocumentState')
     def getDocumentState(self, rpath):
