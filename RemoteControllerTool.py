@@ -98,8 +98,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
     def _restrictedTraverse(self, path):
         portal = self._getPortalObject()
-        if portal.default_charset != "unicode":
-            path = toLatin9(path)
+        path = toLatin9(path)
         return portal.restrictedTraverse(path)
 
     def _getPortalObject(self):
@@ -754,6 +753,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
         LOG(glog_key, DEBUG, "editOrCreateDocument doc_def = %s" % str(doc_def))
 
+        portal = self._getPortalObject()
         if portal.default_charset != "unicode":
             doc_def = toLatin9(doc_def)
         doc_def = unMarshallDocument(doc_def)
@@ -865,6 +865,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         data dictionary.
         """
         LOG(glog_key, DEBUG, "editDocument doc_def = %s" % str(doc_def))
+        portal = self._getPortalObject()
         if portal.default_charset != "unicode":
             doc_def = toLatin9(doc_def)
         proxy = self._restrictedTraverse(rpath)
@@ -884,6 +885,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         Optional parameter position can be any value >= 0.
         """
         LOG(glog_key, DEBUG, "editOrCreateDocument doc_def = %s" % str(doc_def))
+        portal = self._getPortalObject()
         if portal.default_charset != "unicode":
             doc_def = toLatin9(doc_def)
         try:
@@ -920,6 +922,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         """
         doc = doc_proxy.getEditableContent()
         
+        portal = self._getPortalObject()
         if portal.default_charset != "unicode":
             doc_def = toLatin9(doc_def)
 
