@@ -97,8 +97,9 @@ class RemoteControllerTool(UniqueObject, Folder):
     dav_lock_timeout = '1200';
 
     def _restrictedTraverse(self, path):
-        path = toLatin9(path)
         portal = self._getPortalObject()
+        if portal.default_charset != "unicode":
+            path = toLatin9(path)
         return portal.restrictedTraverse(path)
 
     def _getPortalObject(self):
@@ -753,7 +754,8 @@ class RemoteControllerTool(UniqueObject, Folder):
 
         LOG(glog_key, DEBUG, "editOrCreateDocument doc_def = %s" % str(doc_def))
 
-        doc_def = toLatin9(doc_def)
+        if portal.default_charset != "unicode":
+            doc_def = toLatin9(doc_def)
         doc_def = unMarshallDocument(doc_def)
 
 
@@ -863,7 +865,8 @@ class RemoteControllerTool(UniqueObject, Folder):
         data dictionary.
         """
         LOG(glog_key, DEBUG, "editDocument doc_def = %s" % str(doc_def))
-        doc_def = toLatin9(doc_def)
+        if portal.default_charset != "unicode":
+            doc_def = toLatin9(doc_def)
         proxy = self._restrictedTraverse(rpath)
         if not _checkPermission(ModifyPortalContent, proxy):
             raise Unauthorized("You need the ModifyPortalContent permission.")
@@ -881,7 +884,8 @@ class RemoteControllerTool(UniqueObject, Folder):
         Optional parameter position can be any value >= 0.
         """
         LOG(glog_key, DEBUG, "editOrCreateDocument doc_def = %s" % str(doc_def))
-        doc_def = toLatin9(doc_def)
+        if portal.default_charset != "unicode":
+            doc_def = toLatin9(doc_def)
         try:
             proxy = self._restrictedTraverse(rpath)
             LOG(glog_key, DEBUG, "editOrCreateDocument document DOES exist")
@@ -915,8 +919,9 @@ class RemoteControllerTool(UniqueObject, Folder):
         upload.
         """
         doc = doc_proxy.getEditableContent()
-
-        doc_def = toLatin9(doc_def)
+        
+        if portal.default_charset != "unicode":
+            doc_def = toLatin9(doc_def)
 
         # Getting and processing a potential file
         file = doc_def.get(BINARY_FILE_KEY, None)
