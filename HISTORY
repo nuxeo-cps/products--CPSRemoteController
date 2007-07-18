@@ -1,4 +1,24 @@
 ===========================================================
+Package: CPSRemoteController 1.10.2-rel821095958
+===========================================================
+First release built by: div at: 2007-07-18T16:47:57
+SVN Tag: https://svn.nuxeo.org/pub/CPS3/products/CPSRemoteController/tags/1.10.2-rel821095958
+Build from: https://svn.nuxeo.org/pub/CPS3/products/CPSRemoteController/branches/rel821095958@51923
+
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+-
+Bug fixes
+~~~~~~~~~
+- Fixed unicode problem on creating new documents
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSRemoteController 1.10.1
 ===========================================================
 First release built by: madarche at: 2006-12-04T15:34:29
