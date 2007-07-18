@@ -6,7 +6,7 @@ New features
 -
 Bug fixes
 ~~~~~~~~~
--
+- Fixed unicode problem on creating new documents
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
