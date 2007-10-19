@@ -1,4 +1,25 @@
 ===========================================================
+Package: CPSRemoteController 1.11.0
+===========================================================
+First release built by: madarche at: 2007-10-19T12:23:23
+SVN Tag: https://svn.nuxeo.org/pub/CPS3/products/CPSRemoteController/tags/1.11.0
+Build from: https://svn.nuxeo.org/pub/CPS3/products/CPSRemoteController/trunk@52013
+
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+- Added new method to retrieve metadata of a document.
+
+Bug fixes
+~~~~~~~~~
+-
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSRemoteController 1.10.1
 ===========================================================
 First release built by: madarche at: 2006-12-04T15:34:29
