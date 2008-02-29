@@ -32,7 +32,7 @@ from Products.CPSDefault.tests.CPSTestCase import MANAGER_ID
 
 from Products.CPSRemoteController.RemoteControllerClient import \
     RequestDispatcher, RemoteControllerClient, CPSRemoteControllerClient
-from Products.CPSRemoteController.RemoteControllerTool import toLatin9
+from Products.CPSUtil.text import toLatin9
 
 def randomText(max_len=10):
     import random
