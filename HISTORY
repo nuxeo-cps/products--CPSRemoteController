@@ -1,4 +1,24 @@
 ===========================================================
+Package: CPSRemoteController 1.11.2
+===========================================================
+First release built by: madarche at: 2008-03-19T17:50:03
+SVN Tag: https://svn.nuxeo.org/pub/CPS3/products/CPSRemoteController/tags/1.11.2
+Build from: https://svn.nuxeo.org/pub/CPS3/products/CPSRemoteController/trunk@52678
+
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+-
+Bug fixes
+~~~~~~~~~
+- Fixed typo.
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSRemoteController 1.11.1
 ===========================================================
 First release built by: madarche at: 2008-03-07T18:45:22
