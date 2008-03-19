@@ -94,7 +94,7 @@ class RemoteControllerTool(UniqueObject, Folder):
          'label': 'WebDAV lock timeout(secs): '},
         )
 
-    dav_lock_timeout = '1200';
+    dav_lock_timeout = '1200'
 
     def _restrictedTraverse(self, path):
         path = toLatin9(path)
