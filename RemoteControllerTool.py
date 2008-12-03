@@ -1,4 +1,4 @@
-# (C) Copyright 2005-2006 Nuxeo SAS <http://nuxeo.com>
+# (C) Copyright 2005-2008 Nuxeo SAS <http://nuxeo.com>
 # Authors:
 # M.-A. Darche <madarche@nuxeo.com>
 # Ruslan Spivak <rspivak@nuxeo.com>
@@ -239,13 +239,13 @@ class RemoteControllerTool(UniqueObject, Folder):
         the result of retrieving the content info in level 1.
 
         Examples:
-        
+
         from xmlrpclib import ServerProxy
         p = ServerProxy('http://manager:xxxxx@myserver.net:8080/cps/portal_remote_controller')
         metadata = p.getDocumentMetadata('workspaces/folder1')
         print metadata['contentInfo']
         print metadata['dublinCore']
-        
+
         XXX TODO: If any of the data returned has a written accent the client
         raises an exception due to malformed xml.
         """
@@ -255,18 +255,18 @@ class RemoteControllerTool(UniqueObject, Folder):
 
         utool = getToolByName(self, 'portal_url')
         contentInfo = proxy.getContentInfo(level=1)
-        
+
         ## Complete information for File content type.
         if contentInfo['type'] == 'File':
             if contentInfo.has_key('download_url') and contentInfo.has_key('download_mimetype'):
                contentInfo['download_url'] = ''.join([utool(), '/', contentInfo['download_url']])
                contentInfo['download_mimetype'] = str(contentInfo['download_mimetype'])
-            
+
         ## Avoid to send the proxy as it is unuseful for the client.
         del contentInfo['doc']
 
         ## getContentInfo does not gets all metadata information so Dublin Core
-        ## values are picked up too. 
+        ## values are picked up too.
         tmpDublinCore = proxy.getMetadataHeaders()
         dublinCore = {}
         for key, value in tmpDublinCore:
@@ -811,7 +811,6 @@ class RemoteControllerTool(UniqueObject, Folder):
         doc_def = toLatin9(doc_def)
         doc_def = unMarshallDocument(doc_def)
 
-
         # If no Title is given, the portal_type is used as a fallback title
         doc_title = doc_def.get('Title', portal_type)
 
@@ -819,7 +818,10 @@ class RemoteControllerTool(UniqueObject, Folder):
         # 'write_ignore_storage' option set it the metadata_schema. This is to
         # avoid unwanted effects. So the language has to be set at creation
         # time.
-        doc_language = doc_def.get('Language', 'en')
+        portal = self._getPortalObject()
+        portal_default_language = portal.getDefaultLanguage()
+        LOG(glog_key, DEBUG, "portal_default_language = %s" % portal_default_language)
+        doc_language = doc_def.get('Language', portal_default_language)
         id = folder_proxy.computeId(compute_from=doc_title)
         portal_type = toLatin9(portal_type)
 

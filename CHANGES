@@ -6,7 +6,8 @@ New features
 -
 Bug fixes
 ~~~~~~~~~
--
+- #1942: RemoteControllerTool should create documents with the portal's default
+  language.
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
