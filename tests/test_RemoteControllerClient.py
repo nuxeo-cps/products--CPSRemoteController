@@ -222,28 +222,28 @@ class RemoteControllerClientTC(CPSRemoteControllerTestCase.CPSRemoteControllerTe
         from OFS.Image import File
 
         text = randomText()
-        attached_file_and_link = {'Title': 'ok', 'photo': None, 'Source': '',
-                                  'Language': 'en', 'attachedFile_f2': None,
-                                  'Format': 'text/html',
-                                  'ExpirationDate': None, 'Coverage': '',
-                                  'ModificationDate':
-                                   DateTime('2005/11/29 19:44:00 GMT+1'),
-                                   'preview': None, 'attachedFile_f0': None,
-                                   'attachedFile_f1': 
-                                     File('attachedFile_f1', 
-                                          'thefile.pdf', text),
-                                   'EffectiveDate': None, 'Rights': '',
-                                   'photo_position': '', 'photo_subtitle': '',
-                                   'photo_original': None, 'link_href_f0':
-                                   'http://www.google.com', 'Description': '',
-                                   'Contributors': [u'Manager CPS manager'],
-                                   'link_description_f0': 'Google',
-                                   'link_title_f0': 'Google',
-                                   'Creator': 'manager', 'allow_discussion': 0,
-                                   'Relation': '', 'CreationDate':
-                                   DateTime('2005/11/29 19:40:34 GMT+1'),
-                                   'Subject': []}
-
+        attached_file_and_link = {
+            'Title': 'ok', 'photo': None, 'Source': '',
+            'Language': 'en', 
+            'attachedFile_f2': None,
+            'Format': 'text/html',
+            'ExpirationDate': None, 'Coverage': '',
+            'ModificationDate': DateTime('2005/11/29 19:44:00 GMT+1'),
+            'preview': None, 
+            'attachedFile_f0': None,
+            'attachedFile_f1': File('attachedFile_f1', 'thefile.pdf', text),
+            'EffectiveDate': None, 'Rights': '',
+            'photo_position': '', 'photo_subtitle': '',
+            'photo_original': None, 
+            'link_href_f0': 'http://www.google.com', 'Description': '',
+            'Contributors': [u'Manager CPS manager'],
+            'link_description_f0': 'Google',
+            'link_title_f0': 'Google',
+            'Creator': 'manager', 'allow_discussion': 0,
+            'Relation': '', 
+            'CreationDate': DateTime('2005/11/29 19:40:34 GMT+1'),
+            'Subject': []}
+        
         rpced_doc = self._document_send(attached_file_and_link,
                                         'Flexible').getContent()
         self.assertEquals(rpced_doc.link_href_f0,
