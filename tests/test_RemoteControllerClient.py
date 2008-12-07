@@ -54,7 +54,6 @@ class RemoteControllerClientTC(CPSRemoteControllerTestCase.CPSRemoteControllerTe
         except AttributeError:
             self.ws = self.portal
         self.document_schemas = self.portal.getDocumentSchemas()
-        self.document_types = self.portal.getDocumentTypes()
         self.tool = self.portal.portal_remote_controller
 
     def beforeTearDown(self):
@@ -149,6 +148,7 @@ class RemoteControllerClientTC(CPSRemoteControllerTestCase.CPSRemoteControllerTe
     def test_file_sending(self):
         from StringIO import StringIO
         from ZPublisher.HTTPRequest import FileUpload
+        from OFS.Image import File
 
         # creating doc
         self.ws.invokeFactory('File', 'file1')
@@ -166,19 +166,24 @@ class RemoteControllerClientTC(CPSRemoteControllerTestCase.CPSRemoteControllerTe
                     setattr(self, k, v)
 
         text = randomText()
-        file = StringIO(text)
-        fs = FieldStorage(file=file, headers={"Content-Type": "text/html"},
+        fs = FieldStorage(file=StringIO(text), 
+                          headers={"Content-Type": "text/html"},
             filename="filename")
         fileupload = FileUpload(fs)
         doc = proxy.getContent()
         doc_def = proxy.getTypeInfo().getDataModel(ob=doc)
         doc_def = doc_def.data
-        doc_def['file'] = fileupload
+        # GR: used to be the FileUpload itself, which is not accepted 
+        # any more. After checking CPSFileField.validate 
+        # (not really called, but still a hint) and CPSFileWidget.validate,
+        # got to the conclusion that file dm entries should 
+        # always be OFS.Image.File instances
+        doc_def['file'] = File('file', 'filename', fileupload) 
 
         # sending and checking how the rpc-ed file looks
         rpced_doc = self._document_send(doc_def, proxy.portal_type)
-        file = rpced_doc['file']
-        self.assertEquals(file.read(), text)
+        f = rpced_doc['file']
+        self.assertEquals(str(f), text)
 
     def test_link(self):
         self.ws.invokeFactory('Link', 'link1')
@@ -214,15 +219,19 @@ class RemoteControllerClientTC(CPSRemoteControllerTestCase.CPSRemoteControllerTe
 
     def test_flexibles(self):
         from DateTime import DateTime
+        from OFS.Image import File
 
+        text = randomText()
         attached_file_and_link = {'Title': 'ok', 'photo': None, 'Source': '',
                                   'Language': 'en', 'attachedFile_f2': None,
                                   'Format': 'text/html',
                                   'ExpirationDate': None, 'Coverage': '',
                                   'ModificationDate':
                                    DateTime('2005/11/29 19:44:00 GMT+1'),
-                                   'preview': None, 'attachedFile_f0':
-                                   '', 'attachedFile_f1': '',
+                                   'preview': None, 'attachedFile_f0': None,
+                                   'attachedFile_f1': 
+                                     File('attachedFile_f1', 
+                                          'thefile.pdf', text),
                                    'EffectiveDate': None, 'Rights': '',
                                    'photo_position': '', 'photo_subtitle': '',
                                    'photo_original': None, 'link_href_f0':
@@ -236,9 +245,11 @@ class RemoteControllerClientTC(CPSRemoteControllerTestCase.CPSRemoteControllerTe
                                    'Subject': []}
 
         rpced_doc = self._document_send(attached_file_and_link,
-                                        'Flexible')
-        self.assertEquals(rpced_doc.getContent().link_href_f0,
+                                        'Flexible').getContent()
+        self.assertEquals(rpced_doc.link_href_f0,
                           'http://www.google.com')
+        self.assertEquals(str(rpced_doc.attachedFile_f1), text)
+        self.assertEquals(rpced_doc.attachedFile_f1.title, 'thefile.pdf')
 
 
     def test_newsitems(self):
@@ -252,7 +263,7 @@ class RemoteControllerClientTC(CPSRemoteControllerTestCase.CPSRemoteControllerTe
                             'content_format': 'html', 'ExpirationDate': None,
                             'Coverage': '', 'ModificationDate':
                             DateTime('2005/11/29 22:14:41 GMT+1'), 'preview':
-                            '', 'content_position': 'normal', 'Language':
+                            None, 'content_position': 'normal', 'Language':
                             'en', 'Rights': '', 'photo_position': 'left',
                             'photo_subtitle': '', 'photo_original': '',
                             'link_href_f0': 'http://www.google.com',
