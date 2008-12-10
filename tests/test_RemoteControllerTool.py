@@ -419,8 +419,12 @@ class ProductTestCase(CPSRemoteControllerTestCase):
                            checkin_transition="unlock",
                            comment=comments)
 
-        archived = [d for d in proxy.getArchivedInfos() if d['is_frozen']]
+        info =  proxy.getArchivedInfos()
+        archived = [d for d in info if d['is_archived']]
         self.assertEquals(len(archived), 1)
+
+        frozen = [d for d in info if d['is_frozen']]
+        self.assertEquals(len(frozen), 2)
 
         revs_info = tool.getDocumentArchivedRevisionsInfo(doc_rpath)
         self.assertEquals(len(revs_info), 1)

@@ -376,7 +376,7 @@ class RemoteControllerTool(UniqueObject, Folder):
 
         info = []
         for rev_info in archived:
-            if rev_info['is_frozen']:
+            if rev_info['is_archived']:
                 d = {}
                 rev_number = rev_info['rev']
                 d['rpath'] = '/'.join([rpath,
