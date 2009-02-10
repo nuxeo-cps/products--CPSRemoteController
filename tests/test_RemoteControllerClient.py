@@ -1,7 +1,9 @@
 #!/usr/bin/python
 # -*- encoding: iso-8859-15 -*-
-# Copyright (c) 2005 Nuxeo SARL <http://nuxeo.com>
-# Author : Tarek Ziadé <tz@nuxeo.com>
+# Copyright (c) 2005-2009 Nuxeo SA <http://nuxeo.com>
+# Authors:
+# Tarek Ziadé <tz@nuxeo.com>
+# M.-A. Darche <madarche@nuxeo.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as published
@@ -27,12 +29,14 @@ if __name__ == '__main__':
 
 import unittest
 from Testing import ZopeTestCase
+
 import CPSRemoteControllerTestCase
+from Products.CPSUtil.text import toLatin9
 from Products.CPSDefault.tests.CPSTestCase import MANAGER_ID
+from Products.CPSDocument.tests.document_definitions import getDocumentSchemas
 
 from Products.CPSRemoteController.RemoteControllerClient import \
     RequestDispatcher, RemoteControllerClient, CPSRemoteControllerClient
-from Products.CPSUtil.text import toLatin9
 
 def randomText(max_len=10):
     import random
@@ -53,7 +57,7 @@ class RemoteControllerClientTC(CPSRemoteControllerTestCase.CPSRemoteControllerTe
             self.ws = self.portal.workspaces
         except AttributeError:
             self.ws = self.portal
-        self.document_schemas = self.portal.getDocumentSchemas()
+        self.document_schemas = getDocumentSchemas()
         self.tool = self.portal.portal_remote_controller
 
     def beforeTearDown(self):
