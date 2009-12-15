@@ -1,4 +1,26 @@
 ===========================================================
+Package: CPSRemoteController 1.11.3
+===========================================================
+First release built by: gracinet at: 2009-12-15T12:29:04
+SVN Tag: https://svn.nuxeo.org/pub/CPS3/products/CPSRemoteController/tags/1.11.3
+Build from: https://svn.nuxeo.org/pub/CPS3/products/CPSRemoteController/trunk@54101
+
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+-
+Bug fixes
+~~~~~~~~~
+- #1947: getDocumentArchivedRevisionsInfo returns info for frozen revisions
+- #1942: RemoteControllerTool should create documents with the portal's default
+  language.
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSRemoteController 1.11.2
 ===========================================================
 First release built by: madarche at: 2008-03-19T17:50:03

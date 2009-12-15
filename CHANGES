@@ -6,9 +6,7 @@ New features
 -
 Bug fixes
 ~~~~~~~~~
-- #1947: getDocumentArchivedRevisionsInfo returns info for frozen revisions
-- #1942: RemoteControllerTool should create documents with the portal's default
-  language.
+-
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
