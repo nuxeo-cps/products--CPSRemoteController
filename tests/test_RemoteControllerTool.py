@@ -1,4 +1,3 @@
-# -*- coding: ISO-8859-15 -*-
 # (C) Copyright 2005-2006 Nuxeo SAS <http://nuxeo.com>
 # Authors:
 # M.-A. Darche <madarche@nuxeo.com>
@@ -134,7 +133,7 @@ class ProductTestCase(CPSRemoteControllerTestCase):
         self.assertEquals(len(proxy_list1) + 1, len(proxy_list2))
         self.assert_(doc_rpath in proxy_list2)
 
-        title = "Le rapport de la réunion de lundi matin"
+        title = u"Le rapport de la r\xe9union de lundi matin"
         description = "Encore un rapport ennuyeux"
         language = 'fr'
         data_dict = {'Title': title,
