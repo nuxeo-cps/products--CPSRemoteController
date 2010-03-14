@@ -6,7 +6,7 @@ New features
 -
 Bug fixes
 ~~~~~~~~~
--
+- Switch to mercurial DCVS and hgbundler release manager
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
