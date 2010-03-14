@@ -1,4 +1,21 @@
 ===========================================================
+Package: CPSRemoteController 1.11.4
+===========================================================
+First release built by: gracinet at: 2010-03-14T16:51:51
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+-
+Bug fixes
+~~~~~~~~~
+- Switch to mercurial DCVS and hgbundler release manager
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSRemoteController 1.11.3
 ===========================================================
 First release built by: gracinet at: 2009-12-15T12:29:04
