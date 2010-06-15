@@ -153,7 +153,7 @@ class RemoteControllerTool(UniqueObject, Folder):
         members_directory = self.portal_directories.members
         mtool = getToolByName(self, 'portal_membership')
         proxy = self._restrictedTraverse(rpath)
-        roles_dict, local_roles_blocked = proxy.getCPSLocalRoles()
+        roles_dict, local_roles_blocked = mtool.getCPSLocalRoles(proxy)
         #LOG(glog_key, TRACE, "roles_dict = %s" % roles_dict)
 
         # Get the local roles explicitly associated with this user
