@@ -6,7 +6,7 @@ New features
 -
 Bug fixes
 ~~~~~~~~~
--
+- #2157: fixed test broken by changes in CPSDefault's skins
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
