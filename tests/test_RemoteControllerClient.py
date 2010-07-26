@@ -234,8 +234,8 @@ class RemoteControllerClientTC(CPSRemoteControllerTestCase.CPSRemoteControllerTe
             'ExpirationDate': None, 'Coverage': '',
             'ModificationDate': DateTime('2005/11/29 19:44:00 GMT+1'),
             'preview': None, 
-            'attachedFile_f0': None,
-            'attachedFile_f1': File('attachedFile_f1', 'thefile.pdf', text),
+            'attachedFile_f0': File('attachedFile_f1', 'thefile.pdf', text),
+            'attachedFile_f1': text,
             'EffectiveDate': None, 'Rights': '',
             'photo_position': '', 'photo_subtitle': '',
             'photo_original': None, 
@@ -243,7 +243,7 @@ class RemoteControllerClientTC(CPSRemoteControllerTestCase.CPSRemoteControllerTe
             'Contributors': [u'Manager CPS manager'],
             'link_description_f0': 'Google',
             'link_title_f0': 'Google',
-            'Creator': 'manager', 'allow_discussion': 0,
+            'Creator': 'manager', 'allow_discussion': False,
             'Relation': '', 
             'CreationDate': DateTime('2005/11/29 19:40:34 GMT+1'),
             'Subject': []}
@@ -252,8 +252,8 @@ class RemoteControllerClientTC(CPSRemoteControllerTestCase.CPSRemoteControllerTe
                                         'Flexible').getContent()
         self.assertEquals(rpced_doc.link_href_f0,
                           'http://www.google.com')
-        self.assertEquals(str(rpced_doc.attachedFile_f1), text)
-        self.assertEquals(rpced_doc.attachedFile_f1.title, 'thefile.pdf')
+        self.assertEquals(str(rpced_doc.attachedFile_f0), text)
+        self.assertEquals(rpced_doc.attachedFile_f0.title, 'thefile.pdf')
 
 
     def test_newsitems(self):
@@ -274,7 +274,7 @@ class RemoteControllerClientTC(CPSRemoteControllerTestCase.CPSRemoteControllerTe
                             'Description': '', 'link_description_1_f0': '',
                             'Contributors': [u'admin'], 'link_description_f0':
                             '', 'link_title_f0': 'Google', 'Creator':
-                            'admin', 'allow_discussion': 0, 'Relation': '',
+                            'admin', 'allow_discussion': False, 'Relation': '',
                             'CreationDate': DateTime('2005/11/29 22:08:33 GMT+1'),
                             'Subject': [u'Arts']}
 

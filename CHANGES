@@ -6,7 +6,7 @@ New features
 -
 Bug fixes
 ~~~~~~~~~
--
+- #2178: fixed the tests now that fields validation is being called
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
