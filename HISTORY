@@ -1,4 +1,21 @@
 ===========================================================
+Package: CPSRemoteController 1.11.8
+===========================================================
+First release built by: gracinet at: 2011-09-23T00:28:37
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+-
+Bug fixes
+~~~~~~~~~
+- #2421: put all form buttons in a consistent container
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSRemoteController 1.11.7
 ===========================================================
 First release built by: gracinet at: 2010-12-30T13:05:34
