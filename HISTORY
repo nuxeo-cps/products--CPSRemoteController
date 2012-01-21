@@ -1,4 +1,21 @@
 ===========================================================
+Package: CPSRemoteController 1.13.0
+===========================================================
+First release built by: gracinet at: 2012-01-21T22:23:45
+Requires
+~~~~~~~~
+- Zope 2.10 / CMF 2.1.1
+New features
+~~~~~~~~~~~~
+-
+Bug fixes
+~~~~~~~~~
+-
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSRemoteController 1.12.0-CPS-3.5
 ===========================================================
 First release built by: gracinet at: 2011-11-23T19:59:09
